@@ -5,7 +5,7 @@ import { DrinkPhoto } from "@/components/DrinkPhoto";
 import { GuestMenu } from "@/components/GuestMenu";
 import { VenueFrame } from "@/components/VenueFrame";
 import { worldById } from "@/data/worlds";
-import { pick, t } from "@/lib/i18n";
+import { brandLang, pick, t } from "@/lib/i18n";
 import type { Glass, Ice, Method } from "@/lib/types";
 import { loadVenue, type Search } from "@/lib/venuePage";
 import { menuView } from "@/lib/view";
@@ -65,7 +65,7 @@ export default async function VenuePage({ params, searchParams }: { params: Para
           <header className="wm-head">
             <span className="wm-emblem" aria-hidden />
             <p className="wm-kicker">{pick(v.tagline, lang)}</p>
-            <h1 className="wm-title" lang="en">
+            <h1 className="wm-title" lang={brandLang(v.name)}>
               {v.name}
             </h1>
             <p className="wm-greeting">{pick(w.greeting, lang)}</p>

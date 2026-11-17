@@ -6,6 +6,7 @@ import { useCallback, useEffect, useState } from "react";
 import { HistoryTab } from "@/components/panel/HistoryTab";
 import { MenuTab } from "@/components/panel/MenuTab";
 import { PricesTab } from "@/components/panel/PricesTab";
+import { PrintTab } from "@/components/panel/PrintTab";
 import { SettingsTab } from "@/components/panel/SettingsTab";
 import { worldById } from "@/data/worlds";
 import { loadWorkspace, type Workspace } from "@/lib/panel/db";
@@ -14,6 +15,7 @@ const TABS = [
   ["menu", "Menü"],
   ["fiyat", "Fiyatlar"],
   ["ayar", "Ayarlar"],
+  ["baski", "Basılı menü & QR"],
   ["gecmis", "Fiyat geçmişi"],
 ] as const;
 type Tab = (typeof TABS)[number][0];
@@ -75,6 +77,7 @@ export default function VenueWorkspace() {
       {tab === "menu" && <MenuTab ws={ws} reload={reload} canEdit={canEdit} />}
       {tab === "fiyat" && canEdit && <PricesTab ws={ws} reload={reload} />}
       {tab === "ayar" && canEdit && <SettingsTab ws={ws} reload={reload} />}
+      {tab === "baski" && canEdit && <PrintTab ws={ws} />}
       {tab === "gecmis" && canEdit && <HistoryTab ws={ws} />}
     </div>
   );

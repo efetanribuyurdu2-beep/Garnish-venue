@@ -46,6 +46,7 @@ Next.js 16 (App Router) + React 19 + TypeScript, Supabase (Postgres, Auth, RLS) 
 | `src/app/page.tsx`, `src/components/LandingPhone.tsx` | Product page: live demo menu in a drawn phone (iframe of `/v/demo`, nine world buttons re-dress it), why now (legal timeline), three steps, features, world portals, pilot (`NEXT_PUBLIC_CONTACT_URL`, else "Başvurular yakında") |
 | `src/lib/supabase/browser.ts`, `rows.ts` | Browser Supabase client; database rows ↔ product model (`venueFrom/To`, `itemFrom/To`, `sectionFrom`), shared by guest reads and the panel |
 | `src/app/panel/*`, `src/components/panel/*`, `src/lib/panel/*` | **Bar panel** (Turkish, Maison noir, client-side with the member's session; RLS decides). `/panel/giris` email+password; `/panel` my venues + create (slug check, world); `/panel/[venue]` tabs Menü (sections, starters, order, sold-out toggle) · Fiyatlar (bulk % with rounding + preview via `reprice()`, every price inline) · Ayarlar (identity, world, palette, languages, notes, publish) · Fiyat geçmişi; `/panel/[venue]/icki/[item]` editor (`yeni` = new): start from the Garnish library, recipe rows → live preview (glass, ABV, kcal, allergens, 0% version), extra allergens, photo upload. Staff see only the menu tab and the sold-out toggle |
+| `src/app/yazdir/[venue]/page.tsx`, `qr/page.tsx`, `print.css`, `src/components/PrintBar.tsx`, `src/components/panel/PrintTab.tsx`, `src/lib/qr.ts`, `siteUrl.ts` | **Printed price list** (A4 print page, vector, "Yazdır · PDF kaydet" = `window.print()`): every drink with price and 0% price, full ingredients, ABV, kcal, volume, allergen icons, allergen key, legal notes, "prices valid from <date>", QR to the live menu; world colours or `?kagit=acik` (light paper), `?lang=en`; more than 12 drinks → two tighter columns so a usual menu fits one page. **Table cards** (`/qr?masa=N`, `?numara=yok` for one card without a number): four A6 cards per A4 with cut lines, QR → `/v/<slug>?masa=N`. Both read the published menu; the panel tab "Basılı menü & QR" links to them. Checked by rendering Chromium PDFs and decoding the QR codes (jsQR) |
 | `supabase/migrations/0001_init.sql`, `0002_photos.sql`, `0003_panel.sql` | Schema + RLS (see below); photo column + public `menu-photos` bucket; panel RPCs `create_venue`, `slug_available`, `reprice` |
 | `supabase/setup.sql` | 0001 + 0002 in one file, as the owner pasted it into the production SQL Editor (Nov 2026). Later migrations are pasted one by one |
 
@@ -61,11 +62,13 @@ Next.js 16 (App Router) + React 19 + TypeScript, Supabase (Postgres, Auth, RLS) 
 - Sakura's printed oshinagaki is vertical; the guest menu keeps the paper and hanko but reads across (prices and allergens must be scannable).
 - Glass realism: keep it filter-free (no feGaussianBlur/drop-shadow); light comes from gradients so dozens of glasses per page stay cheap. New glass shape → add a profile to `P` in `glassReal.tsx`.
 - Caps-only display faces (Syncopate, Ruslan Display, Aboreto): numbers with units use the prose face.
-- Turkish uppercase turns i into İ: set `lang="en"` on names that read the same in both languages (`nameLang`).
+- Turkish uppercase turns i into İ: set `lang="en"` on names that read the same in both languages (`nameLang`). A bar's own name uses `brandLang(name)`: Turkish letters → `tr` (GECESİ), otherwise `en` (MAISON).
+- Print: Chrome does not repeat a fixed frame cleanly across printed pages, so the frame is screen-only; the A4 width (794 px) would trip phone media queries, so those are `screen and (…)`.
 - `?world=` previews only work on demo venues; a real bar's world comes from the database.
 
 ## Roadmap
 - **Faz 0**: foundation, schema, demo guest menu, realistic glasses, photos, product page, bar panel. ✔
-- **Next**: production wiring (paste 0003, Vercel env vars, auth URLs; email confirmation off for the pilot or custom SMTP), printed PDF menu (port `menuPdf`/`/api/menu` from the site), table QR codes, staff invitations, a draft preview for unpublished menus.
+- Production wired (Nov 2026): https://garnish-venue.vercel.app, Vercel ↔ Supabase integration, 0003 applied, email sign-in on with confirmation off (pilot).
+- **Next**: staff invitations, a draft preview for unpublished menus, custom SMTP (Resend) before real customers, analytics from `?masa=`.
 - **Pilot**: 3 cocktail bars in İstanbul, free.
 - **Faz 2**: analytics, more languages, "what's your mood" recommendations, bespoke worlds, subscriptions (iyzico). **Faz 3**: ordering / POS integration, Garnish Passport across bars, venue discovery.

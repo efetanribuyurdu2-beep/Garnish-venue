@@ -1,0 +1,140 @@
+/* Printable pages (pr-*): the printed price list and the table cards.
+   On screen: A4 sheets on the desk with a toolbar. On paper: real A4, the world's colours kept
+   (print-color-adjust), or "light paper" to save ink. */
+
+.pr { --pr-acc: var(--accent); --pr-ink: var(--ink); --pr-soft: var(--muted); min-height: 100vh; background: #1a1916; color: var(--pr-ink); font-family: var(--font-body); padding-bottom: 60px; }
+.pr.pr-light { --bg: #ffffff; --surface: #ffffff; --ink: #1d1a16; --muted: #5f574b; --line: rgba(0, 0, 0, 0.18); --pr-acc: color-mix(in srgb, var(--accent) 62%, #000); }
+* { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+/* toolbar: always the panel's own look, whatever the world */
+.pr-bar {
+  --bg: #0b0b0b; --ink: #efe6d2; --muted: #a69d8a; --accent: #c9a961; --line: rgba(201, 169, 97, 0.28); --surface: #151413; --radius: 2px;
+  position: sticky; top: 0; z-index: 10;
+  display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px;
+  padding: 10px 18px; background: #0b0b0b; color: #efe6d2; border-bottom: 1px solid rgba(201, 169, 97, 0.3);
+  font-family: "Jost", system-ui, sans-serif;
+}
+.pr-bar .btn, .pr-bar .chip { font-family: "Jost", system-ui, sans-serif; border-radius: 999px; }
+.pr-back { color: #a69d8a; font-size: 0.85rem; }
+.pr-title { font-family: "Bodoni Moda", Georgia, serif; font-style: italic; font-size: 1.05rem; }
+.pr-opts { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-left: auto; }
+.pr-form { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: #a69d8a; }
+.pr-form .input { width: 74px; padding: 6px 8px; background: #151413; color: #efe6d2; border: 1px solid rgba(201, 169, 97, 0.28); }
+
+/* ───────────── the printed menu */
+.pr-doc {
+  position: relative;
+  width: 210mm; min-height: 297mm; max-width: calc(100% - 24px);
+  margin: 26px auto; padding: 20mm 18mm 16mm;
+  background: var(--bg); color: var(--pr-ink);
+  box-shadow: 0 30px 80px -30px #000;
+  font-size: 9.6pt; line-height: 1.45;
+}
+.pr-frame { position: absolute; inset: 7mm; border: 0.3mm solid color-mix(in srgb, var(--pr-acc) 70%, transparent); pointer-events: none; }
+.pr-frame::after { content: ""; position: absolute; inset: 1.4mm; border: 0.2mm solid color-mix(in srgb, var(--pr-acc) 35%, transparent); }
+.pr-frame .wm-corner { width: 13mm; height: 13mm; }
+.pr-frame .wm-corner.tl { top: -1mm; left: -1mm; } .pr-frame .wm-corner.tr { top: -1mm; right: -1mm; }
+.pr-frame .wm-corner.bl { bottom: -1mm; left: -1mm; } .pr-frame .wm-corner.br { bottom: -1mm; right: -1mm; }
+.pr-light .pr-frame .wm-corner { opacity: 0.85; }
+
+.pr-head { text-align: center; margin-bottom: 7mm; }
+.pr-emblem { display: block; width: 13mm; height: 13mm; margin: 0 auto 3mm; background: var(--emblem) center / contain no-repeat; }
+.pr-kicker { margin: 0 0 1.5mm; font-size: 7.6pt; letter-spacing: 0.32em; text-transform: uppercase; color: var(--pr-acc); }
+.pr-head h1 { margin: 0; font-size: 30pt; line-height: 1.05; color: var(--pr-ink); }
+[data-world="maison"] .pr-head h1 { font-style: italic; }
+.pr-sub { margin: 2mm 0 0; font-family: var(--font-display); font-size: 10pt; letter-spacing: 0.4em; text-transform: uppercase; color: var(--pr-soft); }
+.pr-band { display: block; height: 4mm; margin: 5mm auto 0; width: 70%; background: var(--band) center / auto 100% repeat-x; opacity: 0.85; }
+
+.pr-doc.two .pr-body { column-count: 2; column-gap: 10mm; column-rule: 0.2mm solid color-mix(in srgb, var(--pr-acc) 25%, transparent); }
+.pr-section { margin: 0 0 6mm; }
+.pr-section h2 { display: flex; align-items: center; gap: 3mm; margin: 0 0 3mm; font-size: 11pt; letter-spacing: 0.24em; text-transform: uppercase; color: var(--pr-acc); break-after: avoid; }
+.pr-section h2::before, .pr-section h2::after { content: ""; flex: 1; height: 0.2mm; background: currentColor; opacity: 0.5; }
+.pr-note { margin: -1.5mm 0 3mm; text-align: center; font-family: var(--font-prose, var(--font-display)); font-style: italic; font-size: 8.6pt; color: var(--pr-soft); }
+.pr-item { margin: 0 0 3.2mm; break-inside: avoid; }
+.pr-row { display: grid; grid-template-columns: auto 1fr auto; align-items: baseline; column-gap: 2mm; }
+.pr-name { font-family: var(--font-display); font-size: 12.5pt; letter-spacing: var(--display-spacing); text-transform: var(--display-case); line-height: 1.15; }
+.pr-leader { border-bottom: 0.25mm dotted currentColor; opacity: 0.4; transform: translateY(-1mm); }
+.pr-price { font-family: var(--font-display); font-size: 11pt; color: var(--pr-acc); font-variant-numeric: tabular-nums; white-space: nowrap; text-transform: none; }
+.pr-inside { margin: 0.6mm 0 0; font-size: 8.4pt; color: var(--pr-soft); }
+.pr-inside span { letter-spacing: 0.08em; }
+.pr-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 0 3.4mm; margin: 0.6mm 0 0; font-size: 7.8pt; color: var(--pr-soft); }
+.pr-al { display: inline-flex; gap: 1mm; color: var(--pr-ink); }
+.pr-zero { margin-top: 0.8mm; font-size: 8.6pt; color: var(--pr-soft); }
+.pr-zero .pr-price { font-size: 9.4pt; }
+
+.pr-foot { display: grid; grid-template-columns: 1fr 34mm; gap: 7mm; align-items: end; margin-top: 7mm; padding-top: 4mm; border-top: 0.25mm solid color-mix(in srgb, var(--pr-acc) 45%, transparent); break-inside: avoid; }
+.pr-legend h3 { margin: 0 0 1.5mm; font-size: 7.6pt; letter-spacing: 0.26em; text-transform: uppercase; color: var(--pr-acc); }
+.pr-legend ul { list-style: none; margin: 0 0 2mm; padding: 0; display: flex; flex-wrap: wrap; gap: 0.8mm 4mm; font-size: 8pt; }
+.pr-legend li { display: inline-flex; align-items: center; gap: 1mm; }
+.pr-legend p { margin: 0 0 1mm; font-size: 7.4pt; color: var(--pr-soft); }
+.pr-legal strong { font-weight: 500; color: var(--pr-ink); }
+.pr-qr { display: grid; justify-items: center; gap: 1.5mm; text-align: center; font-size: 6.8pt; color: var(--pr-soft); }
+.pr-qr-code { display: block; width: 30mm; height: 30mm; padding: 1.5mm; background: #fff; border-radius: 1.5mm; }
+.pr-qr-code svg, .pr-card-qr svg { display: block; width: 100%; height: 100%; }
+.pr-house { margin: 5mm 0 0; text-align: center; font-family: var(--font-prose, var(--font-display)); font-style: italic; font-size: 9pt; color: var(--pr-soft); }
+.pr-made { display: flex; align-items: center; justify-content: center; gap: 1.5mm; margin: 3mm 0 0; font-family: var(--font-brand); font-size: 7pt; letter-spacing: 0.24em; color: var(--pr-soft); opacity: 0.8; }
+
+/* ───────────── table cards: four A6 cards on an A4 sheet, with cut lines */
+.pr-sheet {
+  display: grid; grid-template-columns: repeat(2, 105mm); grid-template-rows: repeat(2, 148.5mm);
+  width: 210mm; height: 297mm; margin: 26px auto; background: #fff;
+  box-shadow: 0 30px 80px -30px #000;
+  page: cards;
+}
+.pr-card {
+  position: relative; overflow: hidden; isolation: isolate;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;
+  padding: 10mm 9mm 7mm; background: var(--bg); color: var(--ink);
+  outline: 0.2mm dashed #b8b8b8; outline-offset: -0.1mm;
+}
+.pr-card-wall { position: absolute; inset: 0; z-index: -1; background: var(--wall) center / 34mm auto repeat; opacity: 0.22; -webkit-mask: radial-gradient(70% 55% at 50% 45%, transparent 40%, #000); mask: radial-gradient(70% 55% at 50% 45%, transparent 40%, #000); }
+.pr-card .wm-corner { width: 11mm; height: 11mm; }
+.pr-card .wm-corner.tl { top: 4mm; left: 4mm; } .pr-card .wm-corner.tr { top: 4mm; right: 4mm; }
+.pr-card .wm-corner.bl { bottom: 4mm; left: 4mm; } .pr-card .wm-corner.br { bottom: 4mm; right: 4mm; }
+.pr-card .pr-emblem { width: 11mm; height: 11mm; margin-bottom: 2mm; }
+.pr-card .pr-kicker { font-size: 6.6pt; }
+.pr-card-name { margin: 0 0 4mm; font-family: var(--font-display); font-size: 19pt; line-height: 1.05; letter-spacing: var(--display-spacing); text-transform: var(--display-case); }
+[data-world="maison"] .pr-card-name { font-style: italic; }
+.pr-card-qr { display: block; width: 46mm; height: 46mm; padding: 2.2mm; background: #fff; border-radius: 2mm; box-shadow: 0 0 0 0.4mm var(--accent); }
+.pr-card-call { margin: 4mm 0 0.5mm; font-family: var(--font-display); font-size: 13pt; letter-spacing: 0.3em; text-transform: uppercase; color: var(--accent); }
+.pr-card-call span { opacity: 0.5; }
+.pr-card-hint { margin: 0; font-size: 7.4pt; line-height: 1.4; color: var(--muted); }
+.pr-card-table { margin: 3mm 0 0; font-size: 8pt; letter-spacing: 0.3em; text-transform: uppercase; color: var(--muted); }
+.pr-card-table strong { font-family: var(--font-display); font-size: 15pt; letter-spacing: 0.05em; color: var(--ink); margin-left: 1mm; }
+.pr-card .pr-made { position: absolute; bottom: 5mm; left: 0; right: 0; margin: 0; }
+
+@media screen and (max-width: 820px) {
+  .pr-doc, .pr-sheet { transform-origin: top left; }
+  .pr-doc { width: auto; min-height: 0; padding: 14mm 9mm 10mm; }
+  .pr-doc.two .pr-body { column-count: 1; }
+  .pr-sheet { zoom: 0.44; margin: 14px auto; }
+}
+
+@media print {
+  @page { size: A4; margin: 11mm 10mm; }
+  @page cards { size: A4; margin: 0; }
+  html, body { background: var(--bg) !important; }
+  html.pr-light-root { --bg: #ffffff; background: #fff !important; }
+  .pr-bar { display: none !important; }
+  .pr { background: none; min-height: 0; padding: 0; }
+  .pr-doc { width: auto; max-width: none; min-height: 0; margin: 0; padding: 4mm 6mm 0; box-shadow: none; background: none; }
+  .pr-frame { display: none; }
+  .pr-head { margin-top: 2mm; }
+  .pr-sheet { margin: 0; box-shadow: none; zoom: 1; break-after: page; }
+  .pr-sheet:last-child { break-after: auto; }
+  .pr-cards { background: #fff; }
+}
+
+/* long menus (two columns): a little tighter so a typical bar menu fits one A4 page */
+.pr-doc.two .pr-head { margin-bottom: 5mm; }
+.pr-doc.two .pr-head h1 { font-size: 26pt; }
+.pr-doc.two .pr-emblem { width: 10mm; height: 10mm; margin-bottom: 2mm; }
+.pr-doc.two .pr-band { margin-top: 3.5mm; height: 3.4mm; }
+.pr-doc.two .pr-section { margin-bottom: 4.5mm; }
+.pr-doc.two .pr-item { margin-bottom: 2.4mm; }
+.pr-doc.two .pr-name { font-size: 11.5pt; }
+.pr-doc.two .pr-price { font-size: 10.4pt; }
+.pr-doc.two .pr-inside { font-size: 7.9pt; }
+.pr-doc.two .pr-foot { margin-top: 4mm; grid-template-columns: 1fr 26mm; }
+.pr-doc.two .pr-qr-code { width: 24mm; height: 24mm; }
+.pr-doc.two .pr-house { margin-top: 3mm; }
