@@ -3,8 +3,6 @@
 -- Guests read published menus with the anon key; everything else needs a
 -- signed-in member of the venue. Prices are integers in the smallest unit (kuruş).
 
-create extension if not exists pgcrypto;
-
 -- ───────────────────────────────────────────── venues
 create table public.venues (
   id           uuid primary key default gen_random_uuid(),
@@ -130,7 +128,7 @@ create table public.venue_tables (
   id       uuid primary key default gen_random_uuid(),
   venue_id uuid not null references public.venues on delete cascade,
   label    text not null,
-  token    text not null unique default encode(gen_random_bytes(6), 'hex'),
+  token    text not null unique default substr(md5(random()::text || clock_timestamp()::text), 1, 12),
   unique (venue_id, label)
 );
 
