@@ -4,49 +4,14 @@
  * and their available items, nothing else).
  */
 import { createClient } from "@supabase/supabase-js";
-import type { MenuItem, MenuSection, Venue, VenueMenu } from "@/domain/types";
+import type { VenueMenu } from "@/domain/types";
+import { itemFrom, sectionFrom, venueFrom } from "@/lib/supabase/rows";
 
-const URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+import { SUPABASE_KEY, SUPABASE_URL, supabaseConfigured } from "@/lib/supabase/env";
 
-export const supabaseConfigured = () => Boolean(URL && KEY);
+export { supabaseConfigured };
 
-const client = () => createClient(URL!, KEY!, { auth: { persistSession: false } });
-
-/* eslint-disable @typescript-eslint/no-explicit-any */
-const venueFrom = (r: any): Venue => ({
-  id: r.id,
-  slug: r.slug,
-  name: r.name,
-  tagline: r.tagline,
-  city: r.city,
-  world: r.world,
-  palette: r.palette ?? undefined,
-  currency: r.currency,
-  languages: r.languages,
-  footer: r.footer ?? undefined,
-  serviceNote: r.service_note ?? undefined,
-  instagram: r.instagram ?? undefined,
-});
-const sectionFrom = (r: any): MenuSection => ({ id: r.id, venueId: r.venue_id, title: r.title, note: r.note ?? undefined, position: r.position });
-const itemFrom = (r: any): MenuItem => ({
-  id: r.id,
-  venueId: r.venue_id,
-  sectionId: r.section_id,
-  slug: r.slug,
-  name: r.name,
-  description: r.description,
-  story: r.story ?? undefined,
-  price: r.price,
-  recipe: r.recipe,
-  available: r.available,
-  featured: r.featured,
-  zeroPrice: r.zero_price ?? undefined,
-  extraAllergens: r.extra_allergens ?? [],
-  libraryId: r.library_id ?? undefined,
-  photo: r.photo ?? undefined,
-  position: r.position,
-});
+const client = () => createClient(SUPABASE_URL, SUPABASE_KEY, { auth: { persistSession: false } });
 
 export async function supabaseMenu(slug: string): Promise<VenueMenu | null> {
   const db = client();
