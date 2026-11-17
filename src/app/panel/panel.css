@@ -208,3 +208,9 @@ a.pn-item-main:hover { background: color-mix(in srgb, var(--accent) 7%, transpar
 .pn-small { font-size: 0.78rem; margin-top: 12px; }
 .pn-tables { width: 130px; margin: 0; }
 .pn-url { padding: 9px 12px; border: 1px dashed var(--line); font-size: 0.86rem; word-break: break-all; color: var(--accent); }
+
+/* phones: every tab in view (two rows) instead of a row that hides the last tabs off-screen */
+@media (max-width: 640px) {
+  .pn-tabs { flex-wrap: wrap; overflow: visible; gap: 0; }
+  .pn-tabs button { flex: 1 1 auto; padding: 11px 10px; font-size: 0.72rem; letter-spacing: 0.1em; }
+}
