@@ -7,7 +7,9 @@
 import type { MenuItem, MenuSection, Venue } from "@/domain/types";
 import { supabaseBrowser } from "@/lib/supabase/browser";
 import { itemFrom, itemTo, sectionFrom, venueFrom, venueTo } from "@/lib/supabase/rows";
-import type { L } from "@/lib/types";
+import type { L, WorldId } from "@/lib/types";
+import { describe, suggestedPrice, worldStarter } from "@/repo/demo";
+import { isZeroCocktail } from "@/lib/zero";
 
 export type Role = "owner" | "manager" | "staff";
 export type PanelVenue = Venue & { published: boolean };
@@ -119,4 +121,37 @@ export async function priceHistory(venueId: string, limit = 200): Promise<PriceR
   const rows = must(await db().from("price_history").select("*").eq("venue_id", venueId).order("changed_at", { ascending: false }).limit(limit));
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (rows as any[]).map((r) => ({ id: r.id, itemId: r.item_id, field: r.field, oldPrice: r.old_price, newPrice: r.new_price, at: r.changed_at }));
+}
+
+// ───────────── a new bar starts with its world's menu
+/** Adds the world's own menu (collection, classics, alcohol-free) after what is already there. Returns the number of drinks. */
+export async function seedWorldMenu(venueId: string, world: WorldId, startPosition = 0): Promise<number> {
+  const starter = worldStarter(world);
+  let count = 0;
+  for (const [si, sec] of starter.entries()) {
+    const section = await addSection(venueId, sec.title, startPosition + si);
+    if (sec.note) await saveSection(section.id, { note: sec.note });
+    const rows = sec.drinks.map(({ c, signature }, i) => {
+      const price = suggestedPrice(world, c, signature);
+      return itemTo({
+        venueId,
+        sectionId: section.id,
+        slug: c.id,
+        name: c.name,
+        description: describe(c.parts),
+        story: c.story,
+        price: price * 100,
+        zeroPrice: sec.key === "sig" && !isZeroCocktail(c) && i < 3 ? Math.round((price * 0.62) / 10) * 1000 : undefined,
+        recipe: { parts: c.parts, method: c.method, glass: c.glass, ice: c.ice, garnish: c.garnish },
+        available: true,
+        featured: sec.key === "sig" && i === 0,
+        extraAllergens: [],
+        libraryId: c.id,
+        position: i,
+      });
+    });
+    must(await db().from("menu_items").insert(rows));
+    count += rows.length;
+  }
+  return count;
 }

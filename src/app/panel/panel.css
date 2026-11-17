@@ -214,3 +214,14 @@ a.pn-item-main:hover { background: color-mix(in srgb, var(--accent) 7%, transpar
   .pn-tabs { flex-wrap: wrap; overflow: visible; gap: 0; }
   .pn-tabs button { flex: 1 1 auto; padding: 11px 10px; font-size: 0.72rem; letter-spacing: 0.1em; }
 }
+
+/* start with the world's menu */
+.pn-choice { display: grid; gap: 8px; }
+.pn-option { display: flex; align-items: flex-start; gap: 12px; padding: 14px 16px; border: 1px solid var(--line); cursor: pointer; transition: border-color 0.2s, background 0.2s; }
+.pn-option input { margin-top: 4px; width: 18px; height: 18px; accent-color: var(--accent); }
+.pn-option span { display: grid; gap: 2px; }
+.pn-option strong { font-weight: 500; }
+.pn-option small { color: var(--muted); font-size: 0.82rem; }
+.pn-option.on { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 8%, transparent); }
+.pn-seed { border-color: var(--accent); background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 9%, var(--surface)), var(--surface)); }
+.pn-seed p { color: var(--muted); }

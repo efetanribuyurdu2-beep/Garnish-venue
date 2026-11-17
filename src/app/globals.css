@@ -587,3 +587,27 @@
 .lp-cta-center { justify-content: center; }
 .lp-foot-login { margin-top: 10px; color: var(--accent); font-size: 0.9rem; }
 @media (max-width: 420px) { .lp-nav-brand span { display: none; } }
+
+/* ─────────────────────────────── world menu language in the guest menu */
+.gm-eyebrow { display: flex; align-items: baseline; gap: 10px; min-height: 0; margin-bottom: 2px; }
+.gm-eyebrow .gm-chosen { margin: 0; }
+.gm .gm-mark { font-size: 0.72rem; line-height: 1.3; letter-spacing: 0.12em; white-space: nowrap; text-transform: none; opacity: 0.9; }
+.wmenu-anatolia .gm .gm-mark, .wmenu-alchemist .gm .gm-mark, .wmenu-sakura .gm .gm-mark { font-size: 1rem; letter-spacing: 0.04em; }
+.wmenu-maison .gm .gm-mark { letter-spacing: 0.16em; }
+.gm-section-title.wm-section-title { margin-bottom: 6px; }
+.gm-marknote { margin: 18px 0 0; text-align: center; font-size: 0.74rem; color: var(--wm-soft); font-style: italic; }
+
+/* Sakura: the drink's Japanese name standing top to bottom beside it, as on an oshinagaki */
+.gm-link.has-ja { grid-template-columns: 22px 56px minmax(0, 1fr); }
+.gm-item.featured .gm-link.has-ja { grid-template-columns: 26px 96px minmax(0, 1fr); }
+.gm-ja { writing-mode: vertical-rl; font-family: var(--font-display); font-size: 0.98rem; line-height: 1.05; letter-spacing: 0.08em; color: var(--wm-rule); align-self: center; max-height: 9.5em; overflow: hidden; }
+.gm-ja .tcy { text-combine-upright: all; }
+.gm-ja-title { font-family: var(--font-display); font-size: 1.1rem; letter-spacing: 0.3em; margin-right: 6px; }
+.wmenu-sakura .gm-section-title { justify-content: center; }
+@media (max-width: 720px) {
+  .gm-item.featured .gm-link.has-ja { grid-template-columns: 22px 76px minmax(0, 1fr); }
+}
+/* long names wrap instead of pushing the price off the card */
+.gm-row { grid-template-columns: minmax(0, auto) minmax(14px, 1fr) auto; }
+.gm-name { min-width: 0; overflow-wrap: anywhere; }
+.gm-ja { max-height: none; }

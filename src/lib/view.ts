@@ -3,13 +3,14 @@
  * menu. All the drink maths runs here on the server, so the ingredient
  * catalogue never ships to the guest's phone.
  */
-import { GARNISHES } from "@/data/cocktails";
+import { GARNISHES, cocktailById } from "@/data/cocktails";
 import { ingredientById } from "@/data/ingredients";
 import type { MenuItem, VenueMenu } from "@/domain/types";
 import { allergenById } from "./allergens";
 import { factsOf, zeroRecipe, type Facts } from "./facts";
 import { money, nameLang, percent, pick } from "./i18n";
-import type { Lang } from "./types";
+import type { Lang, WorldId } from "./types";
+import { JA, MARK } from "./worldMenu";
 
 export interface ItemView {
   id: string;
@@ -24,6 +25,8 @@ export interface ItemView {
   abv: string; // formatted for the language
   kcal: number;
   allergens: { id: string; name: string; mark: string }[];
+  mark: string; // the world's mark: No. I, ٣, 一, ☿, ❄ 14°, 86 proof…
+  ja?: string; // Japanese name, for Sakura's oshinagaki
   /** what the server needs to draw the glass thumbnail */
   glass: { glass: string; color: string; opaque: boolean; ice: string; method: string; garnish: string };
 }
@@ -41,9 +44,12 @@ const allergenViews = (f: Facts, lang: Lang) =>
     return { id, name: pick(a.name, lang), mark: a.mark };
   });
 
-export function itemView(it: MenuItem, currency: string, lang: Lang): ItemView {
+export function itemView(it: MenuItem, currency: string, lang: Lang, world: WorldId = "maison", index = 0): ItemView {
   const f = factsOf(it.recipe, it.extraAllergens);
+  const lib = it.libraryId ? cocktailById(it.libraryId) : undefined;
   return {
+    mark: MARK[world]({ index, id: it.id, abv: f.abv, year: lib?.year, root: lib?.root }),
+    ja: world === "sakura" && it.libraryId ? JA[it.libraryId] : undefined,
     id: it.id,
     slug: it.slug,
     name: pick(it.name, lang),
@@ -60,7 +66,8 @@ export function itemView(it: MenuItem, currency: string, lang: Lang): ItemView {
   };
 }
 
-export function menuView(m: VenueMenu, lang: Lang): SectionView[] {
+export function menuView(m: VenueMenu, lang: Lang, world: WorldId = m.venue.world): SectionView[] {
+  let index = 0;
   return [...m.sections]
     .sort((a, b) => a.position - b.position)
     .map((s) => ({
@@ -70,7 +77,7 @@ export function menuView(m: VenueMenu, lang: Lang): SectionView[] {
       items: m.items
         .filter((i) => i.sectionId === s.id && i.available)
         .sort((a, b) => a.position - b.position)
-        .map((i) => itemView(i, m.venue.currency, lang)),
+        .map((i) => itemView(i, m.venue.currency, lang, world, index++)),
     }))
     .filter((s) => s.items.length > 0);
 }

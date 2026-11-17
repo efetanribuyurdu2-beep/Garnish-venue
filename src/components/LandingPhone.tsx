@@ -3,9 +3,9 @@
 import { useState } from "react";
 
 /**
- * A phone on the product page with the live demo menu inside (an iframe of
- * /v/demo), and the nine worlds under it: tapping one re-dresses the same
- * menu in front of the visitor.
+ * A phone on the product page with a live menu inside (an iframe of
+ * /v/demo?world=…), and the nine worlds under it: tapping one opens that
+ * world's own bar and menu.
  */
 export function LandingPhone({ worlds }: { worlds: { id: string; name: string }[] }) {
   const [world, setWorld] = useState("maison");

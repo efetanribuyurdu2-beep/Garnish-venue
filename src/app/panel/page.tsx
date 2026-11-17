@@ -4,7 +4,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { WORLDS } from "@/data/worlds";
-import { createVenue, myVenues, slugAvailable, type PanelVenue, type Role } from "@/lib/panel/db";
+import { createVenue, myVenues, seedWorldMenu, slugAvailable, type PanelVenue, type Role } from "@/lib/panel/db";
+import type { WorldId } from "@/lib/types";
 import { slugify } from "@/lib/panel/labels";
 
 const ROLE: Record<Role, string> = { owner: "Sahip", manager: "Yönetici", staff: "Personel" };
@@ -16,7 +17,8 @@ export default function PanelHome() {
   const [slug, setSlug] = useState("");
   const [slugTouched, setSlugTouched] = useState(false);
   const [city, setCity] = useState("İstanbul");
-  const [world, setWorld] = useState("maison");
+  const [world, setWorld] = useState<WorldId>("maison");
+  const [starter, setStarter] = useState(true);
   const [free, setFree] = useState<boolean | null>(null);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
@@ -38,6 +40,7 @@ export default function PanelHome() {
     setErr("");
     try {
       const v = await createVenue(s, name.trim(), city.trim(), world);
+      if (starter) await seedWorldMenu(v.id, world);
       router.push(`/panel/${v.id}`);
     } catch (e) {
       setErr((e as Error).message.includes("duplicate") ? "Bu adres alınmış, başka bir tane deneyin." : (e as Error).message);
@@ -109,9 +112,30 @@ export default function PanelHome() {
               ))}
             </div>
           </fieldset>
+          <fieldset className="pn-field">
+            <span>Menü</span>
+            <div className="pn-choice">
+              <label className={`pn-option${starter ? " on" : ""}`}>
+                <input type="radio" name="starter" checked={starter} onChange={() => setStarter(true)} />
+                <span>
+                  <strong>{WORLDS.find((w) => w.id === world)?.bar.tr} menüsüyle başla</strong>
+                  <small>
+                    {WORLDS.find((w) => w.id === world)?.collection.tr}, klasikler ve alkolsüzler önerilen fiyatlarla gelir; dilediğinizi değiştirir, silersiniz.
+                  </small>
+                </span>
+              </label>
+              <label className={`pn-option${!starter ? " on" : ""}`}>
+                <input type="radio" name="starter" checked={!starter} onChange={() => setStarter(false)} />
+                <span>
+                  <strong>Boş menü</strong>
+                  <small>Bölümleri ve içkileri kendiniz eklersiniz.</small>
+                </span>
+              </label>
+            </div>
+          </fieldset>
           {err && <p className="pn-msg err">{err}</p>}
           <button className="btn" disabled={busy || free === false || s.length < 2 || !name.trim()}>
-            {busy ? "Oluşturuluyor…" : "Barı oluştur"}
+            {busy ? (starter ? "Bar ve menü hazırlanıyor…" : "Oluşturuluyor…") : "Barı oluştur"}
           </button>
         </form>
       </section>

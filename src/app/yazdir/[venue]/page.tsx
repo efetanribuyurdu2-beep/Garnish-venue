@@ -9,6 +9,7 @@ import { factsOf, zeroRecipe } from "@/lib/facts";
 import { brandLang, money, percent, pick } from "@/lib/i18n";
 import { allergenById } from "@/lib/allergens";
 import { qrSvg } from "@/lib/qr";
+import { HEAD } from "@/lib/worldMenu";
 import { siteOrigin } from "@/lib/siteUrl";
 import type { Lang } from "@/lib/types";
 import { getVenueMenu } from "@/repo";
@@ -98,7 +99,9 @@ export default async function PrintedMenu({ params, searchParams }: { params: Pa
         </span>
         <header className="pr-head">
           <span className="pr-emblem" aria-hidden />
-          {pick(v.tagline, lang) && <p className="pr-kicker">{pick(v.tagline, lang)}</p>}
+          <p className="pr-kicker" lang={brandLang(pick(v.tagline, lang) || pick(HEAD[v.world].kicker, lang))}>
+            {pick(v.tagline, lang) || pick(HEAD[v.world].kicker, lang)}
+          </p>
           <h1 lang={brandLang(v.name)}>{v.name}</h1>
           <p className="pr-sub">{t.menu}</p>
           <span className="pr-band" aria-hidden />
@@ -173,7 +176,7 @@ export default async function PrintedMenu({ params, searchParams }: { params: Pa
             <span>{t.online}</span>
           </div>
         </footer>
-        {v.footer && <p className="pr-house">{pick(v.footer, lang)}</p>}
+        <p className="pr-house">{pick(v.footer, lang) || pick(HEAD[v.world].foot, lang)}</p>
         <p className="pr-made">
           <LogoMark size={14} /> Garnish
         </p>
