@@ -1,10 +1,11 @@
 -- Garnish Venue · functions the bar panel calls
+-- Safe to run more than once (create or replace).
 -- create_venue: makes a venue and its owner in one step (returns the new row)
 -- slug_available: is /v/<slug> still free?
 -- reprice: bulk price change by a percentage, rounded to a step (e.g. 10 TL);
 --          every change still lands in price_history through the trigger
 
-create function public.create_venue(p_slug text, p_name text, p_city text, p_world text)
+create or replace function public.create_venue(p_slug text, p_name text, p_city text, p_world text)
 returns public.venues
 language plpgsql security definer set search_path = public as $$
 declare v public.venues;
@@ -22,13 +23,13 @@ end $$;
 revoke execute on function public.create_venue(text, text, text, text) from public, anon;
 grant execute on function public.create_venue(text, text, text, text) to authenticated;
 
-create function public.slug_available(p_slug text) returns boolean
+create or replace function public.slug_available(p_slug text) returns boolean
 language sql stable security definer set search_path = public as $$
   select not exists (select 1 from public.venues where slug = lower(p_slug));
 $$;
 grant execute on function public.slug_available(text) to anon, authenticated;
 
-create function public.reprice(p_venue uuid, p_percent numeric, p_step int default 1000,
+create or replace function public.reprice(p_venue uuid, p_percent numeric, p_step int default 1000,
                                p_section uuid default null, p_include_zero boolean default true)
 returns int
 language plpgsql security definer set search_path = public as $$
