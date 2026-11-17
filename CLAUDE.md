@@ -43,6 +43,7 @@ Next.js 16 (App Router) + React 19 + TypeScript, Supabase (Postgres, Auth, RLS) 
 | `src/app/v/[venue]/page.tsx`, `[item]/page.tsx`, `layout.tsx`, `@modal/(.)[item]` | Guest menu; a drink opened from the menu is intercepted into the `@modal` slot (sheet, back = close, scroll kept); opened directly it is the full `[item]` page |
 | `src/components/DrinkPhoto.tsx`, `src/lib/photos.ts`, `src/lib/photoUpload.ts` | Drink photographs: `MenuItem.photo` is shown instead of the glass (list thumb + drink page, credit for stock). `uploadDrinkPhoto()` shrinks in the browser (WebP ≤ 1600 px, average colour) and uploads to `menu-photos/<venue_id>/` |
 | `src/data/stockPhotos.ts` | Credited Unsplash photos copied from the site's Cocktail Book; only the demo venue Maison Noire uses them (Sirkeci shows the drawings) |
+| `src/app/page.tsx`, `src/components/LandingPhone.tsx` | Product page: live demo menu in a drawn phone (iframe of `/v/demo`, nine world buttons re-dress it), why now (legal timeline), three steps, features, world portals, pilot (`NEXT_PUBLIC_CONTACT_URL`, else "Başvurular yakında") |
 | `src/lib/supabase/browser.ts` | Browser Supabase client for the panel |
 | `supabase/migrations/0001_init.sql`, `0002_photos.sql` | Schema + RLS (see below); photo column + public `menu-photos` bucket (owners/managers write only their venue's folder) |
 
