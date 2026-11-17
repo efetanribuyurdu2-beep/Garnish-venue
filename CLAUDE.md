@@ -35,9 +35,12 @@ Next.js 16 (App Router) + React 19 + TypeScript, Supabase (Postgres, Auth, RLS) 
 | `src/lib/i18n.ts` | `pick`, `t`, `money` (Intl, kuruş), `percent` (%14,8 in TR), `nameLang` |
 | `src/lib/venuePage.ts` | Loads a venue for a guest page: language (`?lang=`), world preview (`?world=`, demo venues only) |
 | `src/repo/` | Where menus come from: `demo.ts` (Maison Noire `/v/demo`, Sirkeci Meyhanesi `/v/sirkeci`, built from the catalogue), `supabase.ts` (published venues, anon key), `index.ts` chooses |
-| `src/components/GuestMenu.tsx` | The only client component: filters (0% only, leave out an allergen), large-text mode (remembered in localStorage) |
+| `src/components/glassReal.tsx` | **Photographic glassware** (`GlassReal`): each glass is a turned profile (y, radius) → wall thickness, the drink lit as a cylinder, surface ellipse, meniscus, coloured caustic on the counter, real ice (cube/sphere/collins/crushed), bubbles, foam, condensation, Fresnel edges and reflections; world craft etched on top (`Craft`). Covers martini, coupe, Nick&Nora, flute, wine, rocks, highball, copper mug, tiki mug; other vessels fall back to the core `GlassSvg`. No filters, hook-free, server-rendered. Use it everywhere a drink is shown |
+| `src/components/GuestMenu.tsx` | Client: sticky bar (section tabs with scroll-spy + "Tercihler"), drinks with server-drawn glass thumbnails (`thumbs` prop), bartender's choice card (`featured`), preferences `<dialog>` sheet (0% only, leave out allergens, large text in localStorage), active-filter pills |
+| `src/components/AllergenIcon.tsx` | 14 hand-drawn allergen marks (line icons, currentColor) used in the list, sheet, legend and item page |
+| `src/components/ItemDetail.tsx`, `VersionSwitch.tsx`, `ItemSheet.tsx` | A drink: shared body (glass, taste radar, story, label strip), Original/0% switch (client), and the sheet it opens in over the menu |
 | `src/components/VenueFrame.tsx`, `Radar.tsx` | World wrapper (`data-world` on a div, wall, language switch, legal notes, "Made with Garnish"); server taste radar |
-| `src/app/v/[venue]/page.tsx`, `[item]/page.tsx` | Guest menu and item page (dynamic, server-rendered) |
+| `src/app/v/[venue]/page.tsx`, `[item]/page.tsx`, `layout.tsx`, `@modal/(.)[item]` | Guest menu; a drink opened from the menu is intercepted into the `@modal` slot (sheet, back = close, scroll kept); opened directly it is the full `[item]` page |
 | `supabase/migrations/0001_init.sql` | Schema + RLS (see below) |
 
 ## Database (supabase/migrations/0001_init.sql)
@@ -49,6 +52,7 @@ Next.js 16 (App Router) + React 19 + TypeScript, Supabase (Postgres, Auth, RLS) 
 - Calories and alcohol are **estimates** from the recipe and are always shown with "≈" and the footer note; allergens are a starting point the bar confirms. Never present them as lab values.
 - The legal footer ("printed menu available from staff", VAT note) is on every guest page.
 - Sakura's printed oshinagaki is vertical; the guest menu keeps the paper and hanko but reads across (prices and allergens must be scannable).
+- Glass realism: keep it filter-free (no feGaussianBlur/drop-shadow); light comes from gradients so dozens of glasses per page stay cheap. New glass shape → add a profile to `P` in `glassReal.tsx`.
 - Caps-only display faces (Syncopate, Ruslan Display, Aboreto): numbers with units use the prose face.
 - Turkish uppercase turns i into İ: set `lang="en"` on names that read the same in both languages (`nameLang`).
 - `?world=` previews only work on demo venues; a real bar's world comes from the database.

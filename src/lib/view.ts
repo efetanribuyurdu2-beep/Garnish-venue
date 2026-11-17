@@ -24,6 +24,8 @@ export interface ItemView {
   abv: string; // formatted for the language
   kcal: number;
   allergens: { id: string; name: string; mark: string }[];
+  /** what the server needs to draw the glass thumbnail */
+  glass: { glass: string; color: string; opaque: boolean; ice: string; method: string; garnish: string };
 }
 
 export interface SectionView {
@@ -54,6 +56,7 @@ export function itemView(it: MenuItem, currency: string, lang: Lang): ItemView {
     abv: percent(f.abv, lang, 0),
     kcal: f.kcal,
     allergens: allergenViews(f, lang),
+    glass: { glass: it.recipe.glass, color: f.color, opaque: f.opaque, ice: it.recipe.ice, method: it.recipe.method, garnish: it.recipe.garnish },
   };
 }
 

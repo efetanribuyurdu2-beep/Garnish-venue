@@ -17,6 +17,7 @@ export interface Facts {
   allergens: AllergenId[];
   zero: boolean; // no alcoholic ingredient
   color: string;
+  opaque: boolean;
   profile: ReturnType<typeof analyse>["profile"];
 }
 
@@ -30,6 +31,7 @@ export function factsOf(r: Recipe, extra: string[] = []): Facts {
     allergens: allergensOf(r.parts, r.garnish, extra),
     zero: r.parts.every((p) => !isAlcoholic(p.id)),
     color: a.color,
+    opaque: a.opaque,
     profile: a.profile,
   };
 }
