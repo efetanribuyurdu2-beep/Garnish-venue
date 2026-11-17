@@ -578,3 +578,12 @@
   .gi-photo { order: 0; width: calc(100% + 2 * var(--pad, 20px)); max-width: none; margin: -8px calc(-1 * var(--pad, 20px)) 18px; aspect-ratio: 4 / 3.6 !important; border-radius: 0; box-shadow: none; }
 }
 .gi-card { --pad: clamp(20px, 5vw, 72px); }
+
+/* product page: the way into the bar panel, always in reach */
+.lp-nav { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px clamp(16px, 4vw, 40px); background: color-mix(in srgb, var(--bg) 88%, transparent); border-bottom: 1px solid var(--line); backdrop-filter: blur(8px); }
+.lp-nav-brand { display: inline-flex; align-items: center; gap: 10px; color: var(--accent); font-family: var(--font-brand); letter-spacing: 0.32em; font-size: 0.8rem; }
+.lp-nav-login { border-radius: 999px; }
+.lp-hero { padding-top: 40px; }
+.lp-cta-center { justify-content: center; }
+.lp-foot-login { margin-top: 10px; color: var(--accent); font-size: 0.9rem; }
+@media (max-width: 420px) { .lp-nav-brand span { display: none; } }
