@@ -44,13 +44,16 @@ Next.js 16 (App Router) + React 19 + TypeScript, Supabase (Postgres, Auth, RLS) 
 | `src/components/DrinkPhoto.tsx`, `src/lib/photos.ts`, `src/lib/photoUpload.ts` | Drink photographs: `MenuItem.photo` is shown instead of the glass (list thumb + drink page, credit for stock). `uploadDrinkPhoto()` shrinks in the browser (WebP ≤ 1600 px, average colour) and uploads to `menu-photos/<venue_id>/` |
 | `src/data/stockPhotos.ts` | Credited Unsplash photos copied from the site's Cocktail Book; only the demo venue Maison Noire uses them (Sirkeci shows the drawings) |
 | `src/app/page.tsx`, `src/components/LandingPhone.tsx` | Product page: live demo menu in a drawn phone (iframe of `/v/demo`, nine world buttons re-dress it), why now (legal timeline), three steps, features, world portals, pilot (`NEXT_PUBLIC_CONTACT_URL`, else "Başvurular yakında") |
-| `src/lib/supabase/browser.ts` | Browser Supabase client for the panel |
-| `supabase/migrations/0001_init.sql`, `0002_photos.sql` | Schema + RLS (see below); photo column + public `menu-photos` bucket (owners/managers write only their venue's folder) |
+| `src/lib/supabase/browser.ts`, `rows.ts` | Browser Supabase client; database rows ↔ product model (`venueFrom/To`, `itemFrom/To`, `sectionFrom`), shared by guest reads and the panel |
+| `src/app/panel/*`, `src/components/panel/*`, `src/lib/panel/*` | **Bar panel** (Turkish, Maison noir, client-side with the member's session; RLS decides). `/panel/giris` email+password; `/panel` my venues + create (slug check, world); `/panel/[venue]` tabs Menü (sections, starters, order, sold-out toggle) · Fiyatlar (bulk % with rounding + preview via `reprice()`, every price inline) · Ayarlar (identity, world, palette, languages, notes, publish) · Fiyat geçmişi; `/panel/[venue]/icki/[item]` editor (`yeni` = new): start from the Garnish library, recipe rows → live preview (glass, ABV, kcal, allergens, 0% version), extra allergens, photo upload. Staff see only the menu tab and the sold-out toggle |
+| `supabase/migrations/0001_init.sql`, `0002_photos.sql`, `0003_panel.sql` | Schema + RLS (see below); photo column + public `menu-photos` bucket; panel RPCs `create_venue`, `slug_available`, `reprice` |
+| `supabase/setup.sql` | 0001 + 0002 in one file, as the owner pasted it into the production SQL Editor (Nov 2026). Later migrations are pasted one by one |
 
 ## Database (supabase/migrations/0001_init.sql)
 - `venues` (slug, world, palette, currency, languages, `published`), `venue_members` (owner/manager/staff), `menu_sections`, `menu_items` (`price`/`zero_price` int kuruş, `recipe` jsonb, `extra_allergens`), `price_history`, `venue_tables` (QR token per table).
 - RLS: guests (anon) read published venues and their available items only. Owners/managers write. Staff can only mark items sold out, through `set_item_available()`. `price_history` is append-only, written by a trigger on every price change (proof for inspections). Creating a venue makes you its owner (trigger).
-- Tested locally against Postgres 16 with stand-ins for `auth.uid()` and the anon/authenticated roles (start one with `initdb` under `/var/tmp` as user postgres).
+- Production: Supabase project `baqwlixdkgsvanhzrowi` (West EU, Ireland). There is no management token in the session: the owner applies migrations by pasting the file into **SQL Editor → Run**. Applied: `setup.sql` (0001+0002). Keep new migrations self-contained and idempotent-safe to paste.
+- **Local Supabase for development** (`supabase/config.toml`, CLI in `/var/tmp/sbcli`, `npm i supabase`): start Docker with `dockerd &`; public.ecr.aws and Docker Hub are blocked or rate-limited here, so pull the images the CLI wants from `mirror.gcr.io/<image>` and `docker tag` them as `docker.io/<image>`; the kernel has no IPv6, so Realtime cannot start: build a stub `docker.io/supabase/realtime:<tag>` whose `/app/bin/*` scripts exit 0. Then `SUPABASE_INTERNAL_IMAGE_REGISTRY=docker.io supabase start -x studio,imgproxy,vector,logflare,edge-runtime,supavisor,postgres-meta,realtime`, put the printed URL and anon key in `.env.local`, build, and drive the panel with Playwright (sign-up needs no email locally).
 
 ## Decisions & gotchas
 - Calories and alcohol are **estimates** from the recipe and are always shown with "≈" and the footer note; allergens are a starting point the bar confirms. Never present them as lab values.
@@ -62,7 +65,7 @@ Next.js 16 (App Router) + React 19 + TypeScript, Supabase (Postgres, Auth, RLS) 
 - `?world=` previews only work on demo venues; a real bar's world comes from the database.
 
 ## Roadmap
-- **Faz 0 (now)**: foundation, schema, demo guest menu. ✔ first pass
-- **Next**: connect Supabase (env + run the migration), seed the demo into it, sign-in, bar panel (menu editor with recipe → automatic allergens/kcal, bulk price change, sold out, price history), printed PDF menu (port `menuPdf`/`/api/menu` from the site), table QR codes.
+- **Faz 0**: foundation, schema, demo guest menu, realistic glasses, photos, product page, bar panel. ✔
+- **Next**: production wiring (paste 0003, Vercel env vars, auth URLs; email confirmation off for the pilot or custom SMTP), printed PDF menu (port `menuPdf`/`/api/menu` from the site), table QR codes, staff invitations, a draft preview for unpublished menus.
 - **Pilot**: 3 cocktail bars in İstanbul, free.
 - **Faz 2**: analytics, more languages, "what's your mood" recommendations, bespoke worlds, subscriptions (iyzico). **Faz 3**: ordering / POS integration, Garnish Passport across bars, venue discovery.
