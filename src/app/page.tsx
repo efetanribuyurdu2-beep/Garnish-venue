@@ -33,6 +33,15 @@ export default function Home() {
   const worlds = WORLDS.map((w) => ({ id: w.id, name: w.name.tr }));
   return (
     <main className="lp">
+      <nav className="lp-nav">
+        <Link href="/" className="lp-nav-brand" aria-label="Garnish Venue">
+          <LogoMark size={28} />
+          <span>GARNISH · VENUE</span>
+        </Link>
+        <Link href="/panel" className="btn ghost small lp-nav-login">
+          Bar girişi
+        </Link>
+      </nav>
       <section className="lp-hero">
         <div className="lp-hero-text">
           <span className="lp-mark">
@@ -44,8 +53,8 @@ export default function Home() {
             Kokteyl barları için lüks ve etkileşimli QR menü. Misafiriniz bir PDF değil, barınızın kendisini görür. Alerjen ve kalori reçeteden gelir, fiyatlar tek tıkla değişir.
           </p>
           <div className="lp-cta">
-            <Link className="btn" href="/v/demo">Demo menüyü aç</Link>
-            <a className="btn ghost" href="#pilot">Pilot programı</a>
+            <Link className="btn" href="/panel">Barınızın menüsünü oluşturun</Link>
+            <Link className="btn ghost" href="/v/demo">Demo menüyü aç</Link>
           </div>
           <p className="lp-hint">Telefondaki menü gerçek demo menüdür: kaydırın, bir içkiye dokunun, dünyayı değiştirin.</p>
         </div>
@@ -120,18 +129,24 @@ export default function Home() {
         <p className="lp-eyebrow">Pilot programı</p>
         <h2>İlk üç bar için ücretsiz kurulum.</h2>
         <p>Menünüzü biz girelim, dünyanızı birlikte seçelim, fotoğraflarınızı ekleyelim. Karşılığında yalnızca dürüst geri bildiriminizi istiyoruz.</p>
-        {CONTACT ? (
-          <a className="btn" href={CONTACT} target="_blank" rel="noreferrer">
-            Başvurun
-          </a>
-        ) : (
-          <span className="btn ghost lp-soon">Başvurular yakında</span>
-        )}
+        <div className="lp-cta lp-cta-center">
+          <Link className="btn" href="/panel">
+            Hemen deneyin
+          </Link>
+          {CONTACT && (
+            <a className="btn ghost" href={CONTACT} target="_blank" rel="noreferrer">
+              Bize yazın
+            </a>
+          )}
+        </div>
       </section>
 
       <footer className="lp-foot">
         <LogoMark size={28} />
         <p>Garnish Venue · İstanbul</p>
+        <Link href="/panel" className="lp-foot-login">
+          Bar girişi →
+        </Link>
       </footer>
     </main>
   );
