@@ -5,8 +5,9 @@ import { usePathname, useRouter } from "next/navigation";
 import { createContext, useContext, useEffect, useState } from "react";
 import { LogoMark } from "@/components/Logo";
 import { db, signOut } from "@/lib/panel/db";
+import { supabaseConfigured } from "@/lib/supabase/env";
 
-const configured = Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+const configured = supabaseConfigured();
 const UserCtx = createContext<{ id: string; email: string } | null>(null);
 export const usePanelUser = () => useContext(UserCtx);
 

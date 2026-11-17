@@ -7,12 +7,11 @@ import { createClient } from "@supabase/supabase-js";
 import type { VenueMenu } from "@/domain/types";
 import { itemFrom, sectionFrom, venueFrom } from "@/lib/supabase/rows";
 
-const URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+import { SUPABASE_KEY, SUPABASE_URL, supabaseConfigured } from "@/lib/supabase/env";
 
-export const supabaseConfigured = () => Boolean(URL && KEY);
+export { supabaseConfigured };
 
-const client = () => createClient(URL!, KEY!, { auth: { persistSession: false } });
+const client = () => createClient(SUPABASE_URL, SUPABASE_KEY, { auth: { persistSession: false } });
 
 export async function supabaseMenu(slug: string): Promise<VenueMenu | null> {
   const db = client();
