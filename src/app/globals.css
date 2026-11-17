@@ -1,0 +1,209 @@
+/* Garnish Venue: the guest menu (gm-*), item page (gi-*) and the product page (lp-*).
+   World tokens and skins come from garnish.css; everything here reads them. */
+
+/* ─────────────────────────────── venue frame */
+.venue {
+  position: relative;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  isolation: isolate;
+}
+[data-world="alchemist"].venue { font-size: 1.12rem; font-weight: 400; }
+.venue-wall {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: var(--wall) center / 220px auto repeat;
+  opacity: 0.16;
+  -webkit-mask: linear-gradient(180deg, #000, transparent 70%);
+  mask: linear-gradient(180deg, #000, transparent 70%);
+  pointer-events: none;
+}
+.venue-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 14px 16px 0;
+  font-size: 0.72rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.venue-langs { display: flex; gap: 4px; }
+.venue-langs a { padding: 6px 10px; border: 1px solid transparent; border-radius: var(--radius); }
+.venue-langs a.on { border-color: var(--accent); color: var(--accent); }
+.venue-main { padding: 0 12px; }
+.venue-main .wmenu { padding: 14px 0 28px; }
+.venue-foot {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 8px 20px 40px;
+  text-align: center;
+  font-size: 0.74rem;
+  color: var(--muted);
+}
+.venue-foot p { margin: 0 0 6px; }
+.venue-powered {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+  font-family: var(--font-brand);
+  letter-spacing: 0.12em;
+  color: var(--muted);
+  opacity: 0.8;
+}
+
+/* ─────────────────────────────── guest menu */
+.gm-card { padding-inline: clamp(18px, 5vw, 64px); }
+.gm-tools {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin: 0 0 30px;
+}
+.gm-tools .chip { font-size: 0.78rem; }
+.gm-bigA { font-size: 1.15em; margin-left: 1px; }
+.gm-avoid { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 6px; width: 100%; }
+.gm-avoid-label { font-size: 0.74rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--wm-soft); }
+.gm-none { text-align: center; color: var(--wm-soft); font-style: italic; }
+
+.gm-section + .gm-section { margin-top: 36px; }
+.gm-section-title {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 1rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--wm-rule);
+  margin: 0 0 6px;
+}
+.gm-section-title::before,
+.gm-section-title::after { content: ""; flex: 1; height: 1px; background: currentColor; opacity: 0.45; }
+.gm-section-note { text-align: center; font-family: var(--font-prose, var(--font-display)); font-style: italic; font-size: 0.86rem; color: var(--wm-soft); margin: 0 0 14px; }
+.gm-list { list-style: none; margin: 14px 0 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 44px; row-gap: 6px; }
+.gm-link { display: block; padding: 10px 0; border-radius: var(--radius); transition: color 0.25s; }
+.gm-row { display: grid; grid-template-columns: auto 1fr auto; align-items: baseline; column-gap: 8px; }
+.gm-name { font-family: var(--font-display); font-size: 1.15rem; letter-spacing: var(--display-spacing); text-transform: var(--display-case); line-height: 1.2; transition: color 0.25s; }
+.gm-link:hover .gm-name { color: var(--wm-rule); }
+.gm-star { color: var(--wm-rule); font-size: 0.8em; }
+.gm-leader { border-bottom: 1px dotted currentColor; opacity: 0.35; transform: translateY(-4px); min-width: 14px; }
+.gm-price { font-family: var(--font-display); font-size: 1rem; color: var(--wm-rule); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.gm-desc { display: block; font-size: 0.84rem; color: var(--wm-soft); margin-top: 3px; }
+.gm-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; margin-top: 6px; font-size: 0.72rem; letter-spacing: 0.06em; color: var(--wm-soft); }
+.gm-badge,
+.gm-al {
+  display: inline-block;
+  min-width: 1.9em;
+  padding: 0 5px;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  font-size: 0.66rem;
+  line-height: 1.6;
+  text-align: center;
+  text-decoration: none;
+}
+.gm-allergens { display: inline-flex; gap: 4px; }
+.gm-zero-also { color: var(--wm-rule); }
+
+/* large-text mode: one column, bigger type, more contrast */
+.gm-big .gm-list { grid-template-columns: minmax(0, 1fr); }
+.gm-big .gm-name { font-size: 1.5rem; }
+.gm-big .gm-price { font-size: 1.3rem; }
+.gm-big .gm-desc { font-size: 1.08rem; color: var(--wm-ink); }
+.gm-big .gm-meta { font-size: 0.95rem; color: var(--wm-ink); }
+.gm-big .gm-al, .gm-big .gm-badge { font-size: 0.85rem; }
+
+@media (max-width: 720px) {
+  .gm-list { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* Sakura's printed oshinagaki reads top to bottom; the guest menu keeps the paper and the hanko but reads across */
+.wmenu-sakura .gm-name { font-family: var(--font-display); }
+
+/* ─────────────────────────────── item page */
+.gi-card { padding-top: clamp(24px, 4vw, 48px); }
+.gi-back { display: inline-block; font-size: 0.78rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--wm-soft); padding: 6px 0; }
+.gi-back:hover { color: var(--wm-rule); }
+.gi-head { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 12px 28px; margin: 18px 0 8px; }
+.gi-glass { display: grid; place-items: center; width: 180px; }
+.gi-title { font-size: clamp(2rem, 6vw, 3.2rem); }
+.gi-desc { color: var(--wm-soft); margin: 0 0 6px; }
+.gi-garnish { font-size: 0.82rem; color: var(--wm-soft); margin: 0; font-style: italic; }
+.gi-story { font-family: var(--font-prose, var(--font-display)); font-style: italic; font-size: 1.05rem; line-height: 1.7; max-width: 620px; margin: 18px auto 28px; text-align: center; }
+.gi-grid { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 24px 40px; align-items: start; }
+.gi-taste { text-align: center; color: var(--wm-ink); }
+.gi-label { font-size: 0.7rem; letter-spacing: 0.26em; text-transform: uppercase; color: var(--wm-rule); margin: 16px 0 6px; }
+.gi-taste .gi-label { margin-top: 0; }
+.gi-version + .gi-version { margin-top: 26px; padding-top: 22px; border-top: 1px solid var(--line); }
+.gi-version-title { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; font-size: 1.15rem; margin: 0 0 10px; }
+.gi-price { color: var(--wm-rule); font-variant-numeric: tabular-nums; }
+.gi-facts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin: 0; }
+.gi-facts div { border: 1px solid var(--line); border-radius: var(--radius); padding: 8px 10px; }
+.gi-facts dt { font-size: 0.64rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--wm-soft); }
+.gi-facts dd { margin: 2px 0 0; font-family: var(--font-display); font-size: 1.05rem; font-variant-numeric: tabular-nums; }
+.gi-inside { margin: 0; font-size: 0.92rem; }
+.gi-allergens { list-style: none; display: flex; flex-wrap: wrap; gap: 6px 16px; margin: 0; padding: 0; font-size: 0.92rem; }
+@media (max-width: 720px) {
+  .gi-head { grid-template-columns: minmax(0, 1fr); justify-items: center; text-align: center; }
+  .gi-grid { grid-template-columns: minmax(0, 1fr); }
+  .gi-facts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* ─────────────────────────────── product page */
+.lp { max-width: 980px; margin: 0 auto; padding: 56px 20px 64px; color: var(--ink); }
+.lp-hero { text-align: center; color: var(--accent); }
+.lp-kicker { font-family: var(--font-brand); letter-spacing: 0.5em; font-size: 0.85rem; margin: 18px 0 8px; }
+.lp-hero h1 { color: var(--ink); font-size: clamp(2.2rem, 6vw, 4rem); font-style: italic; max-width: 760px; margin: 0 auto 18px; }
+.lp-lead { color: var(--muted); max-width: 560px; margin: 0 auto 28px; font-size: 1.05rem; }
+.lp-cta { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+.lp-points { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; margin: 72px 0; }
+.lp-points article { border: 1px solid var(--line); padding: 26px 26px 22px; background: var(--surface); }
+.lp-points h2 { font-size: 1.4rem; color: var(--accent); margin-bottom: 8px; }
+.lp-points p { margin: 0; color: var(--muted); }
+.lp-worlds { text-align: center; }
+.lp-worlds h2 { font-size: clamp(1.6rem, 4vw, 2.4rem); }
+.lp-worlds > p { color: var(--muted); }
+.lp-worlds ul { list-style: none; padding: 0; margin: 24px 0 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.lp-world {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 18px;
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  font-family: var(--font-display);
+  letter-spacing: var(--display-spacing);
+  text-transform: var(--display-case);
+  font-size: 1.05rem;
+  transition: transform 0.25s, border-color 0.25s;
+}
+.lp-world:hover { transform: translateY(-2px); border-color: var(--accent); }
+.lp-world-emblem { width: 34px; height: 34px; flex: none; background: var(--emblem) center / contain no-repeat; }
+.lp-foot { text-align: center; color: var(--muted); margin-top: 64px; font-size: 0.9rem; }
+.lp-404 { min-height: 100vh; display: grid; place-content: center; justify-items: center; text-align: center; color: var(--accent); gap: 6px; }
+.lp-404 h1 { color: var(--ink); font-style: italic; font-size: 2.4rem; margin-top: 16px; }
+.lp-404 p { color: var(--muted); margin: 0 0 18px; }
+@media (max-width: 720px) {
+  .lp-points { grid-template-columns: minmax(0, 1fr); }
+  .lp-worlds ul { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* controls on the menu paper follow the paper's ink, not the page (light washi, parchment and birch bark) */
+.gm-card .chip { background: transparent; color: var(--wm-soft); border-color: color-mix(in srgb, var(--wm-rule) 45%, transparent); }
+.gm-card .chip:hover { color: var(--wm-ink); border-color: var(--wm-rule); }
+.gm-card .chip.on { background: var(--wm-rule); border-color: var(--wm-rule); color: var(--chip-on-ink, var(--bg)); }
+.wmenu-sakura, .wmenu-alchemist, .wmenu-boreal { --chip-on-ink: #fff; }
+/* units stay as written (ml, g, kcal) even where the display face is set in capitals */
+.gm-meta, .gm-price, .gi-facts dd, .gi-price { text-transform: none; }
+/* caps-only display faces (Syncopate, Ruslan Display, Aboreto) would print ML and KCAL: facts use the reading face */
+.gi-facts dd { font-family: var(--font-prose, var(--font-body)); font-weight: 500; }

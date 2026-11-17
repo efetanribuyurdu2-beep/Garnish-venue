@@ -1,0 +1,919 @@
+/* Ported from Garnish (TheGarnish/src/app/globals.css): world tokens, base, controls, world UI kit and the world menu skins. Keep in step with the site when a world changes. */
+/* ─────────────────────────────── World tokens */
+:root,
+[data-world="maison"] {
+  --font-brand: "Cormorant Garamond", Georgia, serif;
+  --bg: #0b0b0b;
+  --surface: #151413;
+  --surface2: #1d1b19;
+  --ink: #efe6d2;
+  --muted: #a69d8a;
+  --accent: #c9a961;
+  --accent2: #efe6d2;
+  --line: rgba(201, 169, 97, 0.28);
+  --font-display: "Bodoni Moda", Georgia, serif;
+  --font-body: "Jost", system-ui, sans-serif;
+  --display-weight: 500;
+  --display-spacing: 0.04em;
+  --display-case: none;
+  --radius: 2px;
+  --glow: none;
+}
+[data-world="maison"][data-palette="midnight"] {
+  --bg: #0a1226;
+  --surface: #101b36;
+  --surface2: #16234a;
+  --accent: #d4b56a;
+  --line: rgba(212, 181, 106, 0.28);
+}
+[data-world="maison"][data-palette="bordeaux"] {
+  --bg: #26080f;
+  --surface: #350c16;
+  --surface2: #42111d;
+  --ink: #f1e3c6;
+  --muted: #c3a98d;
+  --accent: #e3c48e;
+  --line: rgba(227, 196, 142, 0.3);
+}
+[data-world="anatolia"] {
+  --bg: #0a1c36;
+  --surface: #0f2849;
+  --surface2: #143259;
+  --ink: #f5ecd9;
+  --muted: #a9b9cf;
+  --accent: #2fb7b0;
+  --accent2: #c8323c;
+  --gold: #d4a94a;
+  --line: rgba(212, 169, 74, 0.35);
+  --font-display: "Aref Ruqaa", Georgia, serif;
+  --font-body: "Jost", system-ui, sans-serif;
+  --display-weight: 700;
+  --display-spacing: 0.01em;
+  --radius: 14px;
+  --display-case: none;
+}
+[data-world="cosmos"] {
+  --bg: #05060f;
+  --surface: rgba(20, 20, 56, 0.72);
+  --surface2: rgba(38, 30, 90, 0.7);
+  --ink: #e8ecff;
+  --muted: #9aa3d6;
+  --accent: #9b7bff;
+  --accent2: #ff7ac8;
+  --line: rgba(155, 123, 255, 0.35);
+  --font-display: "Syncopate", system-ui, sans-serif;
+  --font-body: "Exo 2", system-ui, sans-serif;
+  --display-weight: 400;
+  --display-spacing: 0.16em;
+  --display-case: uppercase;
+  --radius: 18px;
+  --glow: 0 0 24px rgba(155, 123, 255, 0.35);
+}
+[data-world="jazz"] {
+  --bg: #0b0a08;
+  --surface: #17140f;
+  --surface2: #201b13;
+  --ink: #f3e7c9;
+  --muted: #b5a581;
+  --accent: #d9b25f;
+  --accent2: #1f6f63;
+  --line: rgba(217, 178, 95, 0.35);
+  --font-display: "Limelight", Georgia, serif;
+  --font-body: "Josefin Sans", system-ui, sans-serif;
+  --display-weight: 400;
+  --display-spacing: 0.08em;
+  --display-case: uppercase;
+  --radius: 0;
+}
+[data-world="sakura"] {
+  --bg: #170f13;
+  --surface: #22171c;
+  --surface2: #2d1e25;
+  --ink: #f7eef0;
+  --muted: #c3aab3;
+  --accent: #f2a7bb;
+  --accent2: #c8102e;
+  --line: rgba(242, 167, 187, 0.28);
+  --font-display: "Zen Antique", Georgia, serif;
+  --font-body: "Zen Kaku Gothic New", system-ui, sans-serif;
+  --display-weight: 400;
+  --display-spacing: 0.08em;
+  --radius: 4px;
+  --display-case: none;
+}
+[data-world="alchemist"] {
+  --bg: #12100b;
+  --surface: #1d1912;
+  --surface2: #272117;
+  --ink: #e6d9bd;
+  --muted: #a8987a;
+  --accent: #c39245;
+  --accent2: #5f9470;
+  --line: rgba(195, 146, 69, 0.32);
+  --font-display: "Grenze Gotisch", Georgia, serif;
+  --font-body: "Cormorant Garamond", Georgia, serif;
+  --display-weight: 500;
+  --display-spacing: 0.02em;
+  --radius: 3px;
+  --display-case: none;
+}
+[data-world="tiki"] {
+  --bg: #0b1912;
+  --surface: #11251b;
+  --surface2: #173123;
+  --ink: #f4ead2;
+  --muted: #b8b394;
+  --accent: #f0a04b;
+  --accent2: #e2574c;
+  --line: rgba(240, 160, 75, 0.32);
+  --font-display: "Kavoon", Georgia, serif;
+  --font-body: "Karla", system-ui, sans-serif;
+  --display-weight: 400;
+  --display-spacing: 0.02em;
+  --radius: 20px;
+  --display-case: none;
+}
+
+[data-world="boreal"] {
+  --bg: #07121f;
+  --surface: #0d1d2e;
+  --surface2: #13283d;
+  --ink: #e8f1f6;
+  --muted: #9db3c4;
+  --accent: #7fe3c4;
+  --accent2: #b7d4ff;
+  --gold: #b7d4ff;
+  --line: rgba(183, 212, 255, 0.3);
+  --font-display: "Ruslan Display", Georgia, serif;
+  --font-body: "Jost", system-ui, sans-serif;
+  --display-weight: 400;
+  --display-spacing: 0.08em;
+  --display-case: uppercase;
+  --radius: 6px;
+}
+[data-world="riviera"] {
+  --bg: #17110d;
+  --surface: #221914;
+  --surface2: #2c2019;
+  --ink: #f4ead6;
+  --muted: #c2ad8e;
+  --accent: #e3b341;
+  --accent2: #7d8f3a;
+  --gold: #e3b341;
+  --line: rgba(227, 179, 65, 0.3);
+  --font-display: "Aboreto", Georgia, serif;
+  --font-body: "Lora", Georgia, serif;
+  --display-weight: 400;
+  --display-spacing: 0.1em;
+  --radius: 10px;
+  --display-case: uppercase;
+}
+
+/* ─────────────────────────────── Base */
+* {
+  box-sizing: border-box;
+}
+html {
+  background: var(--bg);
+  color: var(--ink);
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-weight: 300;
+  line-height: 1.6;
+  transition: background 0.6s ease, color 0.6s ease;
+  overflow-x: hidden;
+}
+[data-world="alchemist"] body {
+  font-size: 1.12rem;
+  font-weight: 400;
+}
+a {
+  color: inherit;
+  text-decoration: none;
+}
+button,
+input,
+select {
+  font: inherit;
+  color: inherit;
+}
+h1,
+h2,
+h3,
+.display {
+  font-family: var(--font-display);
+  font-weight: var(--display-weight);
+  letter-spacing: var(--display-spacing);
+  text-transform: var(--display-case);
+  line-height: 1.15;
+  margin: 0 0 0.5em;
+}
+::selection {
+  background: var(--accent);
+  color: var(--bg);
+}
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+.boot {
+  min-height: 100vh;
+  background: var(--bg);
+}
+
+/* ─────────────────────────────── Controls */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--accent);
+  color: var(--bg);
+  border: 1px solid var(--accent);
+  padding: 11px 26px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-size: 0.78rem;
+  font-weight: 500;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: transform 0.25s, box-shadow 0.25s, background 0.25s;
+}
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px -10px var(--accent);
+}
+.btn.ghost {
+  background: transparent;
+  color: var(--accent);
+}
+.btn.small {
+  padding: 6px 14px;
+  font-size: 0.68rem;
+}
+.link {
+  background: none;
+  border: 0;
+  color: var(--muted);
+  cursor: pointer;
+  letter-spacing: 0.08em;
+  padding: 6px;
+}
+.link:hover {
+  color: var(--ink);
+}
+.input,
+select.input {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  min-width: 0;
+  width: 100%;
+}
+.input.center {
+  text-align: center;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+}
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+.chip {
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--muted);
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: all 0.25s;
+}
+.chip:hover {
+  color: var(--ink);
+  border-color: var(--accent);
+}
+.chip.on {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--bg);
+}
+
+/* long prose keeps a readable face where the display font is caps-only or very bold */
+[data-world="boreal"] { --font-prose: "Forum", Georgia, serif; }
+[data-world="riviera"] { --font-prose: "Lora", Georgia, serif; }
+[data-world="cosmos"] { --font-prose: "Exo 2", system-ui, sans-serif; }
+[data-world="jazz"] { --font-prose: "Poiret One", Georgia, serif; }
+[data-world="tiki"] { --font-prose: "Karla", system-ui, sans-serif; }
+[data-world="cosmos"] .hero h1 { font-size: clamp(1.8rem, 3.6vw, 2.9rem); line-height: 1.25; }
+/* ═════════════════════════════════════════════ WORLD UI KIT
+   The basic interface (buttons, chips, fields, nav underline, scrollbar, focus
+   ring, selection, eyebrow rule) is restyled per world, so changing worlds
+   changes the lines and the hand of the whole site, not only its colours. */
+
+/* shared hooks every world can override */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent) transparent; /* Firefox takes colours only, the gradients below are for Chromium/Safari */
+}
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: var(--ui-track, transparent); }
+::-webkit-scrollbar-thumb {
+  background: var(--ui-thumb, var(--accent));
+  border: 2px solid var(--bg);
+  border-radius: var(--ui-thumb-r, 999px);
+}
+.nav-links a { position: relative; border-bottom: 0; }
+.nav-links a::after {
+  content: "";
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: -2px;
+  height: var(--ui-nav-h, 1px);
+  background: var(--ui-nav, var(--accent));
+  transform: scaleX(0);
+  transform-origin: var(--ui-nav-origin, center);
+  transition: transform 0.35s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.nav-links a:hover::after,
+.nav-links a.active::after { transform: scaleX(1); }
+.eyebrow::before {
+  content: var(--ui-eyebrow, none);
+  margin-right: 0.7em;
+  letter-spacing: 0;
+}
+.input:focus,
+select.input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: var(--ui-field-focus, 0 0 0 1px var(--accent));
+}
+
+/* ── Maison: Art Deco. Gilded metal, double rules, sharp corners */
+[data-world="maison"] {
+  --ui-thumb: linear-gradient(180deg, #f3e3b3, #b8954a);
+  --ui-thumb-r: 0;
+  --ui-nav: linear-gradient(var(--accent), var(--accent)) top / 100% 1px no-repeat, linear-gradient(var(--accent), var(--accent)) bottom / 100% 1px no-repeat;
+  --ui-nav-h: 4px;
+  --ui-eyebrow: "◆";
+}
+[data-world="maison"] .btn {
+  background: linear-gradient(180deg, #f3e3b3 0%, var(--accent) 45%, #9c7b38 100%);
+  border: 0;
+  border-radius: 0;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35), inset 0 0 0 3px var(--accent), inset 0 0 0 4px rgba(0, 0, 0, 0.35);
+  color: #120f08;
+}
+[data-world="maison"] .btn.ghost {
+  background: transparent;
+  color: var(--accent);
+  box-shadow: inset 0 0 0 1px var(--accent), inset 0 0 0 3px var(--bg), inset 0 0 0 4px var(--line);
+}
+[data-world="maison"] .chip { border-radius: 0; letter-spacing: 0.08em; }
+[data-world="maison"] .chip.on { background: transparent; color: var(--accent); box-shadow: inset 0 0 0 3px var(--bg), inset 0 0 0 4px var(--accent); }
+[data-world="maison"] .input,
+[data-world="maison"] select.input { background: transparent; border-width: 0 0 1px; border-radius: 0; }
+[data-world="maison"] :focus-visible { outline: 1px solid var(--accent); outline-offset: 4px; box-shadow: 0 0 0 6px var(--bg), 0 0 0 7px var(--line); }
+
+/* ── Anatolia: woven kilim, madder red, gold thread, rounded arch tops */
+[data-world="anatolia"] {
+  --ui-thumb: linear-gradient(180deg, #c8323c, #8e1f27);
+  --ui-nav: var(--band) repeat-x left center / auto 6px;
+  --ui-nav-h: 6px;
+  --ui-nav-origin: left;
+  --ui-eyebrow: "❖";
+  --ui-field-focus: 0 0 0 3px rgba(212, 169, 74, 0.25);
+}
+[data-world="anatolia"] .btn {
+  background: linear-gradient(180deg, #c8323c, #8e1f27);
+  border: 1px solid var(--gold);
+  color: #f5ecd9;
+  border-radius: 18px 18px 6px 6px;
+  box-shadow: inset 0 -5px 0 -2px rgba(212, 169, 74, 0.55), inset 0 0 0 3px rgba(10, 28, 54, 0.35);
+}
+[data-world="anatolia"] .btn.ghost { background: transparent; color: var(--gold); box-shadow: inset 0 -3px 0 -1px rgba(212, 169, 74, 0.5); }
+[data-world="anatolia"] .chip { border-style: dashed; border-color: rgba(212, 169, 74, 0.45); }
+[data-world="anatolia"] .chip.on { background: #a3262e; border: 1px solid var(--gold); color: #f5ecd9; }
+[data-world="anatolia"] .input,
+[data-world="anatolia"] select.input { border-color: rgba(212, 169, 74, 0.45); box-shadow: inset 0 0 0 3px var(--surface), inset 0 0 0 4px rgba(212, 169, 74, 0.18); }
+[data-world="anatolia"] :focus-visible { outline: 2px dashed var(--gold); outline-offset: 3px; }
+[data-world="anatolia"] ::selection { background: #c8323c; color: #f5ecd9; }
+
+/* ── Cosmos: neon glass, glowing rails */
+[data-world="cosmos"] {
+  --ui-thumb: linear-gradient(180deg, #9b7bff, #ff7ac8);
+  --ui-nav: linear-gradient(90deg, transparent, #9b7bff, #ff7ac8, transparent);
+  --ui-nav-h: 2px;
+  --ui-eyebrow: "✦";
+  --ui-field-focus: 0 0 0 1px #9b7bff, 0 0 18px rgba(155, 123, 255, 0.45);
+}
+[data-world="cosmos"] .btn {
+  background: linear-gradient(90deg, #7b5cff, #c46bff 55%, #ff7ac8);
+  border: 0;
+  border-radius: 999px;
+  color: #fff;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.25) inset, 0 0 22px rgba(155, 123, 255, 0.45);
+}
+[data-world="cosmos"] .btn:hover { box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.4) inset, 0 0 34px rgba(255, 122, 200, 0.55); }
+[data-world="cosmos"] .btn.ghost { background: rgba(20, 20, 56, 0.5); color: #e8ecff; box-shadow: 0 0 0 1px #9b7bff inset, 0 0 14px rgba(155, 123, 255, 0.3); backdrop-filter: blur(6px); }
+[data-world="cosmos"] .chip { background: rgba(20, 20, 56, 0.45); backdrop-filter: blur(6px); }
+[data-world="cosmos"] .chip.on { background: rgba(155, 123, 255, 0.25); color: #fff; box-shadow: 0 0 14px rgba(155, 123, 255, 0.5); }
+[data-world="cosmos"] .input,
+[data-world="cosmos"] select.input { border-radius: 999px; background: rgba(8, 9, 26, 0.6); }
+[data-world="cosmos"] :focus-visible { outline: 0; box-shadow: 0 0 0 2px #9b7bff, 0 0 18px rgba(255, 122, 200, 0.6); border-radius: 12px; }
+
+/* ── Jazz: brass marquee, ticket stubs, piano black */
+[data-world="jazz"] {
+  --ui-thumb: linear-gradient(90deg, #8a6a2c, #e9c97a, #8a6a2c);
+  --ui-thumb-r: 0;
+  --ui-nav: radial-gradient(circle, var(--accent) 1.2px, transparent 1.6px) 0 50% / 7px 4px repeat-x;
+  --ui-nav-h: 4px;
+  --ui-eyebrow: "♪";
+}
+[data-world="jazz"] .btn {
+  letter-spacing: 0.18em;
+  font-weight: 600;
+  background: linear-gradient(180deg, #f0d38e, #c79a45 55%, #8a6a2c);
+  border: 0;
+  border-radius: 0;
+  color: #120e07;
+  box-shadow: inset 0 0 0 1px #2a2013, inset 0 0 0 3px #e9c97a, 0 0 18px -6px rgba(217, 178, 95, 0.7);
+}
+[data-world="jazz"] .btn.ghost { background: transparent; color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent), inset 0 0 0 4px var(--bg), inset 0 0 0 5px rgba(217, 178, 95, 0.4); }
+/* ticket stub: notched sides */
+[data-world="jazz"] .chip {
+  border-radius: 0;
+  -webkit-mask: radial-gradient(circle 5px at 0 50%, transparent 98%, #000) left / 51% 100% no-repeat, radial-gradient(circle 5px at 100% 50%, transparent 98%, #000) right / 51% 100% no-repeat;
+  mask: radial-gradient(circle 5px at 0 50%, transparent 98%, #000) left / 51% 100% no-repeat, radial-gradient(circle 5px at 100% 50%, transparent 98%, #000) right / 51% 100% no-repeat;
+  padding-inline: 18px;
+}
+[data-world="jazz"] .chip.on { background: var(--accent); color: #120e07; }
+[data-world="jazz"] .input,
+[data-world="jazz"] select.input { background: #050403; border-width: 0 0 2px; border-color: var(--accent); border-radius: 0; }
+[data-world="jazz"] :focus-visible { outline: 1px solid var(--accent); outline-offset: 3px; box-shadow: 0 0 14px rgba(217, 178, 95, 0.5); }
+
+/* ── Sakura: vermilion hanko, ink brush strokes, washi */
+[data-world="sakura"] {
+  --ui-thumb: #f2a7bb;
+  --ui-nav: linear-gradient(90deg, transparent, #c8102e 12%, #e8495f 60%, rgba(200, 16, 46, 0.4) 88%, transparent);
+  --ui-nav-h: 3px;
+  --ui-nav-origin: left;
+  --ui-eyebrow: "❀";
+}
+[data-world="sakura"] .nav-links a::after { border-radius: 50% 40% 60% 30% / 100%; }
+[data-world="sakura"] .btn {
+  background: #c8102e;
+  border: 0;
+  color: #fff6f2;
+  border-radius: 4px 9px 3px 8px;
+  box-shadow: inset 0 0 0 2px rgba(255, 246, 242, 0.25), 0 6px 18px -10px #c8102e;
+}
+[data-world="sakura"] .btn.ghost {
+  background: linear-gradient(90deg, transparent 4%, rgba(242, 167, 187, 0.9) 10%, rgba(242, 167, 187, 0.7) 85%, transparent 96%) bottom / 100% 2px no-repeat;
+  color: var(--accent);
+  box-shadow: none;
+  border-radius: 0;
+}
+[data-world="sakura"] .chip { border-radius: 2px; background: rgba(247, 238, 240, 0.04); }
+[data-world="sakura"] .chip.on { background: #f7eef0; color: #c8102e; border-color: #f7eef0; }
+[data-world="sakura"] .input,
+[data-world="sakura"] select.input { background: rgba(247, 238, 240, 0.04); border-width: 0 0 1px; border-radius: 0; }
+[data-world="sakura"] :focus-visible { outline: 2px solid #c8102e; outline-offset: 3px; }
+[data-world="sakura"] ::selection { background: #c8102e; color: #fff6f2; }
+
+/* ── Alchemist: riveted brass plaques, apothecary labels */
+[data-world="alchemist"] {
+  --ui-thumb: linear-gradient(90deg, #6b4f22, #c39245, #6b4f22);
+  --ui-thumb-r: 2px;
+  --ui-nav: linear-gradient(var(--accent), var(--accent)) center / 100% 1px no-repeat, radial-gradient(circle, var(--accent) 2px, transparent 2.5px) left center / 5px 5px no-repeat, radial-gradient(circle, var(--accent) 2px, transparent 2.5px) right center / 5px 5px no-repeat;
+  --ui-nav-h: 5px;
+  --ui-eyebrow: "☿";
+}
+[data-world="alchemist"] .btn {
+  background: radial-gradient(circle at 7px 50%, #3a2b14 2px, transparent 2.5px), radial-gradient(circle at calc(100% - 7px) 50%, #3a2b14 2px, transparent 2.5px), linear-gradient(180deg, #e0b866, #b07f35 60%, #7b5520);
+  border: 1px solid #3a2b14;
+  border-radius: 3px;
+  color: #1d150a;
+  box-shadow: inset 0 1px 0 rgba(255, 240, 200, 0.5), 0 2px 0 #3a2b14;
+}
+[data-world="alchemist"] .btn.ghost { background: rgba(230, 217, 189, 0.06); color: #e0b866; font-weight: 600; border: 1px solid var(--accent); box-shadow: inset 0 0 0 3px var(--bg), inset 0 0 0 4px var(--line); }
+/* apothecary label: clipped corners */
+[data-world="alchemist"] .chip {
+  border-radius: 0;
+  clip-path: polygon(8px 0, calc(100% - 8px) 0, 100% 50%, calc(100% - 8px) 100%, 8px 100%, 0 50%);
+  background: rgba(230, 217, 189, 0.07);
+  border: 0;
+  padding-inline: 18px;
+}
+[data-world="alchemist"] .chip.on { background: #e6d9bd; color: #1d150a; }
+[data-world="alchemist"] .input,
+[data-world="alchemist"] select.input { background: rgba(230, 217, 189, 0.05); border-style: double; border-width: 3px; }
+[data-world="alchemist"] :focus-visible { outline: 1px dashed var(--accent2); outline-offset: 4px; }
+
+/* ── Tiki: bamboo poles, rope, chunky carved shapes */
+[data-world="tiki"] {
+  --ui-thumb: repeating-linear-gradient(180deg, #c99a4e 0 22px, #7a5a26 22px 24px);
+  --ui-thumb-r: 6px;
+  --ui-nav: repeating-linear-gradient(115deg, #f0a04b 0 4px, #7a5a26 4px 7px);
+  --ui-nav-h: 4px;
+  --ui-nav-origin: left;
+  --ui-eyebrow: "✺";
+}
+[data-world="tiki"] .nav-links a::after { border-radius: 4px; }
+[data-world="tiki"] .btn {
+  /* bamboo: a node near each end, the grain running along the pole */
+  background: linear-gradient(90deg, transparent 10px, rgba(70, 45, 15, 0.6) 10px 12px, rgba(255, 230, 170, 0.4) 12px 13px, transparent 13px calc(100% - 13px), rgba(255, 230, 170, 0.4) calc(100% - 13px) calc(100% - 12px), rgba(70, 45, 15, 0.6) calc(100% - 12px) calc(100% - 10px), transparent calc(100% - 10px)),
+    repeating-linear-gradient(180deg, transparent 0 3px, rgba(120, 80, 25, 0.12) 3px 4px), linear-gradient(180deg, #f2cd7d, #d39a43 55%, #a06c22);
+  padding-inline: 32px;
+  border: 2px solid #4a2f10;
+  border-radius: 14px;
+  color: #2a1807;
+  font-weight: 700;
+  box-shadow: 0 3px 0 #4a2f10, inset 0 2px 0 rgba(255, 240, 200, 0.5);
+}
+[data-world="tiki"] .btn:hover { transform: translateY(-2px) rotate(-0.6deg); }
+[data-world="tiki"] .btn.ghost { background: transparent; color: var(--accent); border: 2px dashed var(--accent); box-shadow: none; }
+[data-world="tiki"] .chip { border-width: 2px; font-weight: 600; }
+[data-world="tiki"] .chip.on { background: #e2574c; border-color: #4a2f10; color: #fff4e0; box-shadow: 0 2px 0 #4a2f10; }
+[data-world="tiki"] .input,
+[data-world="tiki"] select.input { border-width: 2px; border-radius: 14px; }
+[data-world="tiki"] :focus-visible { outline: 3px dashed var(--accent); outline-offset: 3px; }
+
+/* ── Boreal: frosted ice, aurora edge, snow-crust highlight */
+[data-world="boreal"] {
+  --ui-thumb: linear-gradient(180deg, #e8f1f6, #7fe3c4);
+  --ui-nav: linear-gradient(90deg, transparent, #7fe3c4, #b7d4ff, #c9a6ff, transparent);
+  --ui-nav-h: 2px;
+  --ui-eyebrow: "❄";
+  --ui-field-focus: 0 0 0 1px #b7d4ff, 0 0 16px rgba(127, 227, 196, 0.35);
+}
+[data-world="boreal"] .btn {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), #dbe9f2 45%, #a9c6da);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  border-radius: 8px;
+  color: #10233a;
+  box-shadow: inset 0 2px 0 #fff, 0 0 0 1px rgba(127, 227, 196, 0.4), 0 8px 22px -12px #7fe3c4;
+}
+[data-world="boreal"] .btn.ghost { background: rgba(232, 241, 246, 0.06); color: #e8f1f6; border: 1px solid rgba(183, 212, 255, 0.5); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35); backdrop-filter: blur(6px); }
+[data-world="boreal"] .chip { background: rgba(232, 241, 246, 0.05); border-color: rgba(183, 212, 255, 0.35); }
+[data-world="boreal"] .chip.on { background: #e8f1f6; color: #10233a; border-color: #fff; box-shadow: 0 0 0 1px #7fe3c4; }
+[data-world="boreal"] .input,
+[data-world="boreal"] select.input { background: rgba(232, 241, 246, 0.05); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12); }
+[data-world="boreal"] :focus-visible { outline: 0; box-shadow: 0 0 0 2px #e8f1f6, 0 0 0 4px rgba(127, 227, 196, 0.6); border-radius: 6px; }
+
+/* ── Riviera: majolica tile edge, cobalt and lemon, engraved caps */
+[data-world="riviera"] {
+  --ui-thumb: linear-gradient(180deg, #e3b341, #b8862a);
+  --ui-nav: var(--band) repeat-x left center / auto 6px;
+  --ui-nav-h: 6px;
+  --ui-eyebrow: "❦";
+}
+[data-world="riviera"] .btn {
+  background: #f1e6cc;
+  border: 0;
+  border-radius: 2px;
+  color: #23407a;
+  box-shadow: inset 0 0 0 2px #23407a, inset 0 0 0 4px #f1e6cc, inset 0 0 0 5px #e3b341;
+}
+[data-world="riviera"] .btn:hover { box-shadow: inset 0 0 0 2px #23407a, inset 0 0 0 4px #f1e6cc, inset 0 0 0 5px #e3b341, 0 8px 24px -10px #e3b341; }
+[data-world="riviera"] .btn.ghost { background: transparent; color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent), inset 0 0 0 3px var(--bg), inset 0 0 0 4px rgba(125, 143, 58, 0.6); }
+[data-world="riviera"] .chip { border-radius: 2px; }
+[data-world="riviera"] .chip.on { background: #23407a; border-color: #e3b341; color: #f4ead6; }
+[data-world="riviera"] .input,
+[data-world="riviera"] select.input { border-radius: 2px; box-shadow: inset 0 0 0 3px var(--surface), inset 0 0 0 4px rgba(125, 143, 58, 0.35); }
+[data-world="riviera"] :focus-visible { outline: 1px solid var(--accent); outline-offset: 3px; box-shadow: 0 0 0 5px rgba(35, 64, 122, 0.6); }
+
+/* ═════════════════════════════════════════════ WORLD MENUS (/cocktails, first view)
+   One printed menu per world. Shared skeleton first, then each world's skin. */
+.back-to-menu { margin: 8px 0 -18px; }
+.wmenu { padding: 24px 0 40px; }
+.wm-card {
+  --wm-paper: var(--surface);
+  --wm-ink: var(--ink);
+  --wm-soft: var(--muted);
+  --wm-rule: var(--accent);
+  position: relative;
+  max-width: 860px;
+  margin: 0 auto;
+  padding: clamp(28px, 5vw, 64px) clamp(20px, 5vw, 72px);
+  background: var(--wm-paper);
+  color: var(--wm-ink);
+  border-radius: var(--radius);
+  box-shadow: 0 40px 80px -40px rgba(0, 0, 0, 0.8);
+  animation: wmIn 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+@keyframes wmIn { from { opacity: 0; transform: translateY(18px) scale(0.985); } }
+.wm-corner { position: absolute; width: 46px; height: 46px; pointer-events: none; }
+.wm-corner.tl { top: 10px; left: 10px; background: var(--c-tl) center / contain no-repeat; }
+.wm-corner.tr { top: 10px; right: 10px; background: var(--c-tr) center / contain no-repeat; }
+.wm-corner.bl { bottom: 10px; left: 10px; background: var(--c-bl) center / contain no-repeat; }
+.wm-corner.br { bottom: 10px; right: 10px; background: var(--c-br) center / contain no-repeat; }
+.wm-head { text-align: center; margin-bottom: 34px; }
+.wm-emblem { display: block; width: 54px; height: 54px; margin: 0 auto 14px; background: var(--emblem) center / contain no-repeat; }
+.wm-kicker { font-size: 0.72rem; letter-spacing: 0.34em; text-transform: uppercase; color: var(--wm-rule); margin: 0 0 10px; }
+.wm-title { font-size: clamp(2.2rem, 6vw, 3.6rem); margin: 0 0 12px; }
+.wm-greeting { font-family: var(--font-prose, var(--font-display)); font-style: italic; color: var(--wm-soft); max-width: 520px; margin: 0 auto; }
+.wm-section + .wm-section { margin-top: 34px; }
+.wm-section-title { display: flex; align-items: center; gap: 16px; font-size: 1.05rem; letter-spacing: 0.24em; text-transform: uppercase; color: var(--wm-rule); margin: 0 0 18px; }
+.wm-section-title::before,
+.wm-section-title::after { content: ""; flex: 1; height: 1px; background: currentColor; opacity: 0.5; }
+.wm-list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 48px; row-gap: 14px; }
+.wm-item a {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: baseline;
+  column-gap: 8px;
+  padding: 6px 0;
+  transition: color 0.25s;
+}
+.wm-item a:hover .wm-name { color: var(--wm-rule); }
+.wm-name { font-family: var(--font-display); font-size: 1.15rem; letter-spacing: var(--display-spacing); text-transform: var(--display-case); transition: color 0.25s; }
+.wm-zero { font-family: var(--font-body); font-size: 0.6rem; letter-spacing: 0.1em; margin-left: 6px; padding: 1px 5px; border: 1px solid currentColor; border-radius: 999px; vertical-align: middle; opacity: 0.75; }
+.wm-leader { border-bottom: 1px dotted currentColor; opacity: 0.35; transform: translateY(-4px); min-width: 16px; }
+.wm-mark { font-size: 0.85rem; color: var(--wm-rule); white-space: nowrap; }
+.wm-ings { grid-column: 1 / -1; font-size: 0.82rem; color: var(--wm-soft); margin-top: 2px; }
+.wm-foot { text-align: center; margin-top: 40px; font-size: 0.85rem; color: var(--wm-soft); font-style: italic; }
+.wm-foot p { margin: 0; }
+@media (max-width: 720px) {
+  .wm-list { grid-template-columns: minmax(0, 1fr); }
+  .wm-corner { width: 30px; height: 30px; }
+}
+
+/* ── Maison: an Art Deco carte, black lacquer with a gilded stepped frame */
+.wmenu-maison .wm-card {
+  --wm-paper: linear-gradient(180deg, #121110, #0b0a09);
+  border: 1px solid var(--accent);
+  box-shadow: inset 0 0 0 6px #0b0a09, inset 0 0 0 7px rgba(201, 169, 97, 0.5), inset 0 0 0 14px #0b0a09, inset 0 0 0 15px rgba(201, 169, 97, 0.25), 0 40px 80px -40px #000;
+  border-radius: 0;
+}
+.wmenu-maison .wm-head::after {
+  content: "";
+  display: block;
+  height: 60px;
+  margin: 22px auto 0;
+  max-width: 320px;
+  background: repeating-conic-gradient(from -90deg at 50% 100%, rgba(201, 169, 97, 0.55) 0 4deg, transparent 4deg 12deg) bottom / 100% 200% no-repeat;
+  -webkit-mask: radial-gradient(circle at 50% 100%, #000 0 58px, transparent 59px);
+  mask: radial-gradient(circle at 50% 100%, #000 0 58px, transparent 59px);
+}
+.wmenu-maison .wm-title { font-style: italic; }
+.wmenu-maison .wm-mark { font-family: var(--font-display); letter-spacing: 0.08em; }
+
+/* ── Anatolia: a meyhane list under a mihrab arch, kilim band, gold thread */
+.wmenu-anatolia .wm-card {
+  --wm-paper: linear-gradient(180deg, #102a4c, #0a1c36 70%);
+  --wm-rule: var(--gold);
+  border-radius: 50% 50% 18px 18px / 140px 140px 18px 18px;
+  border: 2px solid var(--gold);
+  box-shadow: inset 0 0 0 6px #0a1c36, inset 0 0 0 8px rgba(200, 50, 60, 0.7), 0 40px 80px -40px #000;
+  padding-top: clamp(60px, 9vw, 110px);
+}
+.wmenu-anatolia .wm-card::before {
+  content: "";
+  position: absolute;
+  left: 18%;
+  right: 18%;
+  bottom: 14px;
+  height: 12px;
+  background: var(--band) repeat-x left center / auto 12px;
+}
+.wmenu-anatolia .wm-body { position: relative; isolation: isolate; }
+.wmenu-anatolia .wm-body::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  left: 50%;
+  top: 50%;
+  width: min(78%, 560px);
+  aspect-ratio: 3 / 4;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  opacity: 0.17;
+  /* tulip: pink petals, green stem and leaves, a thin gold line around them */
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 400'%3E%3Cg stroke-width='3' stroke-linejoin='round' stroke-linecap='round'%3E%3Cpath d='M150 250 C 148 300 150 340 152 390' fill='none' stroke='%235f9a6a' stroke-width='5'/%3E%3Cpath d='M151 320 C 118 312 92 290 78 254 C 112 258 138 280 151 320 Z' fill='%235f9a6a' stroke='%23d4a94a'/%3E%3Cpath d='M151 350 C 186 340 212 316 226 280 C 192 286 164 308 151 350 Z' fill='%235f9a6a' stroke='%23d4a94a'/%3E%3Cpath d='M150 250 C 92 236 66 176 78 104 C 102 132 124 140 136 128 C 128 92 134 56 150 28 C 166 56 172 92 164 128 C 176 140 198 132 222 104 C 234 176 208 236 150 250 Z' fill='%23e8899f' stroke='%23d4a94a'/%3E%3Cpath d='M150 250 C 132 210 128 166 136 128 M150 250 C 168 210 172 166 164 128' fill='none' stroke='%23b8506a'/%3E%3Cpath d='M150 250 V 70' fill='none' stroke='%23f4b8c6' stroke-width='2'/%3E%3C/g%3E%3C/svg%3E") center / contain no-repeat;
+}
+.wmenu-anatolia .wm-corner.tl,
+.wmenu-anatolia .wm-corner.tr { display: none; }
+.wmenu-anatolia .wm-section-title { justify-content: center; font-family: var(--font-display); text-transform: none; letter-spacing: 0.02em; font-size: 1.5rem; }
+.wmenu-anatolia .wm-section-title::before,
+.wmenu-anatolia .wm-section-title::after { height: 6px; background: var(--band) repeat-x left center / auto 6px; opacity: 0.9; }
+.wmenu-anatolia .wm-mark { font-family: var(--font-display); font-size: 1.3rem; }
+.wmenu-anatolia .wm-leader { border-bottom-style: dashed; border-color: var(--gold); }
+
+/* ── Cosmos: a holographic flight manifest with star coordinates */
+.wmenu-cosmos .wm-card {
+  --wm-paper: linear-gradient(160deg, rgba(30, 24, 80, 0.75), rgba(8, 9, 26, 0.85));
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(155, 123, 255, 0.6);
+  border-radius: 28px;
+  box-shadow: 0 0 40px rgba(155, 123, 255, 0.25), inset 0 0 60px rgba(155, 123, 255, 0.08);
+}
+.wmenu-cosmos .wm-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: repeating-linear-gradient(0deg, transparent 0 3px, rgba(155, 123, 255, 0.05) 3px 4px);
+  pointer-events: none;
+}
+.wmenu-cosmos .wm-title { background: linear-gradient(90deg, #e8ecff, #9b7bff, #ff7ac8); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.wmenu-cosmos .wm-section-title::before,
+.wmenu-cosmos .wm-section-title::after { background: linear-gradient(90deg, transparent, #9b7bff, #ff7ac8, transparent); opacity: 1; }
+.wmenu-cosmos .wm-mark { font-family: var(--font-body); font-size: 0.72rem; letter-spacing: 0.12em; color: #7fe6ff; }
+.wmenu-cosmos .wm-leader { border-bottom: 1px dashed rgba(127, 230, 255, 0.5); opacity: 1; }
+.wmenu-cosmos .wm-item a::before { content: "✦"; position: absolute; margin-left: -18px; color: #ff7ac8; font-size: 0.7rem; opacity: 0; transition: opacity 0.25s; }
+.wmenu-cosmos .wm-item a { position: relative; }
+.wmenu-cosmos .wm-item a:hover::before { opacity: 1; }
+
+/* ── Jazz: a speakeasy card, piano black and brass, prices in cents */
+.wmenu-jazz .wm-card {
+  --wm-paper: radial-gradient(120% 80% at 50% 0%, #1b1710, #070605 70%);
+  border-radius: 0;
+  border: 2px solid var(--accent);
+  box-shadow: inset 0 0 0 5px #070605, inset 0 0 0 6px var(--accent), inset 0 0 0 12px #070605, inset 0 0 0 13px rgba(217, 178, 95, 0.4), 0 0 40px -10px rgba(217, 178, 95, 0.4);
+}
+.wmenu-jazz .wm-head { border-bottom: 1px solid rgba(217, 178, 95, 0.4); padding-bottom: 24px; }
+.wmenu-jazz .wm-head::before {
+  content: "";
+  display: block;
+  height: 10px;
+  margin: 0 auto 18px;
+  max-width: 260px;
+  background: radial-gradient(circle, #ffe7a6 2px, rgba(217, 178, 95, 0.3) 3px, transparent 4px) 0 50% / 14px 10px repeat-x;
+  animation: wmBulbs 1.6s steps(2) infinite;
+}
+@keyframes wmBulbs { 50% { filter: brightness(0.6); } }
+.wmenu-jazz .wm-title { text-shadow: 0 0 18px rgba(217, 178, 95, 0.45); }
+.wmenu-jazz .wm-mark { font-family: var(--font-display); font-size: 1.05rem; }
+.wmenu-jazz .wm-section-title { font-family: var(--font-display); }
+.wmenu-jazz .wm-section-title::before,
+.wmenu-jazz .wm-section-title::after { height: 3px; background: linear-gradient(var(--accent), var(--accent)) top / 100% 1px no-repeat, linear-gradient(var(--accent), var(--accent)) bottom / 100% 1px no-repeat; }
+.wmenu-jazz .wm-foot { letter-spacing: 0.08em; }
+
+/* ── Sakura: an oshinagaki on washi, written top to bottom, right to left */
+.wmenu-sakura .wm-card {
+  --wm-paper: linear-gradient(180deg, rgba(255, 255, 255, 0.05), transparent 30%), #f4ece4;
+  --wm-ink: #2a1a1f;
+  --wm-soft: #6d5a60;
+  --wm-rule: #c8102e;
+  border-radius: 2px;
+  box-shadow: 0 40px 80px -40px #000, inset 0 0 80px rgba(120, 80, 60, 0.12);
+}
+.wmenu-sakura .wm-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(rgba(120, 80, 60, 0.07) 1px, transparent 1.5px) 0 0 / 6px 6px;
+  pointer-events: none;
+}
+.wmenu-sakura .wm-corner { display: none; }
+.wmenu-sakura .wm-greeting { color: #6d5a60; }
+/* each section: its title standing on the right, then the entries read right to left, wrapping into rows.
+   Japanese is written top to bottom; Latin names stay level beneath (the owner did not want sideways Latin). */
+.wmenu-sakura .wm-section { display: flex; flex-direction: row-reverse; align-items: flex-start; gap: 22px; }
+.wmenu-sakura .wm-section + .wm-section { margin-top: 30px; padding-top: 26px; border-top: 1px solid rgba(200, 16, 46, 0.25); }
+.wmenu-sakura .wm-section-title { flex: none; display: flex; flex-direction: column; align-items: center; gap: 10px; width: 76px; margin: 0; color: #c8102e; letter-spacing: 0.08em; font-size: 0.66rem; text-align: center; }
+.wmenu-sakura .wm-section-title .wm-ja { font-size: 1.35rem; letter-spacing: 0.3em; }
+.wmenu-sakura .wm-section-title::before,
+.wmenu-sakura .wm-section-title::after { display: none; }
+.wmenu-sakura .wm-list { flex: 1; display: flex; flex-direction: row-reverse; flex-wrap: wrap; gap: 22px 4px; }
+.wmenu-sakura .wm-item { width: 72px; }
+.wmenu-sakura .tcy { text-combine-upright: all; }
+.wmenu-sakura .wm-item a { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 0; text-align: center; }
+.wmenu-sakura .wm-ja { writing-mode: vertical-rl; font-family: var(--font-display); line-height: 1.1; }
+.wmenu-sakura .wm-item .wm-ja { font-size: 1.12rem; letter-spacing: 0.06em; min-height: 9.5em; color: #2a1a1f; transition: color 0.25s; }
+.wmenu-sakura .wm-name { font-family: var(--font-body); font-size: 0.68rem; letter-spacing: 0.04em; line-height: 1.3; text-transform: none; color: #6d5a60; }
+.wmenu-sakura .wm-zero { display: block; width: max-content; margin: 4px auto 0; }
+.wmenu-sakura .wm-mark { order: -1; color: #c8102e; font-family: var(--font-display); }
+.wmenu-sakura .wm-leader,
+.wmenu-sakura .wm-ings { display: none; }
+.wmenu-sakura .wm-item a:hover .wm-ja { color: #c8102e; }
+.wm-hanko {
+  display: inline-grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  margin-bottom: 10px;
+  border: 3px solid #c8102e;
+  border-radius: 6px;
+  color: #c8102e;
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  line-height: 1.05;
+  writing-mode: vertical-rl;
+  transform: rotate(-4deg);
+  opacity: 0.85;
+}
+
+/* ── Alchemist: a formulary on parchment, planet signs, wax seal */
+.wmenu-alchemist .wm-card {
+  --wm-paper: radial-gradient(120% 90% at 50% 20%, #efe2c3, #d6c39a 70%, #b49a68);
+  --wm-ink: #2b2014;
+  --wm-soft: #5c4a30;
+  --wm-rule: #7b3f12;
+  border-radius: 4px;
+  box-shadow: 0 40px 80px -40px #000, inset 0 0 60px rgba(90, 60, 20, 0.35);
+}
+.wmenu-alchemist .wm-card::after {
+  content: "☿";
+  position: absolute;
+  right: 34px;
+  bottom: -18px;
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #c0392b, #7a1712 70%);
+  color: #f3d9a8;
+  font-size: 1.6rem;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.5);
+}
+.wmenu-alchemist .wm-corner { filter: sepia(1) brightness(0.45); }
+.wmenu-alchemist .wm-section-title { font-family: var(--font-display); text-transform: none; letter-spacing: 0.04em; font-size: 1.5rem; }
+.wmenu-alchemist .wm-mark { font-size: 1.3rem; color: #7b3f12; }
+.wmenu-alchemist .wm-item a { border-bottom: 1px solid rgba(123, 63, 18, 0.18); }
+.wmenu-alchemist .wm-leader { opacity: 0; }
+
+/* ── Tiki: a grog log on a bamboo-framed board, mana strength dots */
+.wmenu-tiki .wm-card {
+  --wm-paper: repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.06) 0 2px, transparent 2px 22px), linear-gradient(180deg, #3a2412, #24160a);
+  --wm-ink: #f4ead2;
+  --wm-soft: #cdb98e;
+  border-radius: 22px;
+  border: 14px solid transparent;
+  border-image: repeating-linear-gradient(90deg, #d39a43 0 54px, #7a5a26 54px 57px, #f2cd7d 57px 58px) 14;
+  box-shadow: 0 40px 80px -40px #000, inset 0 0 50px rgba(0, 0, 0, 0.5);
+}
+.wmenu-tiki .wm-title { color: #f0a04b; text-shadow: 3px 3px 0 #4a2f10; transform: rotate(-1.5deg); }
+.wmenu-tiki .wm-section-title { font-family: var(--font-display); text-transform: none; letter-spacing: 0.02em; font-size: 1.5rem; color: #e2574c; }
+.wmenu-tiki .wm-section-title::before,
+.wmenu-tiki .wm-section-title::after { height: 4px; background: repeating-linear-gradient(115deg, #f0a04b 0 4px, #7a5a26 4px 7px); opacity: 1; border-radius: 4px; }
+.wmenu-tiki .wm-mark { color: #f0a04b; letter-spacing: 0.15em; }
+.wmenu-tiki .wm-leader { border-bottom: 2px dashed rgba(240, 160, 75, 0.35); opacity: 1; }
+
+/* ── Boreal: a birch-bark scroll with a Selbu star and frost degrees */
+.wmenu-boreal .wm-card {
+  /* birch bark: pale, with faint horizontal grain (kept light so it never crosses the text) */
+  --wm-paper: repeating-linear-gradient(180deg, transparent 0 46px, rgba(60, 55, 45, 0.07) 46px 47px, transparent 47px 83px), linear-gradient(90deg, #f1efe8, #e2ded2 50%, #f4f2ec);
+  --wm-ink: #10233a;
+  --wm-soft: #4b5d70;
+  --wm-rule: #2a5d9f;
+  border-radius: 6px;
+  box-shadow: 0 40px 80px -40px #000, inset 0 0 0 1px rgba(255, 255, 255, 0.6);
+}
+.wmenu-boreal .wm-card::before {
+  /* birch lenticels: short dark dashes scattered across the bark */
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 14px 2px at 20% 30%, rgba(30, 30, 30, 0.45), transparent), radial-gradient(ellipse 10px 2px at 70% 12%, rgba(30, 30, 30, 0.4), transparent),
+    radial-gradient(ellipse 18px 2px at 84% 64%, rgba(30, 30, 30, 0.4), transparent), radial-gradient(ellipse 12px 2px at 12% 82%, rgba(30, 30, 30, 0.4), transparent);
+  pointer-events: none;
+}
+.wmenu-boreal .wm-corner { filter: brightness(0.35) saturate(1.6) hue-rotate(10deg); }
+.wmenu-boreal .wm-title { color: #2a5d9f; }
+.wmenu-boreal .wm-section-title::before,
+.wmenu-boreal .wm-section-title::after { height: 8px; opacity: 0.8; background: radial-gradient(circle, #2a5d9f 2px, transparent 2.5px) 0 50% / 12px 8px repeat-x; }
+.wmenu-boreal .wm-mark { color: #2a5d9f; }
+
+/* ── Riviera: a bistro chalkboard in a wooden frame, lemons and vintages */
+.wmenu-riviera .wm-card {
+  --wm-paper: radial-gradient(120% 80% at 30% 20%, #2f3a33, #1d2521 70%);
+  --wm-ink: #f1ede2;
+  --wm-soft: #b9c0b3;
+  --wm-rule: #e3b341;
+  border-radius: 6px;
+  border: 16px solid #6b4a2b;
+  box-shadow: inset 0 0 0 2px #3b2716, 0 0 0 2px #3b2716, 0 40px 80px -40px #000, inset 0 0 70px rgba(0, 0, 0, 0.5);
+}
+.wmenu-riviera .wm-card::before {
+  /* chalk dust */
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1.5px) 0 0 / 5px 5px;
+  pointer-events: none;
+}
+.wmenu-riviera .wm-title { font-family: "Lora", serif; font-style: italic; text-transform: none; letter-spacing: 0.02em; }
+.wmenu-riviera .wm-name { font-family: "Lora", serif; font-style: italic; text-transform: none; letter-spacing: 0; font-size: 1.2rem; }
+.wmenu-riviera .wm-section-title::before,
+.wmenu-riviera .wm-section-title::after { height: 6px; background: var(--band) repeat-x left center / auto 6px; opacity: 0.85; }
+.wmenu-riviera .wm-mark { font-family: "Lora", serif; font-style: italic; color: #e3b341; }
+.wmenu-riviera .wm-leader { border-bottom: 1px dashed rgba(241, 237, 226, 0.35); opacity: 1; }
+
+@media (prefers-reduced-motion: reduce) {
+  .wm-card { animation: none; }
+  .wmenu-jazz .wm-head::before { animation: none; }
+}
+
