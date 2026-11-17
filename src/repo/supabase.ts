@@ -44,6 +44,7 @@ const itemFrom = (r: any): MenuItem => ({
   zeroPrice: r.zero_price ?? undefined,
   extraAllergens: r.extra_allergens ?? [],
   libraryId: r.library_id ?? undefined,
+  photo: r.photo ?? undefined,
   position: r.position,
 });
 

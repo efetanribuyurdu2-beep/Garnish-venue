@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { AllergenIcon } from "@/components/AllergenIcon";
 import { GlassReal } from "@/components/glassReal";
+import { DrinkPhoto } from "@/components/DrinkPhoto";
 import { GuestMenu } from "@/components/GuestMenu";
 import { VenueFrame } from "@/components/VenueFrame";
 import { worldById } from "@/data/worlds";
@@ -23,24 +24,33 @@ export default async function VenuePage({ params, searchParams }: { params: Para
   const v = menu.venue;
   const w = worldById(world);
   const sections = menuView(menu, lang);
-  // glasses are drawn here, on the server, so the drawing code never ships to the phone
+  // the bar's photograph when there is one, otherwise the glass, drawn here on the server
+  const byId = new Map(menu.items.map((it) => [it.id, it]));
   const thumbs = Object.fromEntries(
     sections.flatMap((s) =>
-      s.items.map((i) => [
-        i.id,
-        <GlassReal
-          key={i.id}
-          glass={i.glass.glass as Glass}
-          color={i.glass.color}
-          opaque={i.glass.opaque}
-          ice={i.glass.ice as Ice}
-          method={i.glass.method as Method}
-          garnish={i.glass.garnish}
-          size={i.featured ? 96 : 56}
-          world={world}
-          uid={`t-${i.slug}`}
-        />,
-      ]),
+      s.items.map((i) => {
+        const photo = byId.get(i.id)?.photo;
+        const [w, h] = i.featured ? [104, 132] : [64, 80];
+        return [
+          i.id,
+          photo ? (
+            <DrinkPhoto key={i.id} photo={photo} w={w} h={h} lang={lang} name={i.name} className="dp-thumb" />
+          ) : (
+            <GlassReal
+              key={i.id}
+              glass={i.glass.glass as Glass}
+              color={i.glass.color}
+              opaque={i.glass.opaque}
+              ice={i.glass.ice as Ice}
+              method={i.glass.method as Method}
+              garnish={i.glass.garnish}
+              size={i.featured ? 96 : 56}
+              world={world}
+              uid={`t-${i.slug}`}
+            />
+          ),
+        ];
+      }),
     ),
   );
   const legend = [...new Map(sections.flatMap((s) => s.items.flatMap((i) => i.allergens.map((a) => [a.id, a] as const)))).values()];

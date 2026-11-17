@@ -5,7 +5,8 @@
  */
 import { cocktailById } from "@/data/cocktails";
 import { ingredientById } from "@/data/ingredients";
-import type { MenuItem, MenuSection, Venue, VenueMenu } from "@/domain/types";
+import { STOCK_PHOTOS } from "@/data/stockPhotos";
+import type { MenuItem, MenuSection, Photo, Venue, VenueMenu } from "@/domain/types";
 import type { L } from "@/lib/types";
 
 const l = (tr: string, en: string): L => ({ tr, en });
@@ -17,7 +18,13 @@ function describe(parts: { id: string; ml: number }[]): L {
   return { tr: names.map((n) => n.tr).join(" · "), en: names.map((n) => n.en).join(" · ") };
 }
 
-function build(venueId: string, spec: [section: string, id: string, price: number, extra?: Partial<MenuItem>][]): MenuItem[] {
+/** a credited stock photograph, standing in for the bar's own */
+function stock(id: string): Photo | undefined {
+  const p = STOCK_PHOTOS[id];
+  return p && { url: p.url, alt: p.alt, color: p.color, credit: { author: p.author, authorUrl: p.authorUrl, sourceUrl: p.photoUrl, source: "unsplash" } };
+}
+
+function build(venueId: string, spec: [section: string, id: string, price: number, extra?: Partial<MenuItem>][], photos = false): MenuItem[] {
   return spec.map(([sectionId, id, price, extra], i) => {
     const c = cocktailById(id);
     if (!c) throw new Error(`demo: unknown cocktail ${id}`);
@@ -33,6 +40,7 @@ function build(venueId: string, spec: [section: string, id: string, price: numbe
       recipe: { parts: c.parts, method: c.method, glass: c.glass, ice: c.ice, garnish: c.garnish },
       available: true,
       libraryId: id,
+      ...(photos && stock(id) ? { photo: stock(id) } : {}),
       position: i,
       ...extra,
     };
@@ -81,7 +89,7 @@ const noireMenu: VenueMenu = {
     ["zero", "faux-martini", 450],
     ["zero", "shirley-temple", 380],
     ["zero", "pussyfoot", 420],
-  ]),
+  ], true),
 };
 
 // ───────────────────────────── Meyhane Sirkeci (Anatolia world)

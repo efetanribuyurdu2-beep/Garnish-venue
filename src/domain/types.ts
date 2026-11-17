@@ -40,6 +40,14 @@ export interface Recipe {
   garnish: string; // key in GARNISHES
 }
 
+/** A photograph of the drink: the bar's own upload, or a credited stock photo (demo). */
+export interface Photo {
+  url: string; // public URL (Supabase storage, or Unsplash urls.raw)
+  alt?: L;
+  color?: string; // average colour, painted while it loads
+  credit?: { author: string; authorUrl: string; sourceUrl: string; source: "unsplash" };
+}
+
 export interface MenuItem {
   id: string;
   venueId: string;
@@ -57,6 +65,7 @@ export interface MenuItem {
   /** allergens the bar declares on top of the computed ones (house syrups, garnishes…) */
   extraAllergens?: string[];
   libraryId?: string; // Garnish catalogue cocktail it was started from
+  photo?: Photo; // shown instead of the drawn glass when present
   position: number;
 }
 

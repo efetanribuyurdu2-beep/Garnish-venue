@@ -2,6 +2,7 @@ import type { MenuItem, Venue } from "@/domain/types";
 import { nameLang, percent, pick, t } from "@/lib/i18n";
 import type { Flavor, Lang, WorldId } from "@/lib/types";
 import { itemDetail } from "@/lib/view";
+import { DrinkPhoto } from "./DrinkPhoto";
 import { GlassReal } from "./glassReal";
 import { Radar } from "./Radar";
 import { VersionSwitch, type VersionView } from "./VersionSwitch";
@@ -33,8 +34,11 @@ export function ItemDetail({ it, venue, lang, world, section }: { it: MenuItem; 
   const versions = [version("original", d.original.facts.zero ? t("zero", lang) : t("original", lang), d.original, lang)];
   if (d.zero) versions.push(version("zero", `${t("zero", lang)} · 0%`, d.zero, lang));
   return (
-    <div className="gi">
+    <div className={`gi${it.photo ? " gi-has-photo" : ""}`}>
       <div className="gi-visual">
+        {it.photo ? (
+          <DrinkPhoto photo={it.photo} w={400} h={500} lang={lang} name={pick(it.name, lang)} credit eager className="gi-photo" />
+        ) : (
         <div className="gi-glass">
           <GlassReal
             glass={it.recipe.glass}
@@ -48,6 +52,7 @@ export function ItemDetail({ it, venue, lang, world, section }: { it: MenuItem; 
             uid={`d-${it.slug}`}
           />
         </div>
+        )}
         <div className="gi-taste">
           <p className="gi-label">{t("taste", lang)}</p>
           <Radar profile={d.original.facts.profile} labels={labels} size={190} />

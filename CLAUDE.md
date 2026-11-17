@@ -41,7 +41,10 @@ Next.js 16 (App Router) + React 19 + TypeScript, Supabase (Postgres, Auth, RLS) 
 | `src/components/ItemDetail.tsx`, `VersionSwitch.tsx`, `ItemSheet.tsx` | A drink: shared body (glass, taste radar, story, label strip), Original/0% switch (client), and the sheet it opens in over the menu |
 | `src/components/VenueFrame.tsx`, `Radar.tsx` | World wrapper (`data-world` on a div, wall, language switch, legal notes, "Made with Garnish"); server taste radar |
 | `src/app/v/[venue]/page.tsx`, `[item]/page.tsx`, `layout.tsx`, `@modal/(.)[item]` | Guest menu; a drink opened from the menu is intercepted into the `@modal` slot (sheet, back = close, scroll kept); opened directly it is the full `[item]` page |
-| `supabase/migrations/0001_init.sql` | Schema + RLS (see below) |
+| `src/components/DrinkPhoto.tsx`, `src/lib/photos.ts`, `src/lib/photoUpload.ts` | Drink photographs: `MenuItem.photo` is shown instead of the glass (list thumb + drink page, credit for stock). `uploadDrinkPhoto()` shrinks in the browser (WebP ≤ 1600 px, average colour) and uploads to `menu-photos/<venue_id>/` |
+| `src/data/stockPhotos.ts` | Credited Unsplash photos copied from the site's Cocktail Book; only the demo venue Maison Noire uses them (Sirkeci shows the drawings) |
+| `src/lib/supabase/browser.ts` | Browser Supabase client for the panel |
+| `supabase/migrations/0001_init.sql`, `0002_photos.sql` | Schema + RLS (see below); photo column + public `menu-photos` bucket (owners/managers write only their venue's folder) |
 
 ## Database (supabase/migrations/0001_init.sql)
 - `venues` (slug, world, palette, currency, languages, `published`), `venue_members` (owner/manager/staff), `menu_sections`, `menu_items` (`price`/`zero_price` int kuruş, `recipe` jsonb, `extra_allergens`), `price_history`, `venue_tables` (QR token per table).
