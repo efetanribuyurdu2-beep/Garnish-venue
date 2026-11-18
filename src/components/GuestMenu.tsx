@@ -191,8 +191,11 @@ export function GuestMenu({
                     </span>
                     <span className="gm-desc">{i.description}</span>
                     <span className="gm-meta">
-                      {i.zero || (zeroOnly && i.zeroPrice) ? <span className="gm-badge">0%</span> : <span>{i.abv}</span>}
-                      <span>{i.kcal < 5 ? "< 5" : `≈ ${i.kcal}`} kcal</span>
+                      {i.food ? null : i.zero || (zeroOnly && i.zeroPrice) ? <span className="gm-badge">0%</span> : <span>{i.abv}</span>}
+                      {i.serving && <span>{i.serving}</span>}
+                      {i.kcalKnown && i.kcal > 0 && <span>{i.kcal < 5 ? "< 5" : `≈ ${i.kcal}`} kcal</span>}
+                      {i.kcalKnown && i.kcal === 0 && !i.food && <span>&lt; 5 kcal</span>}
+                      {i.alt && <span className="gm-alt">{i.alt}</span>}
                       {i.allergens.length > 0 && (
                         <span className="gm-allergens" aria-label={`${text.allergens}: ${i.allergens.map((a) => a.name).join(", ")}`}>
                           {i.allergens.map((a) => (

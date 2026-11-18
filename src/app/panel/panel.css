@@ -225,3 +225,12 @@ a.pn-item-main:hover { background: color-mix(in srgb, var(--accent) 7%, transpar
 .pn-option.on { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 8%, transparent); }
 .pn-seed { border-color: var(--accent); background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 9%, var(--surface)), var(--surface)); }
 .pn-seed p { color: var(--muted); }
+
+/* what are you adding: cocktail, wine, beer, spirit, food, other */
+.pn-kinds { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; }
+.pn-kind { display: grid; justify-items: center; gap: 4px; padding: 10px 4px 9px; background: var(--bg); color: var(--ink); border: 1px solid var(--line); border-radius: max(var(--radius), 6px); cursor: pointer; font-size: 0.78rem; transition: border-color 0.2s, background 0.2s; }
+.pn-kind-art { display: grid; place-items: center; height: 46px; }
+.pn-kind-art svg { width: 34px; height: auto; max-height: 46px; }
+.pn-kind.on { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, var(--bg)); color: var(--accent); }
+.pn-pair-tight { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+@media (max-width: 640px) { .pn-kinds { grid-template-columns: repeat(3, minmax(0, 1fr)); } }

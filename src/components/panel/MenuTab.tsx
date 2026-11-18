@@ -5,6 +5,7 @@ import { useState } from "react";
 import type { MenuItem, MenuSection } from "@/domain/types";
 import { worldById } from "@/data/worlds";
 import { addSection, deleteSection, saveSection, seedWorldMenu, setAvailable, setPositions, type Workspace } from "@/lib/panel/db";
+import { nameLang } from "@/lib/i18n";
 import { tl } from "@/lib/panel/labels";
 import type { L } from "@/lib/types";
 import { ItemThumb } from "./ItemThumb";
@@ -146,7 +147,7 @@ export function MenuTab({ ws, reload, canEdit }: { ws: Workspace; reload: () => 
             </ol>
             {canEdit && (
               <Link className="pn-add" href={`/panel/${ws.venue.id}/icki/yeni?bolum=${s.id}`}>
-                + Bu bölüme içki ekle
+                + Bu bölüme ekle
               </Link>
             )}
           </section>
@@ -185,7 +186,7 @@ function ItemRow({ it, ws, canEdit, busy, first, last, onMove, onToggle }: { it:
         <ItemThumb item={it} world={ws.venue.world} />
       </span>
       <span className="pn-item-text">
-        <span className="pn-item-name" lang={it.name.tr === it.name.en ? "en" : undefined}>
+        <span className="pn-item-name" lang={nameLang(it.name)}>
           {it.featured && <span className="pn-star" title="Barmenin seçimi">✦ </span>}
           {it.name.tr}
         </span>

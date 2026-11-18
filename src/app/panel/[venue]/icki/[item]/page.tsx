@@ -8,10 +8,11 @@ import { ItemThumb } from "@/components/panel/ItemThumb";
 import { COCKTAILS, GARNISHES } from "@/data/cocktails";
 import { CATEGORY_LABEL, INGREDIENTS, ingredientById } from "@/data/ingredients";
 import { WORLDS } from "@/data/worlds";
-import type { MenuItem, Photo, Recipe } from "@/domain/types";
+import type { ItemDetails, ItemKind, MenuItem, Photo, Recipe } from "@/domain/types";
 import { ALLERGENS } from "@/lib/allergens";
-import { factsOf, zeroRecipe } from "@/lib/facts";
-import { percent } from "@/lib/i18n";
+import { factsOf, itemFacts, zeroRecipe } from "@/lib/facts";
+import { KIND_LABEL, STYLES } from "@/lib/itemLook";
+import { nameLang, percent } from "@/lib/i18n";
 import { db, deleteItem, loadWorkspace, saveItem, type Workspace } from "@/lib/panel/db";
 import { GLASS_LABEL, ICE_LABEL, METHOD_LABEL, kurusToTl, slugify, tl, tlToKurus } from "@/lib/panel/labels";
 import { uploadDrinkPhoto } from "@/lib/photoUpload";
@@ -30,7 +31,48 @@ function describe(parts: Part[]): L {
   return { tr: names.map((n) => n.tr).join(" · "), en: names.map((n) => n.en).join(" · ") };
 }
 
+const KINDS: ItemKind[] = ["cocktail", "wine", "beer", "spirit", "food", "other"];
+/** allergens a new line of this kind starts with (the bar can untick them) */
+const KIND_ALLERGENS: Partial<Record<ItemKind, string[]>> = { wine: ["sulphites"], beer: ["gluten"] };
+
+interface DetailsDraft {
+  style: string;
+  abv: string;
+  volume: string;
+  kcal: string;
+  serving: L;
+  origin: L;
+  altLabel: L;
+  altPrice: string;
+}
+const num = (s: string) => (s.trim() === "" ? undefined : Number(s.replace(",", ".")));
+const detailsFrom = (d?: ItemDetails): DetailsDraft => ({
+  style: d?.style ?? "",
+  abv: d?.abv !== undefined ? String(d.abv).replace(".", ",") : "",
+  volume: d?.volume !== undefined ? String(d.volume) : "",
+  kcal: d?.kcal !== undefined ? String(d.kcal) : "",
+  serving: d?.serving ?? { tr: "", en: "" },
+  origin: d?.origin ?? { tr: "", en: "" },
+  altLabel: d?.alt?.label ?? { tr: "", en: "" },
+  altPrice: d?.alt ? kurusToTl(d.alt.price) : "",
+});
+const pair = (l: L) => (l.tr.trim() || l.en.trim() ? { tr: l.tr.trim(), en: (l.en || l.tr).trim() } : undefined);
+function detailsTo(x: DetailsDraft, kind: ItemKind): ItemDetails {
+  const alt = tlToKurus(x.altPrice);
+  const out: ItemDetails = {};
+  if (x.style) out.style = x.style;
+  if (kind !== "food" && num(x.abv) !== undefined) out.abv = num(x.abv);
+  if (num(x.volume) !== undefined) out.volume = num(x.volume);
+  if (num(x.kcal) !== undefined) out.kcal = num(x.kcal);
+  if (pair(x.serving)) out.serving = pair(x.serving);
+  if (pair(x.origin)) out.origin = pair(x.origin);
+  if (pair(x.altLabel) && alt > 0) out.alt = { label: pair(x.altLabel)!, price: alt };
+  return out;
+}
+
 interface Draft {
+  kind: ItemKind;
+  details: DetailsDraft;
   name: L;
   description: L;
   story: L;
@@ -47,6 +89,8 @@ interface Draft {
 }
 
 const fromItem = (i: MenuItem): Draft => ({
+  kind: i.kind ?? "cocktail",
+  details: detailsFrom(i.details),
   name: i.name,
   description: i.description,
   story: i.story ?? { tr: "", en: "" },
@@ -54,7 +98,7 @@ const fromItem = (i: MenuItem): Draft => ({
   price: kurusToTl(i.price),
   hasZero: i.zeroPrice !== undefined,
   zeroPrice: kurusToTl(i.zeroPrice),
-  recipe: i.recipe,
+  recipe: i.recipe ?? EMPTY,
   extraAllergens: i.extraAllergens ?? [],
   featured: Boolean(i.featured),
   available: i.available,
@@ -81,6 +125,8 @@ export default function ItemEditor() {
       if (existing) setD(fromItem(existing));
       else
         setD({
+          kind: (search.get("tur") as ItemKind) || "cocktail",
+          details: detailsFrom(),
           name: { tr: "", en: "" },
           description: { tr: "", en: "" },
           story: { tr: "", en: "" },
@@ -96,9 +142,14 @@ export default function ItemEditor() {
     });
   }, [venueId, itemId, search]);
 
-  const facts = useMemo(() => (d && d.recipe.parts.length ? factsOf(d.recipe, d.extraAllergens) : null), [d]);
-  const zeroFacts = useMemo(() => (d && d.hasZero && facts && !facts.zero ? factsOf(zeroRecipe(d.recipe), d.extraAllergens) : null), [d, facts]);
-  const computed = useMemo(() => (d && d.recipe.parts.length ? factsOf(d.recipe).allergens : []), [d]);
+  const cocktail = d?.kind === "cocktail";
+  const facts = useMemo(() => {
+    if (!d) return null;
+    if (d.kind === "cocktail") return d.recipe.parts.length ? factsOf(d.recipe, d.extraAllergens) : null;
+    return itemFacts({ kind: d.kind, details: detailsTo(d.details, d.kind), extraAllergens: d.extraAllergens });
+  }, [d]);
+  const zeroFacts = useMemo(() => (d && cocktail && d.hasZero && facts && !facts.zero ? factsOf(zeroRecipe(d.recipe), d.extraAllergens) : null), [d, facts, cocktail]);
+  const computed = useMemo(() => (d && cocktail && d.recipe.parts.length ? factsOf(d.recipe).allergens : []), [d, cocktail]);
 
   if (ws === undefined || (ws && !d)) return <div className="pn-loading" aria-busy="true" />;
   if (ws === null || !d) return <div className="pn-empty"><h1>Bu bara erişiminiz yok</h1></div>;
@@ -106,6 +157,19 @@ export default function ItemEditor() {
 
   const world = ws.venue.world;
   const set = <K extends keyof Draft>(k: K, v: Draft[K]) => setD((x) => (x ? { ...x, [k]: v } : x));
+  const setDet = (p: Partial<DetailsDraft>) => setD((x) => (x ? { ...x, details: { ...x.details, ...p } } : x));
+  const setKind = (k: ItemKind) =>
+    setD((x) =>
+      x
+        ? {
+            ...x,
+            kind: k,
+            hasZero: k === "cocktail" ? x.hasZero : false,
+            details: { ...x.details, style: k === "cocktail" ? "" : Object.keys(STYLES[k as Exclude<ItemKind, "cocktail">])[0] },
+            extraAllergens: x.extraAllergens.length || !KIND_ALLERGENS[k] ? x.extraAllergens : KIND_ALLERGENS[k]!,
+          }
+        : x,
+    );
   const setRecipe = (r: Partial<Recipe>) => set("recipe", { ...d.recipe, ...r });
   const setPart = (i: number, p: Partial<Part>) => setRecipe({ parts: d.recipe.parts.map((x, j) => (j === i ? { ...x, ...p } : x)) });
   const slug = (() => {
@@ -137,8 +201,9 @@ export default function ItemEditor() {
     !d.sectionId && "Bir bölüm seçin.",
     !(priceK > 0) && "Geçerli bir fiyat girin.",
     d.hasZero && !(zeroK! > 0) && "Alkolsüz fiyatı girin.",
-    d.recipe.parts.length === 0 && "Reçeteye en az bir malzeme ekleyin.",
-    d.recipe.parts.some((p) => !p.id) && "Her satırda bir malzeme seçin.",
+    cocktail && d.recipe.parts.length === 0 && "Reçeteye en az bir malzeme ekleyin.",
+    cocktail && d.recipe.parts.some((p) => !p.id) && "Her satırda bir malzeme seçin.",
+    !cocktail && d.details.altPrice.trim() !== "" && !(tlToKurus(d.details.altPrice) > 0) && "İkinci boyun fiyatını kontrol edin.",
   ].filter(Boolean) as string[];
 
   const save = async () => {
@@ -157,13 +222,15 @@ export default function ItemEditor() {
         description: { tr: d.description.tr.trim(), en: (d.description.en || d.description.tr).trim() },
         story: d.story.tr.trim() || d.story.en.trim() ? { tr: d.story.tr.trim(), en: (d.story.en || d.story.tr).trim() } : undefined,
         price: priceK,
-        zeroPrice: zeroK,
-        recipe: { ...d.recipe, parts: d.recipe.parts.filter((p) => p.id && p.ml > 0) },
+        zeroPrice: cocktail ? zeroK : undefined,
+        kind: d.kind,
+        recipe: cocktail ? { ...d.recipe, parts: d.recipe.parts.filter((p) => p.id && p.ml > 0) } : undefined,
+        details: cocktail ? undefined : detailsTo(d.details, d.kind),
         extraAllergens: d.extraAllergens.filter((a) => !computed.includes(a as never)),
         featured: d.featured,
         available: d.available,
         photo: d.photo,
-        libraryId: d.libraryId,
+        libraryId: cocktail ? d.libraryId : undefined,
         position: existing && existing.sectionId === d.sectionId ? existing.position : sectionItems.length,
       });
       router.push(`/panel/${venueId}`);
@@ -210,11 +277,30 @@ export default function ItemEditor() {
         <Link href={`/panel/${venueId}`} className="pn-back">
           ← {ws.venue.name}
         </Link>
-        <h1>{isNew ? "Yeni içki" : d.name.tr}</h1>
+        <h1>{isNew ? (cocktail ? "Yeni kokteyl" : `Yeni · ${KIND_LABEL[d.kind].tr}`) : d.name.tr}</h1>
       </header>
 
       <div className="pn-editor-grid">
         <div className="pn-editor-form">
+          <section className="pn-card">
+            <p className="pn-eyebrow">Ne ekliyorsunuz?</p>
+            <div className="pn-kinds" role="radiogroup">
+              {KINDS.map((k) => (
+                <button key={k} type="button" role="radio" aria-checked={d.kind === k} className={`pn-kind${d.kind === k ? " on" : ""}`} onClick={() => setKind(k)}>
+                  <span className="pn-kind-art" aria-hidden>
+                    <ItemThumb
+                      item={{ kind: k, details: { style: k === "cocktail" ? undefined : Object.keys(STYLES[k as Exclude<ItemKind, "cocktail">])[0] }, recipe: k === "cocktail" ? { parts: [{ id: "gin", ml: 50 }, { id: "dry-vermouth", ml: 10 }], method: "stir", glass: "martini", ice: "none", garnish: "olive" } : undefined, slug: `k-${k}`, name: { tr: k, en: k }, extraAllergens: [] }}
+                      world={world}
+                      size={34}
+                    />
+                  </span>
+                  {KIND_LABEL[k].tr}
+                </button>
+              ))}
+            </div>
+          </section>
+
+          {cocktail && (
           <section className="pn-card">
             <label className="pn-field">
               <span>Klasikten başla</span>
@@ -233,6 +319,7 @@ export default function ItemEditor() {
               <small>Reçete, hikâye ve açıklama gelir; sonra dilediğiniz gibi değiştirirsiniz.</small>
             </label>
           </section>
+          )}
 
           <section className="pn-card">
             <p className="pn-eyebrow">Menüde</p>
@@ -249,12 +336,14 @@ export default function ItemEditor() {
             <div className="pn-field">
               <span>
                 Kısa açıklama{" "}
-                <button type="button" className="pn-link" onClick={() => set("description", describe(d.recipe.parts))} disabled={!d.recipe.parts.length}>
-                  Reçeteden yaz
-                </button>
+                {cocktail && (
+                  <button type="button" className="pn-link" onClick={() => set("description", describe(d.recipe.parts))} disabled={!d.recipe.parts.length}>
+                    Reçeteden yaz
+                  </button>
+                )}
               </span>
               <div className="pn-pair">
-                <input className="input" value={d.description.tr} onChange={(e) => set("description", { ...d.description, tr: e.target.value })} placeholder="Ör. Cin · Campari · Tatlı Vermut" aria-label="Kısa açıklama (TR)" />
+                <input className="input" value={d.description.tr} onChange={(e) => set("description", { ...d.description, tr: e.target.value })} placeholder={d.kind === "food" ? "İçindekiler: ör. Süzme yoğurt, sarımsak, dereotu" : d.kind === "wine" ? "Ör. Öküzgözü · Boğazkere" : "Ör. Cin · Campari · Tatlı Vermut"} aria-label="Kısa açıklama (TR)" />
                 <input className="input" value={d.description.en} onChange={(e) => set("description", { ...d.description, en: e.target.value })} placeholder="English" aria-label="Kısa açıklama (EN)" />
               </div>
             </div>
@@ -280,12 +369,19 @@ export default function ItemEditor() {
                 <span>Fiyat (₺)</span>
                 <input className="input" inputMode="decimal" value={d.price} onChange={(e) => set("price", e.target.value)} placeholder="Ör. 720" />
               </label>
-              <label className="pn-field">
-                <span>
-                  <input type="checkbox" checked={d.hasZero} onChange={(e) => set("hasZero", e.target.checked)} disabled={facts?.zero} /> Alkolsüzü de var (₺)
-                </span>
-                <input className="input" inputMode="decimal" value={d.zeroPrice} disabled={!d.hasZero} onChange={(e) => set("zeroPrice", e.target.value)} placeholder="Ör. 480" />
-              </label>
+              {cocktail ? (
+                <label className="pn-field">
+                  <span>
+                    <input type="checkbox" checked={d.hasZero} onChange={(e) => set("hasZero", e.target.checked)} disabled={facts?.zero} /> Alkolsüzü de var (₺)
+                  </span>
+                  <input className="input" inputMode="decimal" value={d.zeroPrice} disabled={!d.hasZero} onChange={(e) => set("zeroPrice", e.target.value)} placeholder="Ör. 480" />
+                </label>
+              ) : (
+                <label className="pn-field">
+                  <span>İkinci boy (₺)</span>
+                  <input className="input" inputMode="decimal" value={d.details.altPrice} onChange={(e) => setDet({ altPrice: e.target.value })} placeholder={d.kind === "wine" ? "Şişe: ör. 1900" : "Ör. duble 900"} />
+                </label>
+              )}
             </div>
             <div className="pn-row">
               <label className="pn-check">
@@ -297,6 +393,62 @@ export default function ItemEditor() {
             </div>
           </section>
 
+          {!cocktail && (
+            <section className="pn-card">
+              <p className="pn-eyebrow">Ayrıntılar</p>
+              <div className="pn-grid2">
+                <label className="pn-field">
+                  <span>Tür</span>
+                  <select className="input" value={d.details.style} onChange={(e) => setDet({ style: e.target.value })}>
+                    {Object.entries(STYLES[d.kind as Exclude<ItemKind, "cocktail">]).map(([k, v]) => (
+                      <option key={k} value={k}>
+                        {v.label.tr}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                {d.kind !== "food" && (
+                  <label className="pn-field">
+                    <span>Alkol (%)</span>
+                    <input className="input" inputMode="decimal" value={d.details.abv} onChange={(e) => setDet({ abv: e.target.value })} placeholder={`Ör. ${String(STYLES[d.kind as Exclude<ItemKind, "cocktail">][d.details.style]?.abv ?? "").replace(".", ",")}`} />
+                  </label>
+                )}
+              </div>
+              <div className="pn-field">
+                <span>{d.kind === "food" ? "Köken / not" : d.kind === "wine" ? "Üretici, bölge, yıl" : "Üretici, köken"}</span>
+                <div className="pn-pair">
+                  <input className="input" value={d.details.origin.tr} onChange={(e) => setDet({ origin: { ...d.details.origin, tr: e.target.value } })} placeholder={d.kind === "wine" ? "Ör. Kavaklıdere · Elazığ · 2021" : "Türkçe"} aria-label="Köken (TR)" />
+                  <input className="input" value={d.details.origin.en} onChange={(e) => setDet({ origin: { ...d.details.origin, en: e.target.value } })} placeholder="English" aria-label="Köken (EN)" />
+                </div>
+              </div>
+              <div className="pn-field">
+                <span>Servis (fiyatın karşılığı)</span>
+                <div className="pn-pair">
+                  <input className="input" value={d.details.serving.tr} onChange={(e) => setDet({ serving: { ...d.details.serving, tr: e.target.value } })} placeholder={d.kind === "wine" ? "Ör. Kadeh · 150 ml" : d.kind === "food" ? "Ör. Porsiyon · 2 kişilik" : "Ör. 4 cl"} aria-label="Servis (TR)" />
+                  <input className="input" value={d.details.serving.en} onChange={(e) => setDet({ serving: { ...d.details.serving, en: e.target.value } })} placeholder="English" aria-label="Servis (EN)" />
+                </div>
+              </div>
+              <div className="pn-grid3">
+                <label className="pn-field">
+                  <span>{d.kind === "food" ? "Gramaj (g)" : "Hacim (ml)"}</span>
+                  <input className="input" inputMode="numeric" value={d.details.volume} onChange={(e) => setDet({ volume: e.target.value })} placeholder={d.kind === "food" ? "Ör. 200" : `Ör. ${STYLES[d.kind as Exclude<ItemKind, "cocktail">][d.details.style]?.volume ?? ""}`} />
+                </label>
+                <label className="pn-field">
+                  <span>Kalori (kcal)</span>
+                  <input className="input" inputMode="numeric" value={d.details.kcal} onChange={(e) => setDet({ kcal: e.target.value })} placeholder={d.kind === "food" ? "Biliyorsanız" : "Boşsa tahmin edilir"} />
+                </label>
+                <div className="pn-field">
+                  <span>İkinci boyun adı</span>
+                  <div className="pn-pair pn-pair-tight">
+                    <input className="input" value={d.details.altLabel.tr} onChange={(e) => setDet({ altLabel: { ...d.details.altLabel, tr: e.target.value } })} placeholder={d.kind === "wine" ? "Şişe" : "Duble"} aria-label="İkinci boy (TR)" />
+                    <input className="input" value={d.details.altLabel.en} onChange={(e) => setDet({ altLabel: { ...d.details.altLabel, en: e.target.value } })} placeholder={d.kind === "wine" ? "Bottle" : "Double"} aria-label="İkinci boy (EN)" />
+                  </div>
+                </div>
+              </div>
+            </section>
+          )}
+
+          {cocktail && (
           <section className="pn-card">
             <p className="pn-eyebrow">Reçete</p>
             <p className="pn-hint">Ölçüler ml cinsinden; bitter için 1 dash ≈ 1 ml. Alkol oranı, kalori ve alerjenler buradan hesaplanır.</p>
@@ -372,10 +524,15 @@ export default function ItemEditor() {
               </label>
             </div>
           </section>
+          )}
 
           <section className="pn-card">
             <p className="pn-eyebrow">Alerjenler</p>
-            <p className="pn-hint">Reçeteden bulunanlar işaretli gelir. Ev yapımı şurup, süsleme gibi ek alerjenleri siz işaretleyin. Son kontrol barın sorumluluğundadır.</p>
+            <p className="pn-hint">
+              {cocktail
+                ? "Reçeteden bulunanlar işaretli gelir. Ev yapımı şurup, süsleme gibi ek alerjenleri siz işaretleyin. Son kontrol barın sorumluluğundadır."
+                : "Bu üründeki alerjenleri işaretleyin. Şarapta sülfit, birada gluten olağandır. Son kontrol barın sorumluluğundadır."}
+            </p>
             <div className="pn-allergens">
               {ALLERGENS.map((a) => {
                 const auto = computed.includes(a.id);
@@ -434,10 +591,10 @@ export default function ItemEditor() {
           <div className={`pn-pv wmenu wmenu-${world}`} data-world={world} data-palette={ws.venue.palette ?? "noir"}>
             <div className="wm-card pn-pv-card">
               <div className="pn-pv-visual">
-                <ItemThumb item={{ recipe: d.recipe, photo: d.photo, slug: slug || "yeni", name: d.name }} world={world} size={d.photo ? 150 : 130} />
+                <ItemThumb item={{ kind: d.kind, recipe: cocktail ? d.recipe : undefined, details: cocktail ? undefined : detailsTo(d.details, d.kind), extraAllergens: d.extraAllergens, photo: d.photo, slug: slug || "yeni", name: d.name }} world={world} size={d.photo ? 150 : 130} />
               </div>
               <div className="gm-row">
-                <span className="gm-name" lang={d.name.tr && d.name.tr === d.name.en ? "en" : undefined}>
+                <span className="gm-name" lang={d.name.tr ? nameLang({ tr: d.name.tr, en: d.name.en || d.name.tr }) : undefined}>
                   {d.featured && <span className="gm-star">✦ </span>}
                   {d.name.tr || "İçkinin adı"}
                 </span>
@@ -448,9 +605,9 @@ export default function ItemEditor() {
               {facts && (
                 <>
                   <span className="gm-meta">
-                    {facts.zero ? <span className="gm-badge">0%</span> : <span>{percent(facts.abv, "tr", 1)}</span>}
-                    <span>{facts.kcal < 5 ? "< 5" : `≈ ${facts.kcal}`} kcal</span>
-                    <span>{facts.volume} ml</span>
+                    {d.kind === "food" ? null : facts.zero ? <span className="gm-badge">0%</span> : <span>{percent(facts.abv, "tr", 1)}</span>}
+                    {facts.kcal > 0 && <span>{facts.kcal < 5 ? "< 5" : `≈ ${facts.kcal}`} kcal</span>}
+                    {d.details.serving.tr && !cocktail ? <span>{d.details.serving.tr}</span> : facts.volume > 0 && <span>{facts.volume} {d.kind === "food" ? "g" : "ml"}</span>}
                     <span className="gm-allergens">
                       {facts.allergens.map((a) => (
                         <AllergenIcon key={a} id={a} size={16} title={a} />
@@ -463,6 +620,11 @@ export default function ItemEditor() {
                     </p>
                   )}
                 </>
+              )}
+              {!cocktail && d.details.altPrice && tlToKurus(d.details.altPrice) > 0 && (
+                <p className="pn-pv-zero">
+                  {d.details.altLabel.tr || "İkinci boy"} · {tl(tlToKurus(d.details.altPrice))}
+                </p>
               )}
               {!facts && <p className="pn-hint">Reçeteyi girdikçe alkol, kalori ve alerjenler burada belirir.</p>}
             </div>

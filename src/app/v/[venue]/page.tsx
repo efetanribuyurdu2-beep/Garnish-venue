@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 import { AllergenIcon } from "@/components/AllergenIcon";
-import { GlassReal } from "@/components/glassReal";
+import { ItemVisual } from "@/components/ItemVisual";
 import { DrinkPhoto } from "@/components/DrinkPhoto";
 import { GuestMenu } from "@/components/GuestMenu";
+import { Recommender } from "@/components/Recommender";
 import { VenueFrame } from "@/components/VenueFrame";
 import { worldById } from "@/data/worlds";
 import { brandLang, pick, t } from "@/lib/i18n";
-import type { Glass, Ice, Method } from "@/lib/types";
 import { loadVenue, type Search } from "@/lib/venuePage";
 import { menuView } from "@/lib/view";
 import { HEAD, JA_SECTIONS } from "@/lib/worldMenu";
@@ -38,18 +38,7 @@ export default async function VenuePage({ params, searchParams }: { params: Para
           photo ? (
             <DrinkPhoto key={i.id} photo={photo} w={w} h={h} lang={lang} name={i.name} className="dp-thumb" />
           ) : (
-            <GlassReal
-              key={i.id}
-              glass={i.glass.glass as Glass}
-              color={i.glass.color}
-              opaque={i.glass.opaque}
-              ice={i.glass.ice as Ice}
-              method={i.glass.method as Method}
-              garnish={i.glass.garnish}
-              size={i.featured ? 96 : 56}
-              world={world}
-              uid={`t-${i.slug}`}
-            />
+            <ItemVisual key={i.id} item={byId.get(i.id)!} world={world} size={i.featured ? 96 : 56} uid={`t-${i.slug}`} />
           ),
         ];
       }),
@@ -74,6 +63,7 @@ export default async function VenuePage({ params, searchParams }: { params: Para
             </h1>
             <p className="wm-greeting">{pick(w.greeting, lang)}</p>
           </header>
+          <Recommender sections={sections} lang={lang} base={`/v/${v.slug}`} query={query} />
           <GuestMenu
             sections={sections}
             thumbs={thumbs}

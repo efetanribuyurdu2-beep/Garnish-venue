@@ -49,7 +49,9 @@ export const itemFrom = (r: any): MenuItem => ({
   description: r.description ?? { tr: "", en: "" },
   story: r.story ?? undefined,
   price: r.price,
-  recipe: r.recipe,
+  kind: r.kind ?? "cocktail",
+  recipe: r.recipe ?? undefined,
+  details: r.details ?? undefined,
   available: r.available,
   featured: r.featured,
   zeroPrice: r.zero_price ?? undefined,
@@ -69,7 +71,9 @@ export const itemTo = (i: Partial<MenuItem>) => {
   if ("story" in i) o.story = i.story ?? null;
   if (i.price !== undefined) o.price = i.price;
   if ("zeroPrice" in i) o.zero_price = i.zeroPrice ?? null;
-  if (i.recipe !== undefined) o.recipe = i.recipe;
+  if ("recipe" in i) o.recipe = i.recipe ?? null;
+  if (i.kind !== undefined) o.kind = i.kind;
+  if ("details" in i) o.details = i.details ?? null;
   if (i.available !== undefined) o.available = i.available;
   if (i.featured !== undefined) o.featured = i.featured;
   if (i.extraAllergens !== undefined) o.extra_allergens = i.extraAllergens;

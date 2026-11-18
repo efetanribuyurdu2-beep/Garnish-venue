@@ -44,4 +44,4 @@ export const tlToKurus = (s: string) => {
   return Number.isFinite(n) ? Math.round(n * 100) : NaN;
 };
 export const kurusToTl = (k?: number) => (k === undefined || k === null ? "" : (k / 100).toLocaleString("tr-TR", { maximumFractionDigits: 2 }).replace(/\./g, ""));
-export const tl = (k: number) => new Intl.NumberFormat("tr-TR", { style: "currency", currency: "TRY", maximumFractionDigits: k % 100 ? 2 : 0 }).format(k / 100);
+export const tl = (k: number) => new Intl.NumberFormat("tr-TR", { style: "currency", currency: "TRY", currencyDisplay: "narrowSymbol", maximumFractionDigits: k % 100 ? 2 : 0 }).format(k / 100);
