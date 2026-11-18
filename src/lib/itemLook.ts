@@ -8,7 +8,7 @@ import type { Glass, Ice, L, Method } from "./types";
 
 export type Look =
   | { kind: "glass"; glass: Glass; color: string; opaque: boolean; ice: Ice; method: Method; garnish: string }
-  | { kind: "plate"; style: string };
+  | { kind: "plate"; style: string; dish?: string };
 
 export const KIND_LABEL: Record<ItemKind, L> = {
   cocktail: { tr: "Kokteyl", en: "Cocktail" },
@@ -69,7 +69,7 @@ export const styleOf = (it: Pick<MenuItem, "kind" | "details">) => {
 
 export function lookOf(it: Pick<MenuItem, "kind" | "details" | "recipe">, cocktailColor?: { color: string; opaque: boolean }): Look {
   const k = kindOf(it);
-  if (k === "food") return { kind: "plate", style: it.details?.style ?? "meze" };
+  if (k === "food") return { kind: "plate", style: it.details?.style ?? "meze", dish: it.details?.plate };
   if (k === "cocktail" && it.recipe) {
     const r = it.recipe;
     return { kind: "glass", glass: r.glass, color: cocktailColor?.color ?? "#e8dcc0", opaque: cocktailColor?.opaque ?? false, ice: r.ice, method: r.method, garnish: r.garnish };
