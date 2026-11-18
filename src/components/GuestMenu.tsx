@@ -115,7 +115,7 @@ export function GuestMenu({
       <div className="gm-nav" ref={nav}>
         <div className="gm-tabs" role="navigation">
           {shown.map((s) => (
-            <a key={s.id} href={`#s-${s.id}`} data-s={s.id} className={active === s.id ? "on" : ""} aria-current={active === s.id ? "true" : undefined}>
+            <a key={s.id} href={`#s-${s.id}`} data-s={s.id} lang={s.titleLang} className={active === s.id ? "on" : ""} aria-current={active === s.id ? "true" : undefined}>
               {s.title}
             </a>
           ))}
@@ -168,7 +168,7 @@ export function GuestMenu({
                 {jaSections[sections.findIndex((x) => x.id === s.id)]}
               </span>
             )}
-            <span>{s.title}</span>
+            <span lang={s.titleLang}>{s.title}</span>
           </h2>
           {s.note && <p className="gm-section-note">{s.note}</p>}
           <ol className="gm-list">

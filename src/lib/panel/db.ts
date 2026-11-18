@@ -164,6 +164,7 @@ export async function seedWorldMenu(venueId: string, world: WorldId, startPositi
     const fresh = sec.items.filter((x) => !taken.has(x.slug));
     if (!fresh.length) continue;
     const section = await addSection(venueId, sec.title, startPosition + starter.length + ei);
+    if (sec.note) await saveSection(section.id, { note: sec.note });
     const rows = fresh.map((x, i) => itemTo({ ...x, venueId, sectionId: section.id, available: true, position: i }));
     must(await db().from("menu_items").insert(rows));
     count += rows.length;

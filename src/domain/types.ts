@@ -62,6 +62,7 @@ export interface ItemDetails {
   origin?: L; // producer, region, grape…
   alt?: { label: L; price: number }; // a second size: bottle, double…
   plate?: string; // food: what is drawn on the plate (Dish in data/kitchen.ts)
+  color?: string; // the drink's colour in the drawing, when the style's own is wrong
 }
 
 export interface MenuItem {

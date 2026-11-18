@@ -67,8 +67,8 @@ export function itemFacts(it: Pick<MenuItem, "kind" | "recipe" | "details" | "ex
     kcal: d.kcal ?? estimate,
     kcalKnown: d.kcal !== undefined || k !== "food",
     allergens: allergensOf([], undefined, it.extraAllergens ?? []),
-    zero: abvPct === 0,
-    color: s?.color ?? "#e8dcc0",
+    zero: abvPct <= 0.5, // "alkolsüz" by Turkish rules: at most 0.5%
+    color: d.color ?? s?.color ?? "#e8dcc0",
     opaque: Boolean(s?.opaque),
     profile: NO_PROFILE,
     simple: true,

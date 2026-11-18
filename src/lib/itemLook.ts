@@ -75,5 +75,5 @@ export function lookOf(it: Pick<MenuItem, "kind" | "details" | "recipe">, cockta
     return { kind: "glass", glass: r.glass, color: cocktailColor?.color ?? "#e8dcc0", opaque: cocktailColor?.opaque ?? false, ice: r.ice, method: r.method, garnish: r.garnish };
   }
   const s = styleOf(it)!;
-  return { kind: "glass", glass: s.glass, color: s.color, opaque: Boolean(s.opaque), ice: s.ice ?? "none", method: s.foam ? "dryshake" : "build", garnish: "none" };
+  return { kind: "glass", glass: s.glass, color: it.details?.color ?? s.color, opaque: Boolean(s.opaque), ice: s.ice ?? "none", method: s.foam ? "dryshake" : "build", garnish: "none" };
 }

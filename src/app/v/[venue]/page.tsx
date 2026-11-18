@@ -50,7 +50,7 @@ export default async function VenuePage({ params, searchParams }: { params: Para
   );
   const legend = [...new Map(sections.flatMap((s) => s.items.flatMap((i) => i.allergens.map((a) => [a.id, a] as const)))).values()];
   return (
-    <VenueFrame venue={v} world={world} lang={lang} path={`/v/${v.slug}`} keep={keep} demo={demoNeighbours(slug)}>
+    <VenueFrame venue={v} world={world} lang={lang} path={`/v/${v.slug}`} keep={keep} demo={demoNeighbours(slug)} illustrative={menu.items.some((i) => i.photo?.illustrative)}>
       <div className={`wmenu wmenu-${world}`}>
         <article className="wm-card gm-card">
           <span className="wm-corner tl" aria-hidden />

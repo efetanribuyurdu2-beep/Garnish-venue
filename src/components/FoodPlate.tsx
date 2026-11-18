@@ -261,6 +261,73 @@ export function FoodPlate({ style = "meze", dish, size = 120, world, uid }: { st
           <path d="M52 96 q2 -3 1 -6 M54 96 q3 -2 5 -1 M51 95 q-3 -1 -4 -4" stroke="#4d7a2a" strokeWidth=".9" strokeLinecap="round" fill="none" />
         </g>
       )}
+      {d === "tartare" && (
+        <g>
+          {/* a ring-moulded mound, a yolk on top, capers and two toasts */}
+          <path d="M46 102 v8 q14 6 28 0 v-8" fill="#7e2418" />
+          <ellipse cx="60" cy="102" rx="14" ry="4.6" fill="#a8382a" />
+          {[[53, 101.4], [58, 103], [64, 101], [67, 103.2], [55, 103.8], [62, 104]].map(([x, y], i) => (
+            <circle key={i} cx={x} cy={y} r="1.1" fill="#c9503e" />
+          ))}
+          <path d="M48 106 q12 4 24 0" stroke="#5e170e" strokeWidth=".8" fill="none" opacity=".6" />
+          <ellipse cx="60" cy="100.6" rx="4.4" ry="2.8" fill="#f2a623" />
+          <ellipse cx="58.8" cy="99.8" rx="1.5" ry=".8" fill="#fff" opacity=".7" />
+          {[[44, 112], [76, 111], [79, 114]].map(([x, y], i) => <circle key={i} cx={x} cy={y} r="1.4" fill="#5b6b2a" />)}
+          <path d="M80 104 l12 3 l-10 5 Z" fill="#d9a35a" stroke="#a8702e" strokeWidth=".6" />
+          <path d="M28 108 l12 -2 l-3 7 Z" fill="#d9a35a" stroke="#a8702e" strokeWidth=".6" />
+        </g>
+      )}
+      {d === "bowl" && (
+        <g>
+          {/* a deep glazed bowl, its contents in colourful pieces */}
+          <path d="M38 101 Q40 119 60 119 Q80 119 82 101 Z" fill="#2b2f36" />
+          <path d="M41 106 Q46 116 58 117.4" stroke="#fff" strokeOpacity=".22" strokeWidth="1.4" fill="none" />
+          <ellipse cx="60" cy="101" rx="22" ry="6" fill="#3a3f48" />
+          <ellipse cx="60" cy="101.4" rx="19.6" ry="4.8" fill="#f3efe4" />
+          {[[50, 100.4, "#f08a5d"], [55, 102.4, "#f4a074"], [61, 100, "#e9784c"], [67, 102.2, "#8db255"], [71, 100.2, "#a6c766"], [57, 98.8, "#f2c94c"], [64, 98.6, "#e8b93a"], [52, 103.2, "#c43a2e"]].map(([x, y, c], i) => (
+            <rect key={i} x={(x as number) - 2.2} y={(y as number) - 1.6} width="4.4" height="3.2" rx=".8" fill={c as string} />
+          ))}
+          {[[48, 99], [59, 103.6], [69, 99.4], [74, 102]].map(([x, y], i) => <circle key={i} cx={x} cy={y} r=".5" fill="#222" />)}
+          <path d="M60 97 q2 -3 5 -3" stroke="#3f7a2a" strokeWidth="1.2" fill="none" strokeLinecap="round" />
+        </g>
+      )}
+      {d === "dumplings" && (
+        <g>
+          {/* round, pleated little things: pelmeni, takoyaki, arancini, mochi; a small dish of sauce */}
+          {[[46, 107], [57, 103.5], [68, 106.5], [52, 112.5], [64, 112.8], [76, 111.5]].map(([x, y], i) => (
+            <g key={i}>
+              <ellipse cx={x} cy={y + 2.6} rx="5.6" ry="1.6" fill="#000" opacity=".12" />
+              <ellipse cx={x} cy={y} rx="5.6" ry="4.4" fill={i % 2 ? "#e2b46a" : "#edc985"} />
+              <path d={`M${x - 3.6} ${y - 1.2} q3.6 -3 7.2 0`} stroke="#c08a3e" strokeWidth=".7" fill="none" />
+              <ellipse cx={x - 1.8} cy={y - 1.6} rx="1.8" ry=".9" fill="#fff" opacity=".45" />
+            </g>
+          ))}
+          <ellipse cx="84" cy="102" rx="6.4" ry="2.8" fill="#f6f2e8" stroke="#000" strokeOpacity=".15" strokeWidth=".6" />
+          <ellipse cx="84" cy="101.6" rx="4.6" ry="1.8" fill="#6b2f12" />
+          <path d="M38 115 q3 -3 6 -2" stroke="#3f7a2a" strokeWidth="1.2" fill="none" strokeLinecap="round" />
+        </g>
+      )}
+      {d === "caviar" && (
+        <g>
+          {/* a small tin of roe on ice, blinis with cream and a spoon of roe */}
+          <ellipse cx="50" cy="105" rx="12" ry="4.6" fill="#b9c0c6" />
+          <path d="M38 105 v3 q12 5 24 0 v-3" fill="#8f979e" />
+          <ellipse cx="50" cy="104.6" rx="10" ry="3.6" fill="#15171a" />
+          {Array.from({ length: 16 }, (_, i) => (
+            <circle key={i} cx={42 + (i % 8) * 2.2} cy={103.4 + Math.floor(i / 8) * 1.8} r=".55" fill="#6c7480" opacity=".8" />
+          ))}
+          {[[72, 104], [80, 110], [66, 113]].map(([x, y], i) => (
+            <g key={i}>
+              <ellipse cx={x} cy={y} rx="7" ry="3" fill="#d9a35a" />
+              <ellipse cx={x} cy={y - 0.6} rx="6.2" ry="2.4" fill="#ecc27e" />
+              <ellipse cx={x - 0.6} cy={y - 1.4} rx="3" ry="1.3" fill="#fbf7ec" />
+              {[[-1.4, -2.2], [0.4, -2.6], [1.6, -1.8], [-0.4, -1.4]].map(([dx, dy], j) => (
+                <circle key={j} cx={x + dx} cy={y + dy} r=".7" fill="#e5672a" />
+              ))}
+            </g>
+          ))}
+        </g>
+      )}
       <ellipse cx="44" cy="102" rx="26" ry="7" fill={`url(#gl${id})`} opacity=".35" />
     </svg>
   );
