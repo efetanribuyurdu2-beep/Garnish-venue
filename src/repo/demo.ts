@@ -9,6 +9,7 @@ import { COCKTAILS, cocktailById } from "@/data/cocktails";
 import { ingredientById } from "@/data/ingredients";
 import { SIGNATURE_PHOTOS } from "@/data/signaturePhotos";
 import { STOCK_PHOTOS } from "@/data/stockPhotos";
+import { REGISTER, libItemFields, libraryById, type LibItem } from "@/data/kitchen";
 import { WORLDS, worldById } from "@/data/worlds";
 import type { MenuItem, MenuSection, Photo, Venue, VenueMenu } from "@/domain/types";
 import { analyse } from "@/lib/balance";
@@ -48,91 +49,77 @@ const ZERO_CLASSICS: Record<WorldId, string[]> = {
   alchemist: ["shirley-temple"], tiki: ["pussyfoot"], boreal: ["lime-rickey"], riviera: ["shirley-temple"],
 };
 
-type Simple = [slug: string, tr: string, en: string, kind: "wine" | "beer" | "spirit" | "food" | "other", style: string, price: number, desc: [string, string], origin: [string, string] | null, serving: [string, string], alt: [string, string, number] | null, allergens: string[]];
+type Extra = string | [id: string, over: { name?: L; desc?: L }] | LibItem;
+const own = (x: Omit<LibItem, "serving"> & { serving?: L }): LibItem => ({ serving: l("Porsiyon", "Portion"), ...x });
 
-/** beside the cocktails, what each world's bar also pours and serves */
-const SIMPLE: Record<WorldId, { title: L; items: Simple[] }> = {
-  maison: {
-    title: l("Şampanya & Mahzen", "Champagne & Cellar"),
-    items: [
-      ["champagne-brut", "Champagne Brut", "Champagne Brut", "wine", "sparkling", 950, ["Pinot Noir · Chardonnay · Pinot Meunier", "Pinot Noir · Chardonnay · Pinot Meunier"], ["Reims, Fransa", "Reims, France"], ["Kadeh · 125 ml", "Glass · 125 ml"], ["Şişe", "Bottle", 6400], ["sulphites"]],
-      ["chablis", "Chablis", "Chablis", "wine", "white", 720, ["Chardonnay", "Chardonnay"], ["Burgonya, Fransa", "Burgundy, France"], ["Kadeh · 150 ml", "Glass · 150 ml"], ["Şişe", "Bottle", 3800], ["sulphites"]],
-      ["istiridye", "İstiridye", "Oysters", "food", "meze", 1100, ["Altı adet, mignonette sos ve limon", "Six, with mignonette and lemon"], null, ["6 adet", "6 pieces"], null, ["molluscs", "sulphites"]],
-      ["truf-cips", "Trüflü Patates Cipsi", "Truffle Crisps", "food", "snack", 380, ["Trüf yağı, parmesan", "Truffle oil, parmesan"], null, ["Porsiyon", "Portion"], null, ["milk"]],
-    ],
-  },
-  anatolia: {
-    title: l("Rakı & Meze", "Rakı & Meze"),
-    items: [
-      ["yeni-raki", "Yeni Rakı", "Yeni Rakı", "spirit", "anise", 380, ["Buz, su ve beyaz peynirle", "With ice, water and white cheese"], ["Türkiye", "Türkiye"], ["Tek · 7 cl", "Single · 7 cl"], ["Duble", "Double", 620], []],
-      ["okuzgozu", "Öküzgözü · Boğazkere", "Öküzgözü · Boğazkere", "wine", "red", 560, ["Kırmızı meyve, baharat", "Red fruit, spice"], ["Elazığ · Diyarbakır", "Elazığ · Diyarbakır"], ["Kadeh · 150 ml", "Glass · 150 ml"], ["Şişe", "Bottle", 2600], ["sulphites"]],
-      ["haydari", "Haydari", "Haydari", "food", "meze", 240, ["Süzme yoğurt, sarımsak, dereotu, nane", "Strained yoghurt, garlic, dill, mint"], null, ["Porsiyon", "Portion"], null, ["milk"]],
-      ["acili-ezme", "Acılı Ezme", "Spicy Ezme", "food", "meze", 220, ["Domates, biber, soğan, nar ekşisi", "Tomato, pepper, onion, pomegranate molasses"], null, ["Porsiyon", "Portion"], null, []],
-      ["peynir-kavun", "Beyaz Peynir & Kavun", "White Cheese & Melon", "food", "meze", 320, ["Ezine peyniri, mevsim kavunu", "Ezine cheese, melon in season"], null, ["Porsiyon", "Portion"], null, ["milk"]],
-    ],
-  },
-  cosmos: {
-    title: l("Yakıt İstasyonu", "Fuel Station"),
-    items: [
-      ["nebula-ipa", "Nebula IPA", "Nebula IPA", "beer", "ale", 340, ["Turunçgil, çam, keskin acılık", "Citrus, pine, a sharp bitterness"], ["Craft · İstanbul", "Craft · İstanbul"], ["Şişe · 330 ml", "Bottle · 330 ml"], null, ["gluten"]],
-      ["edamame", "Edamame", "Edamame", "food", "snack", 260, ["Deniz tuzu, shichimi", "Sea salt, shichimi"], null, ["Porsiyon", "Portion"], null, ["soy"]],
-      ["kuyruklu-cips", "Kuyruklu Yıldız Cipsi", "Comet Crisps", "food", "snack", 240, ["Mor patates, karabiber", "Purple potato, black pepper"], null, ["Porsiyon", "Portion"], null, []],
-    ],
-  },
-  jazz: {
-    title: l("Viski Rafı", "The Whisky Shelf"),
-    items: [
-      ["bourbon", "Kentucky Bourbon", "Kentucky Bourbon", "spirit", "whisky", 520, ["Vanilya, karamel, meşe", "Vanilla, caramel, oak"], ["Kentucky, ABD", "Kentucky, USA"], ["4 cl", "4 cl"], ["Duble", "Double", 940], []],
-      ["rye", "Straight Rye", "Straight Rye", "spirit", "whisky", 560, ["Çavdar baharatı, kuru meyve", "Rye spice, dried fruit"], ["ABD", "USA"], ["4 cl", "4 cl"], ["Duble", "Double", 1020], []],
-      ["fistik", "Tuzlu Fıstık", "Salted Peanuts", "food", "snack", 160, ["Kavrulmuş, deniz tuzu", "Roasted, sea salt"], null, ["Kâse", "Bowl"], null, ["peanuts"]],
-    ],
-  },
-  sakura: {
-    title: l("Sake & Izakaya", "Sake & Izakaya"),
-    items: [
-      ["junmai-ginjo", "Junmai Ginjo", "Junmai Ginjo", "spirit", "sake", 640, ["Armut, pirinç, yumuşak bitiş", "Pear, rice, a soft finish"], ["Niigata, Japonya", "Niigata, Japan"], ["Ochoko · 90 ml", "Ochoko · 90 ml"], ["Tokkuri · 300 ml", "Tokkuri · 300 ml", 1900], []],
-      ["edamame-sakura", "Edamame", "Edamame", "food", "snack", 260, ["Deniz tuzu", "Sea salt"], null, ["Porsiyon", "Portion"], null, ["soy"]],
-      ["karaage", "Tavuk Karaage", "Chicken Karaage", "food", "meze", 420, ["Soya, zencefil, nişasta, yuzu mayonez", "Soy, ginger, potato starch, yuzu mayo"], null, ["Porsiyon", "Portion"], null, ["soy", "gluten", "egg"]],
-    ],
-  },
-  alchemist: {
-    title: l("Kabine", "The Cabinet"),
-    items: [
-      ["absinthe", "Absinthe Ritüeli", "Absinthe Ritual", "spirit", "anise", 640, ["Şeker küpü, damla damla buzlu su", "A sugar cube, iced water drop by drop"], ["Val-de-Travers, İsviçre", "Val-de-Travers, Switzerland"], ["3 cl", "3 cl"], null, []],
-      ["chartreuse-v", "Yeşil Chartreuse", "Green Chartreuse", "spirit", "liqueur", 620, ["130 bitki, keşiş tarifi", "130 herbs, the monks' recipe"], ["Fransa", "France"], ["4 cl", "4 cl"], null, []],
-      ["peynir-tabagi", "Simyacının Peyniri", "The Alchemist's Cheese", "food", "meze", 560, ["Üç olgun peynir, ceviz, bal", "Three aged cheeses, walnuts, honey"], null, ["Tabak", "Plate"], null, ["milk", "nuts"]],
-    ],
-  },
-  tiki: {
-    title: l("Rom Mahzeni", "The Rum Cellar"),
-    items: [
-      ["aged-rum", "Yıllanmış Rom", "Aged Rum", "spirit", "rum", 480, ["Melas, muz, tropik baharat", "Molasses, banana, tropical spice"], ["Jamaika", "Jamaica"], ["4 cl", "4 cl"], ["Duble", "Double", 880], []],
-      ["coconut-water", "Hindistan Cevizi Suyu", "Coconut Water", "other", "juice", 220, ["Taze, buz gibi", "Fresh, ice-cold"], null, ["250 ml", "250 ml"], null, []],
-      ["muz-cips", "Muz Cipsi", "Plantain Chips", "food", "snack", 200, ["Lime, tuz", "Lime, salt"], null, ["Kâse", "Bowl"], null, []],
-    ],
-  },
-  boreal: {
-    title: l("Votka & Zakuski", "Vodka & Zakuski"),
-    items: [
-      ["vodka", "Buzlu Votka", "Ice-cold Vodka", "spirit", "clear", 360, ["Dondurucudan, kadeh buzlu", "From the freezer, frosted glass"], ["Rusya · Polonya", "Russia · Poland"], ["4 cl", "4 cl"], ["Duble", "Double", 640], []],
-      ["kvass-beer", "Koyu Bira", "Dark Beer", "beer", "dark", 320, ["Kavrulmuş malt, kahve, çavdar", "Roasted malt, coffee, rye"], null, ["Şişe · 330 ml", "Bottle · 330 ml"], null, ["gluten"]],
-      ["ringa", "Ringa & Çavdar Ekmeği", "Herring & Rye Bread", "food", "meze", 420, ["Marine ringa, kırmızı soğan, dereotu", "Pickled herring, red onion, dill"], null, ["Tabak", "Plate"], null, ["fish", "gluten", "mustard"]],
-    ],
-  },
-  riviera: {
-    title: l("Mahzen", "The Cellar"),
-    items: [
-      ["prosecco", "Prosecco", "Prosecco", "wine", "sparkling", 520, ["Glera", "Glera"], ["Veneto, İtalya", "Veneto, Italy"], ["Kadeh · 125 ml", "Glass · 125 ml"], ["Şişe", "Bottle", 2600], ["sulphites"]],
-      ["provence-rose", "Provence Rosé", "Provence Rosé", "wine", "rose", 580, ["Grenache · Cinsault", "Grenache · Cinsault"], ["Provence, Fransa", "Provence, France"], ["Kadeh · 150 ml", "Glass · 150 ml"], ["Şişe", "Bottle", 2900], ["sulphites"]],
-      ["chianti", "Chianti Classico", "Chianti Classico", "wine", "red", 620, ["Sangiovese", "Sangiovese"], ["Toskana, İtalya", "Tuscany, Italy"], ["Kadeh · 150 ml", "Glass · 150 ml"], ["Şişe", "Bottle", 3100], ["sulphites"]],
-      ["burrata", "Burrata", "Burrata", "food", "meze", 540, ["Domates, fesleğen, zeytinyağı", "Tomato, basil, olive oil"], null, ["Tabak", "Plate"], null, ["milk"]],
-      ["focaccia", "Zeytin & Focaccia", "Olives & Focaccia", "food", "snack", 280, ["Biberiye, deniz tuzu", "Rosemary, sea salt"], null, ["Porsiyon", "Portion"], null, ["gluten"]],
-    ],
-  },
+/** beside the cocktails, what each world's bar also pours and serves: library ids, renamed lines and a few of its own */
+const EXTRAS: Record<WorldId, { key: string; title: L; items: Extra[] }[]> = {
+  maison: [
+    { key: "cellar", title: l("Şampanya & Mahzen", "Champagne & Cellar"), items: ["champagne-brut", "chablis", "pinot-noir", "konyak"] },
+    { key: "kitchen", title: l("Küçük Tabaklar", "Small Plates"), items: ["istiridye", "truf-patates", "peynir-tabagi", "creme-brulee", "espresso"] },
+  ],
+  anatolia: [
+    { key: "cellar", title: l("Rakı & Şarap", "Rakı & Wine"), items: ["raki", "narince", "okuzgozu", "bogazkere"] },
+    { key: "meze", title: l("Soğuk Mezeler", "Cold Meze"), items: ["haydari", "acili-ezme", "fava", "muhammara", "girit-ezmesi", "deniz-borulcesi", "peynir-kavun", "lakerda"] },
+    { key: "hot", title: l("Ara Sıcaklar & Tatlı", "Hot Meze & Sweets"), items: ["sigara-boregi", "kalamar-tava", "arnavut-cigeri", "karides-guvec", "baklava", "turk-kahvesi"] },
+  ],
+  cosmos: [
+    { key: "cellar", title: l("Yakıt İstasyonu", "Fuel Station"), items: [["ipa", { name: l("Nebula IPA", "Nebula IPA") }], "japon-viskisi", "tekila"] },
+    {
+      key: "kitchen",
+      title: l("Yörünge Tabakları", "Orbit Plates"),
+      items: ["edamame", "karaage", "gyoza", own({ id: "kuyruklu-cips", kind: "food", style: "snack", dish: "fries", name: l("Kuyruklu Yıldız Cipsi", "Comet Crisps"), desc: l("Mor patates, karabiber", "Purple potato, black pepper"), price: 240, kcal: 430, allergens: [] }), "matcha-cheesecake"],
+    },
+  ],
+  jazz: [
+    { key: "cellar", title: l("Viski Rafı", "The Whisky Shelf"), items: ["bourbon", "rye", "single-malt", "islay"] },
+    { key: "kitchen", title: l("Bar Atıştırmalıkları", "Bar Bites"), items: ["tuzlu-fistik", "sliders", "patates", "fondan", "espresso"] },
+  ],
+  sakura: [
+    { key: "cellar", title: l("Sake & Viski", "Sake & Whisky"), items: ["sake", "japon-viskisi"] },
+    { key: "kitchen", title: l("Izakaya", "Izakaya"), items: ["edamame", "karaage", "gyoza", "matcha-cheesecake", "sencha"] },
+  ],
+  alchemist: [
+    {
+      key: "cellar",
+      title: l("Kabine", "The Cabinet"),
+      items: ["absinthe", own({ id: "chartreuse-v", kind: "spirit", style: "liqueur", name: l("Yeşil Chartreuse", "Green Chartreuse"), desc: l("130 bitki, keşiş tarifi", "130 herbs, the monks' recipe"), origin: l("Fransa", "France"), serving: l("4 cl", "4 cl"), price: 620, abv: 55, allergens: [] }), "amaro", "konyak"],
+    },
+    { key: "kitchen", title: l("Simyacının Masası", "The Alchemist's Table"), items: [["peynir-tabagi", { name: l("Simyacının Peyniri", "The Alchemist's Cheese") }], "sarkuteri", "creme-brulee", "bitki-cayi"] },
+  ],
+  tiki: [
+    { key: "cellar", title: l("Rom Mahzeni", "The Rum Cellar"), items: ["yillanmis-rom", "hindistan-cevizi-suyu"] },
+    {
+      key: "kitchen",
+      title: l("Ada Tabakları", "Island Plates"),
+      items: [own({ id: "muz-cips", kind: "food", style: "snack", dish: "fries", name: l("Muz Cipsi", "Plantain Chips"), desc: l("Lime, tuz", "Lime, salt"), price: 200, kcal: 380, allergens: [] }), "tavuk-sis", "nachos", "sorbe"],
+    },
+  ],
+  boreal: [
+    { key: "cellar", title: l("Votka & Bira", "Vodka & Beer"), items: ["votka", "stout", "pilsner"] },
+    { key: "kitchen", title: l("Zakuski", "Zakuski"), items: ["ringa", "somon", "kuruyemis", "tarcinli-corek"] },
+  ],
+  riviera: [
+    { key: "cellar", title: l("Mahzen", "The Cellar"), items: ["prosecco", "provence-rose", "chianti", "limoncello"] },
+    { key: "kitchen", title: l("Bahçe Masası", "Garden Table"), items: ["burrata", "bruschetta", "focaccia", "zeytin", "tiramisu"] },
+  ],
 };
 
+/** the world's kitchen & cellar sections, each line as menu fields priced for the world */
+export function worldExtras(world: WorldId) {
+  return EXTRAS[world].map((sec) => ({
+    key: sec.key,
+    title: sec.title,
+    items: sec.items.map((e) => {
+      const [x, over] = typeof e === "string" ? [libraryById(e), {}] : Array.isArray(e) ? [libraryById(e[0]), e[1]] : [e, {}];
+      if (!x) throw new Error(`unknown library line ${String(e)}`);
+      return { slug: x.id, ...libItemFields(x, world, over) };
+    }),
+  }));
+}
+
 /** price register per world (₺, signature cocktail) */
-const BASE: Record<WorldId, number> = { maison: 820, anatolia: 620, cosmos: 720, jazz: 700, sakura: 760, alchemist: 740, tiki: 680, boreal: 660, riviera: 640 };
+const BASE = REGISTER;
 const r10 = (n: number) => Math.round(n / 10) * 10;
 export function suggestedPrice(world: WorldId, c: Cocktail, signature: boolean) {
   if (isZeroCocktail(c)) return r10(BASE[world] * 0.55);
@@ -193,34 +180,25 @@ function demoVenue(world: WorldId): VenueMenu {
     serviceNote: l("Fiyatlara KDV dahildir. Servis ücreti alınmaz.", "Prices include VAT. No service charge."),
   };
   const starter = worldStarter(world);
-  const simple = SIMPLE[world];
-  const order = [...starter.map((s) => s.key)];
-  order.splice(order.indexOf("zero") >= 0 ? order.indexOf("zero") : order.length, 0, "more");
-  const titled = [...starter.map((s) => ({ key: s.key, title: s.title, note: s.note })), { key: "more", title: simple.title, note: undefined }];
-  const sections: MenuSection[] = order.map((key, position) => {
-    const t = titled.find((x) => x.key === key)!;
-    return { id: `${id}-${key}`, venueId: id, title: t.title, ...(t.note ? { note: t.note } : {}), position };
-  });
-  let position = 0;
-  const moreItems: MenuItem[] = simple.items.map(([slug, tr, en, kind, style, price, desc, origin, serving, alt, allergens]) => ({
-    id: `${id}-${slug}`,
+  const extras = worldExtras(world);
+  const sections: MenuSection[] = [...starter, ...extras].map((t, position) => ({
+    id: `${id}-${t.key}`,
     venueId: id,
-    sectionId: `${id}-more`,
-    slug,
-    name: l(tr, en),
-    description: l(desc[0], desc[1]),
-    price: price * 100,
-    kind,
-    details: {
-      style,
-      serving: l(serving[0], serving[1]),
-      ...(origin ? { origin: l(origin[0], origin[1]) } : {}),
-      ...(alt ? { alt: { label: l(alt[0], alt[1]), price: alt[2] * 100 } } : {}),
-    },
-    extraAllergens: allergens,
-    available: true,
-    position: 100 + position++,
+    title: t.title,
+    ...("note" in t && t.note ? { note: t.note } : {}),
+    position,
   }));
+  let position = 0;
+  const moreItems: MenuItem[] = extras.flatMap((sec) =>
+    sec.items.map((x) => ({
+      ...x,
+      id: `${id}-${x.slug}`,
+      venueId: id,
+      sectionId: `${id}-${sec.key}`,
+      available: true,
+      position: 100 + position++,
+    })),
+  );
   const items: MenuItem[] = starter.flatMap((s) =>
     s.drinks.map(({ c, signature }, i) => {
       const price = suggestedPrice(world, c, signature);

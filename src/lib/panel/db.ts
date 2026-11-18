@@ -8,7 +8,7 @@ import type { MenuItem, MenuSection, Venue } from "@/domain/types";
 import { supabaseBrowser } from "@/lib/supabase/browser";
 import { itemFrom, itemTo, sectionFrom, venueFrom, venueTo } from "@/lib/supabase/rows";
 import type { L, WorldId } from "@/lib/types";
-import { describe, suggestedPrice, worldStarter } from "@/repo/demo";
+import { describe, suggestedPrice, worldExtras, worldStarter } from "@/repo/demo";
 import { isZeroCocktail } from "@/lib/zero";
 
 export type Role = "owner" | "manager" | "staff";
@@ -124,14 +124,21 @@ export async function priceHistory(venueId: string, limit = 200): Promise<PriceR
 }
 
 // ───────────── a new bar starts with its world's menu
-/** Adds the world's own menu (collection, classics, alcohol-free) after what is already there. Returns the number of drinks. */
+/**
+ * Adds the world's own menu after what is already there: its collection, the
+ * classics, alcohol-free, then its kitchen & cellar (wine, spirits, meze…).
+ * Lines whose address is already on the menu are skipped. Returns the number of lines.
+ */
 export async function seedWorldMenu(venueId: string, world: WorldId, startPosition = 0): Promise<number> {
   const starter = worldStarter(world);
+  const taken = new Set(((must(await db().from("menu_items").select("slug").eq("venue_id", venueId)) as { slug: string }[]) ?? []).map((r) => r.slug));
   let count = 0;
   for (const [si, sec] of starter.entries()) {
+    const fresh = sec.drinks.filter(({ c }) => !taken.has(c.id));
+    if (!fresh.length) continue;
     const section = await addSection(venueId, sec.title, startPosition + si);
     if (sec.note) await saveSection(section.id, { note: sec.note });
-    const rows = sec.drinks.map(({ c, signature }, i) => {
+    const rows = fresh.map(({ c, signature }, i) => {
       const price = suggestedPrice(world, c, signature);
       return itemTo({
         venueId,
@@ -150,6 +157,14 @@ export async function seedWorldMenu(venueId: string, world: WorldId, startPositi
         position: i,
       });
     });
+    must(await db().from("menu_items").insert(rows));
+    count += rows.length;
+  }
+  for (const [ei, sec] of worldExtras(world).entries()) {
+    const fresh = sec.items.filter((x) => !taken.has(x.slug));
+    if (!fresh.length) continue;
+    const section = await addSection(venueId, sec.title, startPosition + starter.length + ei);
+    const rows = fresh.map((x, i) => itemTo({ ...x, venueId, sectionId: section.id, available: true, position: i }));
     must(await db().from("menu_items").insert(rows));
     count += rows.length;
   }

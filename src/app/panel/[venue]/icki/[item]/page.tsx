@@ -7,6 +7,7 @@ import { AllergenIcon } from "@/components/AllergenIcon";
 import { ItemThumb } from "@/components/panel/ItemThumb";
 import { COCKTAILS, GARNISHES } from "@/data/cocktails";
 import { CATEGORY_LABEL, INGREDIENTS, ingredientById } from "@/data/ingredients";
+import { DISH_LABEL, LIBRARY_GROUPS, libItemFields, libraryById } from "@/data/kitchen";
 import { WORLDS } from "@/data/worlds";
 import type { ItemDetails, ItemKind, MenuItem, Photo, Recipe } from "@/domain/types";
 import { ALLERGENS } from "@/lib/allergens";
@@ -44,6 +45,7 @@ interface DetailsDraft {
   origin: L;
   altLabel: L;
   altPrice: string;
+  plate: string;
 }
 const num = (s: string) => (s.trim() === "" ? undefined : Number(s.replace(",", ".")));
 const detailsFrom = (d?: ItemDetails): DetailsDraft => ({
@@ -55,6 +57,7 @@ const detailsFrom = (d?: ItemDetails): DetailsDraft => ({
   origin: d?.origin ?? { tr: "", en: "" },
   altLabel: d?.alt?.label ?? { tr: "", en: "" },
   altPrice: d?.alt ? kurusToTl(d.alt.price) : "",
+  plate: d?.plate ?? "",
 });
 const pair = (l: L) => (l.tr.trim() || l.en.trim() ? { tr: l.tr.trim(), en: (l.en || l.tr).trim() } : undefined);
 function detailsTo(x: DetailsDraft, kind: ItemKind): ItemDetails {
@@ -67,6 +70,7 @@ function detailsTo(x: DetailsDraft, kind: ItemKind): ItemDetails {
   if (pair(x.serving)) out.serving = pair(x.serving);
   if (pair(x.origin)) out.origin = pair(x.origin);
   if (pair(x.altLabel) && alt > 0) out.alt = { label: pair(x.altLabel)!, price: alt };
+  if (kind === "food" && x.plate) out.plate = x.plate;
   return out;
 }
 
@@ -165,7 +169,7 @@ export default function ItemEditor() {
             ...x,
             kind: k,
             hasZero: k === "cocktail" ? x.hasZero : false,
-            details: { ...x.details, style: k === "cocktail" ? "" : Object.keys(STYLES[k as Exclude<ItemKind, "cocktail">])[0] },
+            details: { ...x.details, style: k === "cocktail" ? "" : Object.keys(STYLES[k as Exclude<ItemKind, "cocktail">])[0], plate: k === "food" ? x.details.plate : "" },
             extraAllergens: x.extraAllergens.length || !KIND_ALLERGENS[k] ? x.extraAllergens : KIND_ALLERGENS[k]!,
           }
         : x,
@@ -193,6 +197,26 @@ export default function ItemEditor() {
       libraryId: c.id,
     });
   };
+
+  // a line from the kitchen & cellar library: name, notes, serving, allergens and a price for this world
+  const fromLibrary = (id: string) => {
+    const x = libraryById(id);
+    if (!x) return;
+    if (d.name.tr.trim() && d.name.tr !== x.name.tr && !confirm(`Bilgiler "${x.name.tr}" ile doldurulsun mu?`)) return;
+    const f = libItemFields(x, world);
+    setD({
+      ...d,
+      kind: x.kind,
+      name: f.name,
+      description: f.description,
+      details: detailsFrom(f.details),
+      extraAllergens: f.extraAllergens ?? [],
+      price: d.price.trim() ? d.price : kurusToTl(f.price),
+      hasZero: false,
+      libraryId: undefined,
+    });
+  };
+  const libGroups = [...LIBRARY_GROUPS].sort((a, b) => Number(b.items[0]?.kind === d.kind) - Number(a.items[0]?.kind === d.kind));
 
   const priceK = tlToKurus(d.price);
   const zeroK = d.hasZero ? tlToKurus(d.zeroPrice) : undefined;
@@ -321,6 +345,27 @@ export default function ItemEditor() {
           </section>
           )}
 
+          {!cocktail && (
+            <section className="pn-card">
+              <label className="pn-field">
+                <span>Kütüphaneden seç</span>
+                <select className="input" value="" onChange={(e) => fromLibrary(e.target.value)}>
+                  <option value="">Mutfak & mahzen kütüphanesinden bir kalem seçin…</option>
+                  {libGroups.map((g) => (
+                    <optgroup key={g.label} label={g.label}>
+                      {g.items.map((x) => (
+                        <option key={x.id} value={x.id}>
+                          {x.name.tr}
+                        </option>
+                      ))}
+                    </optgroup>
+                  ))}
+                </select>
+                <small>Ad, açıklama, servis, alerjenler ve önerilen fiyat gelir; sonra hepsini değiştirebilirsiniz.</small>
+              </label>
+            </section>
+          )}
+
           <section className="pn-card">
             <p className="pn-eyebrow">Menüde</p>
             <div className="pn-grid2">
@@ -407,6 +452,19 @@ export default function ItemEditor() {
                     ))}
                   </select>
                 </label>
+                {d.kind === "food" && (
+                  <label className="pn-field">
+                    <span>Tabakta</span>
+                    <select className="input" value={d.details.plate} onChange={(e) => setDet({ plate: e.target.value })}>
+                      <option value="">Türe göre</option>
+                      {Object.entries(DISH_LABEL).map(([k, v]) => (
+                        <option key={k} value={k}>
+                          {v}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                )}
                 {d.kind !== "food" && (
                   <label className="pn-field">
                     <span>Alkol (%)</span>

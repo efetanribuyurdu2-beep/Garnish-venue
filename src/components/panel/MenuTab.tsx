@@ -53,8 +53,8 @@ export function MenuTab({ ws, reload, canEdit }: { ws: Workspace; reload: () => 
           <p className="pn-eyebrow">{worldById(ws.venue.world).name.tr} dünyası</p>
           <h2>{worldById(ws.venue.world).bar.tr} menüsüyle başlayın</h2>
           <p>
-            {worldById(ws.venue.world).collection.tr} koleksiyonu, dünyaya uygun klasikler ve alkolsüzler; reçeteleri, hikâyeleri ve önerilen fiyatlarıyla. Sonra dilediğinizi
-            değiştirin ya da silin.
+            {worldById(ws.venue.world).collection.tr} koleksiyonu, dünyaya uygun klasikler, alkolsüzler, şarap ve içki rafı ile mutfağı; reçeteleri, alerjenleri ve önerilen
+            fiyatlarıyla. Sonra dilediğinizi değiştirin ya da silin.
           </p>
           <button className="btn" disabled={!!busy} onClick={() => run("seed", () => seedWorldMenu(ws.venue.id, ws.venue.world, sections.length))}>
             {busy === "seed" ? "Menü hazırlanıyor…" : "Dünyanın menüsünü ekle"}

@@ -120,7 +120,7 @@ export default function PanelHome() {
                 <span>
                   <strong>{WORLDS.find((w) => w.id === world)?.bar.tr} menüsüyle başla</strong>
                   <small>
-                    {WORLDS.find((w) => w.id === world)?.collection.tr}, klasikler ve alkolsüzler önerilen fiyatlarla gelir; dilediğinizi değiştirir, silersiniz.
+                    {WORLDS.find((w) => w.id === world)?.collection.tr}, klasikler, alkolsüzler, şarap ve içki rafı, mutfağı (meze, atıştırmalık, tatlı) önerilen fiyatlarla gelir; dilediğinizi değiştirir, silersiniz.
                   </small>
                 </span>
               </label>
