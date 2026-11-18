@@ -248,3 +248,5 @@ a.pn-item-main:hover { background: color-mix(in srgb, var(--accent) 7%, transpar
 
 /* the editor's Save is always in reach */
 .pn-actions { position: sticky; bottom: 0; z-index: 20; padding: 12px 0 calc(12px + env(safe-area-inset-bottom)); background: linear-gradient(transparent, var(--bg) 30%); }
+/* inside the tabbed venue page the phone tab bar is fixed at the bottom: sit just above it */
+@media (max-width: 640px) { .pn-actions-tabbed { bottom: calc(64px + env(safe-area-inset-bottom)); } }
