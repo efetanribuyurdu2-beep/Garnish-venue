@@ -66,6 +66,7 @@ export function VenueFrame({
         {venue.serviceNote && <p>{venue.serviceNote[lang]}</p>}
         <p>{t("estimate", lang)}</p>
         <p>{t("printed", lang)}</p>
+        {demo && <p>{lang === "tr" ? "Fotoğraflar temsilidir." : "Photographs are illustrative."}</p>}
         <a className="venue-powered" href="/" aria-label="Garnish">
           <LogoMark size={22} /> {t("poweredBy", lang)}
         </a>
