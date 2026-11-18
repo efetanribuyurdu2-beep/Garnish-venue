@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { themeCSS } from "@/lib/themeKit";
 import "./garnish.css";
+import "./backdrops.css";
 import "./globals.css";
 
 const host = process.env.VERCEL_PROJECT_PRODUCTION_URL ?? process.env.VERCEL_URL;

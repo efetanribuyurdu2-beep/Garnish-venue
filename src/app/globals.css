@@ -611,3 +611,20 @@
 .gm-row { grid-template-columns: minmax(0, auto) minmax(14px, 1fr) auto; }
 .gm-name { min-width: 0; overflow-wrap: anywhere; }
 .gm-ja { max-height: none; }
+
+/* the world's backdrop sits behind the menu (fixed), the menu above it */
+.venue > .backdrop { z-index: 0; }
+.venue-bar, .venue-main, .venue-foot { position: relative; z-index: 1; }
+
+/* performance on phones: no live blur over moving layers (the Garnish rule for transitions holds here too).
+   The aurora's softness comes from its gradients; Cosmos' glass card is simply more opaque. */
+.venue .bd-aurora { filter: none; opacity: 0.6; }
+.venue .bd-aurora i {
+  height: 48%;
+  background: radial-gradient(50% 50% at 50% 50%, rgba(127, 227, 196, 0.5), rgba(95, 184, 232, 0.28) 42%, rgba(180, 143, 214, 0.12) 68%, transparent 100%);
+  will-change: transform;
+}
+.venue .wmenu-cosmos .wm-card { backdrop-filter: none; --wm-paper: linear-gradient(160deg, rgba(30, 24, 80, 0.92), rgba(8, 9, 26, 0.96)); }
+.venue[data-world="cosmos"] .chip, .venue[data-world="cosmos"] .btn.ghost { backdrop-filter: none; }
+.venue .backdrop * { will-change: auto; }
+@media (prefers-reduced-motion: reduce) { .venue .backdrop * { animation: none !important; } }
