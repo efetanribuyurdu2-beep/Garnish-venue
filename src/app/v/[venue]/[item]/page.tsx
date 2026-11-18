@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { ItemDetail } from "@/components/ItemDetail";
 import { VenueFrame } from "@/components/VenueFrame";
 import { pick, t } from "@/lib/i18n";
+import { versionParam } from "@/lib/guestChoice";
 import { loadVenue, type Search } from "@/lib/venuePage";
 import { getVenueMenu } from "@/repo";
 
@@ -25,7 +26,7 @@ export default async function ItemPage({ params, searchParams }: { params: Param
   const v = menu.venue;
   const section = menu.sections.find((s) => s.id === it.sectionId);
   return (
-    <VenueFrame venue={v} world={world} lang={lang} path={`/v/${v.slug}/${it.slug}`} keep={keep}>
+    <VenueFrame venue={v} world={world} lang={lang} path={`/v/${v.slug}/${it.slug}`} keep={{ ...keep, ...(versionParam((await searchParams).v) ? { v: "zero" } : {}) }}>
       <div className={`wmenu wmenu-${world}`}>
         <article className="wm-card gi-card">
           <span className="wm-corner tl" aria-hidden />
@@ -35,7 +36,7 @@ export default async function ItemPage({ params, searchParams }: { params: Param
           <Link href={`/v/${v.slug}${query}`} className="gi-back">
             ← {t("back", lang)}
           </Link>
-          <ItemDetail it={it} venue={v} lang={lang} world={world} section={section ? pick(section.title, lang) : undefined} />
+          <ItemDetail it={it} venue={v} lang={lang} world={world} section={section ? pick(section.title, lang) : undefined} version={versionParam((await searchParams).v)} />
         </article>
       </div>
     </VenueFrame>

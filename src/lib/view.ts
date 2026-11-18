@@ -35,6 +35,17 @@ export interface ItemView {
   profile?: number[]; // cocktails: taste, AXES order (sweet sour bitter strong fresh aromatic), 0–5
   mark: string; // the world's mark: No. I, ٣, 一, ☿, ❄ 14°, 86 proof…
   ja?: string; // Japanese name, for Sakura's oshinagaki
+  /** the alcohol-free version, when the bar offers one: its own recipe, so its own allergens, taste and energy */
+  zeroVersion?: VersionFacts;
+}
+
+/** what the guest is shown of one version of a line */
+export interface VersionFacts {
+  price: string;
+  description: string;
+  allergens: { id: string; name: string; mark: string }[];
+  profile?: number[];
+  kcal: number;
 }
 
 export interface SectionView {
@@ -51,8 +62,17 @@ const allergenViews = (f: Facts, lang: Lang) =>
     return { id, name: pick(a.name, lang), mark: a.mark };
   });
 
+const AXES6 = ["sweet", "sour", "bitter", "strong", "fresh", "aromatic"] as const;
+const profileOf = (f: Facts) => AXES6.map((k) => Math.round(f.profile[k] * 10) / 10);
+/** "Alkolsüz cin · Nar suyu · …": the version's own ingredients, as the menu describes a drink */
+const partNames = (parts: { id: string; ml: number }[], lang: Lang) =>
+  parts.filter((p) => p.ml >= 5).slice(0, 4).map((p) => pick(ingredientById(p.id)?.name, lang) || p.id).join(" · ");
+
 export function itemView(it: MenuItem, currency: string, lang: Lang, world: WorldId = "maison", index = 0): ItemView {
   const f = itemFacts(it);
+  const hasZero = !f.simple && it.recipe && it.zeroPrice !== undefined && !f.zero;
+  const zr = hasZero ? zeroRecipe(it.recipe!) : undefined;
+  const zf = zr ? factsOf(zr, it.extraAllergens) : undefined;
   const lib = it.libraryId ? cocktailById(it.libraryId) : undefined;
   const kind = kindOf(it);
   const d = it.details;
@@ -63,7 +83,7 @@ export function itemView(it: MenuItem, currency: string, lang: Lang, world: Worl
     serving: d?.serving ? pick(d.serving, lang) : undefined,
     alt: d?.alt ? `${pick(d.alt.label, lang)} ${money(d.alt.price, currency, lang)}` : undefined,
     mark: MARK[world]({ index, id: it.id, abv: f.abv, year: lib?.year, root: lib?.root, food: kind === "food" }),
-    profile: f.simple ? undefined : (["sweet", "sour", "bitter", "strong", "fresh", "aromatic"] as const).map((k) => Math.round(f.profile[k] * 10) / 10),
+    profile: f.simple ? undefined : profileOf(f),
     ja: world === "sakura" && it.libraryId ? JA[it.libraryId] : undefined,
     id: it.id,
     slug: it.slug,
@@ -77,6 +97,10 @@ export function itemView(it: MenuItem, currency: string, lang: Lang, world: Worl
     abv: percent(f.abv, lang, 0),
     kcal: f.kcal,
     allergens: allergenViews(f, lang),
+    zeroVersion:
+      zr && zf && it.zeroPrice !== undefined
+        ? { price: money(it.zeroPrice, currency, lang), description: partNames(zr.parts, lang), allergens: allergenViews(zf, lang), profile: profileOf(zf), kcal: zf.kcal }
+        : undefined,
   };
 }
 

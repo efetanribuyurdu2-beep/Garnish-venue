@@ -1,11 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { itemHref, recommend } from "@/lib/guestChoice";
+import { useGuestPrefs } from "@/lib/guestPrefs";
 import { pick } from "@/lib/i18n";
 import { AXES, MOODS, match, type Mood } from "@/lib/moods";
 import type { Lang } from "@/lib/types";
 import type { SectionView } from "@/lib/view";
+import { AllergenIcon } from "./AllergenIcon";
 
 const T = {
   tr: {
@@ -14,11 +17,16 @@ const T = {
     open: "Bana bir içki öner",
     ask: "Bu akşam nasıl bir şey?",
     zero: "Alkolsüz olsun",
+    zeroOn: "0% · Alkolsüz",
     result: "Barmenin önerileri",
     fit: "uyum",
     again: "Başka bir şey",
     close: "Kapat",
-    none: "Bu seçime uyan içki kalmadı; alkolsüz seçeneğini kapatmayı deneyin.",
+    using: "Menü tercihlerin geçerli",
+    without: (a: string) => `${a} yok`,
+    edit: "Tercihleri düzenle",
+    none: "Bu menüde seçtiğin tercihlere uyan bir içki yok. Tercihlerini değiştirmek istersen düzenleyebilirsin; biz kendiliğimizden değiştirmiyoruz.",
+    fewer: (n: number) => (n === 1 ? "Tercihlerine uyan yalnızca bir içki var." : `Tercihlerine uyan yalnızca ${n} içki var.`),
     axes: ["Tatlı", "Ekşi", "Acı", "Sert", "Ferah", "Aromatik"],
   },
   en: {
@@ -27,16 +35,26 @@ const T = {
     open: "Suggest a drink",
     ask: "What are you in the mood for?",
     zero: "Alcohol-free",
+    zeroOn: "0% · Alcohol-free",
     result: "The bartender suggests",
     fit: "match",
     again: "Something else",
     close: "Close",
-    none: "Nothing on the menu fits this choice; try without alcohol-free.",
+    using: "Your menu preferences apply",
+    without: (a: string) => `${a}-free`,
+    edit: "Edit preferences",
+    none: "Nothing on this menu fits the preferences you chose. If you'd like to change them, you can edit them; we won't change them for you.",
+    fewer: (n: number) => (n === 1 ? "Only one drink fits your preferences." : `Only ${n} drinks fit your preferences.`),
     axes: ["Sweet", "Sour", "Bitter", "Strong", "Fresh", "Aromatic"],
   },
 };
 
-/** "Suggest a drink": six moods → the three drinks on this menu whose taste fits best. */
+/**
+ * "Suggest a drink": six moods → the drinks on this menu whose taste fits best.
+ * It follows the guest's menu preferences (alcohol-free only, allergens left out):
+ * every candidate is judged as the version that would be served, and when nothing
+ * fits it says so instead of relaxing them.
+ */
 export function Recommender({ sections, lang, base, query }: { sections: SectionView[]; lang: Lang; base: string; query: string }) {
   const t = T[lang];
   const sheet = useRef<HTMLDialogElement>(null);
@@ -46,18 +64,21 @@ export function Recommender({ sections, lang, base, query }: { sections: Section
     return () => window.removeEventListener("gv:recommend", open);
   }, []);
   const [mood, setMood] = useState<Mood | null>(null);
-  const [zero, setZero] = useState(false);
-  const all = sections.flatMap((s) => s.items).filter((i): i is typeof i & { profile: number[] } => Boolean(i.profile));
-  // alcohol-free drinks are suggested when asked for (or when the menu has too few others)
-  const boozy = all.filter((i) => !i.zero);
-  const pool = zero ? all.filter((i) => i.zero || i.zeroPrice) : boozy.length >= 3 ? boozy : all;
-  const picks = mood
-    ? pool
-        .map((i) => ({ i, score: match(i.profile, mood) }))
-        .sort((a, b) => b.score - a.score)
-        .slice(0, 3)
-    : [];
+  const [prefs, setPrefs] = useGuestPrefs(base);
+  const all = sections.flatMap((s) => s.items).filter((i) => Boolean(i.profile));
+  const names = useMemo(() => {
+    const m = new Map<string, string>();
+    sections.forEach((s) => s.items.forEach((i) => [...i.allergens, ...(i.zeroVersion?.allergens ?? [])].forEach((a) => m.set(a.id, a.name))));
+    return m;
+  }, [sections]);
+  const active = [...(prefs.zero ? [t.zeroOn] : []), ...prefs.avoid.map((id) => t.without(names.get(id) ?? id))];
+  const picks = mood ? recommend(all, prefs, (p) => match(p, mood), 3) : [];
   if (all.length < 3) return null;
+
+  const editPrefs = () => {
+    sheet.current?.close();
+    window.dispatchEvent(new Event("gv:prefs"));
+  };
 
   return (
     <>
@@ -65,6 +86,11 @@ export function Recommender({ sections, lang, base, query }: { sections: Section
         <div>
           <p className="rc-title">{t.title}</p>
           <p className="rc-body">{t.body}</p>
+          {active.length > 0 && (
+            <p className="rc-prefs">
+              {t.using}: {active.join(" · ")}
+            </p>
+          )}
         </div>
         <button className="btn" onClick={() => sheet.current?.showModal()}>
           ✦ {t.open}
@@ -94,33 +120,56 @@ export function Recommender({ sections, lang, base, query }: { sections: Section
                 <span>
                   <strong>0%</strong> · {t.zero}
                 </span>
-                <input type="checkbox" checked={zero} onChange={(e) => setZero(e.target.checked)} />
+                <input type="checkbox" checked={prefs.zero} onChange={(e) => setPrefs({ zero: e.target.checked })} />
                 <span className="gm-switch-track" aria-hidden />
               </label>
+              {prefs.avoid.length > 0 && (
+                <p className="rc-prefs">
+                  {t.using}: {prefs.avoid.map((id) => t.without(names.get(id) ?? id)).join(" · ")}{" "}
+                  <button className="gm-linkbtn" onClick={editPrefs}>
+                    {t.edit}
+                  </button>
+                </p>
+              )}
             </>
           ) : (
             <>
               <p className="rc-chosen">
                 {pick(mood.name, lang)}
-                {zero ? ` · 0%` : ""}
+                {active.length ? ` · ${active.join(" · ")}` : ""}
               </p>
-              {picks.length === 0 && <p className="rc-body">{t.none}</p>}
+              {picks.length === 0 && (
+                <p className="rc-body rc-none" role="status">
+                  {t.none}
+                </p>
+              )}
+              {picks.length > 0 && picks.length < 3 && (prefs.zero || prefs.avoid.length > 0) && (
+                <p className="rc-body rc-fewer" role="status">
+                  {t.fewer(picks.length)}
+                </p>
+              )}
               <ol className="rc-list">
-                {picks.map(({ i, score }) => (
+                {picks.map(({ item: i, v, score }) => (
                   <li key={i.id}>
-                    <Link href={`${base}/${encodeURIComponent(i.slug)}${query}`} className="rc-pick" onClick={() => sheet.current?.close()} scroll={false}>
+                    <Link href={itemHref(base, i.slug, query, v.key)} className="rc-pick" data-version={v.key} onClick={() => sheet.current?.close()} scroll={false}>
                       <span className="rc-pick-head">
                         <span className="rc-name" lang={i.nameLang}>
                           {i.name}
                         </span>
-                        <span className="rc-price">{zero && !i.zero && i.zeroPrice ? i.zeroPrice : i.price}</span>
+                        <span className="rc-price">{v.price}</span>
                       </span>
-                      <span className="rc-desc">{i.description}</span>
-                      <span className="rc-taste" aria-label={AXES.map((_, k) => `${t.axes[k]} ${i.profile[k]}/5`).join(", ")}>
+                      <span className="rc-desc">{v.description}</span>
+                      <span className="rc-meta">
+                        {v.zero && <span className="gm-badge">0%</span>}
+                        {v.allergens.map((a) => (
+                          <AllergenIcon key={a.id} id={a.id} size={15} title={a.name} />
+                        ))}
+                      </span>
+                      <span className="rc-taste" aria-label={AXES.map((_, k) => `${t.axes[k]} ${v.profile[k]}/5`).join(", ")}>
                         {AXES.map((a, k) => (
                           <span key={a} className="rc-axis">
                             <span className="rc-bar">
-                              <i style={{ height: `${Math.max(6, (i.profile[k] / 5) * 100)}%` }} />
+                              <i style={{ height: `${Math.max(6, (v.profile[k] / 5) * 100)}%` }} />
                             </span>
                             <small>{t.axes[k]}</small>
                           </span>
@@ -134,6 +183,11 @@ export function Recommender({ sections, lang, base, query }: { sections: Section
                 ))}
               </ol>
               <footer className="gm-sheet-foot">
+                {(prefs.zero || prefs.avoid.length > 0) && (
+                  <button className="btn ghost" onClick={editPrefs}>
+                    {t.edit}
+                  </button>
+                )}
                 <button className="btn ghost" onClick={() => setMood(null)}>
                   {t.again}
                 </button>

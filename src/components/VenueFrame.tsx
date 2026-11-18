@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { Venue } from "@/domain/types";
 import type { Lang, WorldId } from "@/lib/types";
 import { brandLang, t } from "@/lib/i18n";
+import { Fonts } from "./Fonts";
 import { LogoMark } from "./Logo";
 import { WorldBackdrop } from "./WorldBackdrop";
 
@@ -32,6 +33,7 @@ export function VenueFrame({
   const q = (l: Lang) => "?" + new URLSearchParams({ ...keep, lang: l }).toString();
   return (
     <div className="venue" data-world={world} data-palette={venue.palette ?? "noir"} lang={lang}>
+      <Fonts worlds={[world]} />
       <WorldBackdrop world={world} />
       {demo && (
         <nav className="venue-demo" aria-label={lang === "tr" ? "Diğer dünyalar" : "Other worlds"}>

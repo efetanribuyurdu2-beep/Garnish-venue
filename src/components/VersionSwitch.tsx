@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { AllergenIcon } from "./AllergenIcon";
 
 export interface VersionView {
@@ -18,21 +18,37 @@ export interface VersionView {
  */
 export function VersionSwitch({
   versions,
+  initial = 0,
   text,
   alt,
 }: {
   versions: VersionView[];
+  initial?: number;
   text: { inside: string; allergens: string; noAllergens: string };
   alt?: { label: string; price: string };
 }) {
-  const [k, setK] = useState(0);
-  const v = versions[k];
+  const [k, setK] = useState(initial);
+  const card = useRef<HTMLDivElement>(null);
+  const v = versions[k] ?? versions[0];
+  // switching keeps the address in step (`?v=zero`, or none for the original), so a refresh or a shared link opens the same version
+  const choose = (i: number) => {
+    setK(i);
+    // the parts of the page drawn for both versions (description, taste) follow the chosen one
+    const page = card.current?.closest<HTMLElement>(".gi");
+    if (page) page.dataset.version = versions[i].key;
+    try {
+      const url = new URL(window.location.href);
+      if (versions[i].key === "zero") url.searchParams.set("v", "zero");
+      else url.searchParams.delete("v");
+      window.history.replaceState(window.history.state, "", url);
+    } catch {}
+  };
   return (
-    <div className="gi-label-card">
+    <div className="gi-label-card" data-version={v.key} ref={card}>
       {versions.length > 1 && (
         <div className="gi-switch" role="tablist">
           {versions.map((x, i) => (
-            <button key={x.key} role="tab" aria-selected={i === k} className={i === k ? "on" : ""} onClick={() => setK(i)}>
+            <button key={x.key} role="tab" aria-selected={i === k} className={i === k ? "on" : ""} data-version={x.key} onClick={() => choose(i)}>
               {x.label}
             </button>
           ))}

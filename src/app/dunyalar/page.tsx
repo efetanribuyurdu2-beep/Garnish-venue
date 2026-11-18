@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Fonts } from "@/components/Fonts";
 import { LogoMark } from "@/components/Logo";
 import { SiteNav } from "@/components/SiteNav";
 import { NAV_WORLDS, WorldSeal } from "@/components/WorldDoor";
@@ -14,6 +15,7 @@ export const metadata: Metadata = {
 export default function Worlds() {
   return (
     <main className="lp dw">
+      <Fonts />
       <SiteNav worlds={NAV_WORLDS()} />
       <header className="dw-head">
         <p className="lp-eyebrow">Garnish · dokuz dünya</p>

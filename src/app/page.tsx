@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Fonts } from "@/components/Fonts";
 import { HeroWorlds, type HeroWorld } from "@/components/HeroWorlds";
 import { LandingPhone } from "@/components/LandingPhone";
 import { LogoMark } from "@/components/Logo";
@@ -52,6 +53,7 @@ export default function Home() {
   });
   return (
     <main className="lp">
+      <Fonts />
       <SiteNav worlds={NAV_WORLDS()} />
       <HeroWorlds worlds={hero} />
 
