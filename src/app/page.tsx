@@ -1,12 +1,19 @@
 import Link from "next/link";
+import { HeroWorlds, type HeroWorld } from "@/components/HeroWorlds";
 import { LandingPhone } from "@/components/LandingPhone";
 import { LogoMark } from "@/components/Logo";
+import { SiteNav } from "@/components/SiteNav";
+import { NAV_WORLDS, WorldSeal } from "@/components/WorldDoor";
 import { WORLDS } from "@/data/worlds";
+import { brandLang, pick } from "@/lib/i18n";
+import { HEAD } from "@/lib/worldMenu";
+import { demoForWorld } from "@/repo/demo";
 
 /**
- * The product page for bars (Turkish first: the first market is Turkey).
- * A live demo menu in a phone, why now (the law), how it works, the worlds,
- * and the pilot invitation.
+ * The home page (Turkish first: the first market is Turkey). It opens on the
+ * nine worlds, one after another; right under them the nine bars' doors; then
+ * what a guest gets at the table; then, for bars, how it works, why now and
+ * the pilot.
  */
 const CONTACT = process.env.NEXT_PUBLIC_CONTACT_URL;
 
@@ -29,55 +36,61 @@ const POINTS: [string, string, React.ReactNode][] = [
   ["Sizin dünyanız", "Menü şablon gibi değil, barınızın kendisi gibi görünür: duvarı, yazısı, kadehleri.", <path key="d" d="M12 3a9 9 0 100 18 9 9 0 000-18zM3 12h18M12 3c2.5 2.5 3.6 5.6 3.6 9S14.5 18.5 12 21c-2.5-2.5-3.6-5.6-3.6-9S9.5 5.5 12 3z" />],
 ];
 
+const GUEST: [string, string][] = [
+  ["Dünyasında açılır", "QR okutulur, bar kendi dünyasında belirir: duvarı, yazısı, kadehleri, hareketli arka planı."],
+  ["Bana bir içki öner", "Misafir ruh hâlini seçer, barmen bu menüden üç içki önerir."],
+  ["Herkes için", "Alkolsüz ve alerjen filtresi, büyük yazı modu, Türkçe ve İngilizce."],
+  ["Gerçekçi ve şeffaf", "Her içki kendi bardağında, kendi renginde; alkol, kalori ve alerjen bilgisiyle."],
+];
+
 export default function Home() {
   const worlds = WORLDS.map((w) => ({ id: w.id, name: w.name.tr }));
+  const hero: HeroWorld[] = WORLDS.map((w) => {
+    const v = demoForWorld(w.id).venue;
+    const kicker = pick(HEAD[w.id].kicker, "tr");
+    return { id: w.id, bar: v.name, barLang: brandLang(v.name), slug: v.slug, kicker, kickerLang: brandLang(kicker), greeting: w.greeting.tr, name: w.name.tr, tagline: w.tagline.tr };
+  });
   return (
     <main className="lp">
-      <nav className="lp-nav">
-        <Link href="/" className="lp-nav-brand" aria-label="Garnish Venue">
-          <LogoMark size={28} />
-          <span>GARNISH · VENUE</span>
-        </Link>
-        <Link href="/panel" className="btn ghost small lp-nav-login">
-          Bar girişi
-        </Link>
-      </nav>
-      <section className="lp-hero">
-        <div className="lp-hero-text">
-          <span className="lp-mark">
-            <LogoMark size={64} />
-          </span>
-          <p className="lp-kicker">GARNISH · VENUE</p>
-          <h1>Barınızın menüsü, kendi dünyasında.</h1>
-          <p className="lp-lead">
-            Kokteyl barları için lüks ve etkileşimli QR menü. Misafiriniz bir PDF değil, barınızın kendisini görür. Alerjen ve kalori reçeteden gelir, fiyatlar tek tıkla değişir.
-          </p>
-          <div className="lp-cta">
-            <Link className="btn" href="/panel">Barınızın menüsünü oluşturun</Link>
-            <Link className="btn ghost" href="/v/demo">Demo menüyü aç</Link>
-          </div>
-          <p className="lp-hint">Telefondaki menüler gerçek: kaydırın, bir içkiye dokunun, alttan başka bir dünyanın barına geçin.</p>
+      <SiteNav worlds={NAV_WORLDS()} />
+      <HeroWorlds worlds={hero} />
+
+      <section className="lp-doors" aria-labelledby="doors-title">
+        <div className="lp-doors-head">
+          <p className="lp-eyebrow">Dokuz bar · dokuz sır</p>
+          <h2 id="doors-title">Hangisini açacaksınız?</h2>
+          <Link href="/dunyalar" className="lp-more">
+            Tüm dünyalar →
+          </Link>
         </div>
-        <LandingPhone worlds={worlds} />
-      </section>
-
-      <section className="lp-sec lp-law">
-        <p className="lp-eyebrow">Neden şimdi</p>
-        <h2>Menüler artık yasal bir belge.</h2>
-        <ol className="lp-timeline">
-          {LAW.map(([d, h, p]) => (
-            <li key={d}>
-              <span className="lp-date">{d}</span>
-              <h3>{h}</h3>
-              <p>{p}</p>
-            </li>
+        <div className="lp-doors-row">
+          {WORLDS.map((w) => (
+            <WorldSeal key={w.id} world={w.id} compact />
           ))}
-        </ol>
-        <p className="lp-small">Tarihler bakanlık duyurularına göredir; uygulama ayrıntıları için Resmî Gazete esastır.</p>
+        </div>
       </section>
 
-      <section className="lp-sec">
-        <p className="lp-eyebrow">Nasıl çalışır</p>
+      <section className="lp-sec lp-guest" id="misafir">
+        <div className="lp-guest-grid">
+          <div className="lp-guest-text">
+            <p className="lp-eyebrow">Masada</p>
+            <h2>Misafiriniz bir PDF değil, barınızı görür.</h2>
+            <ul className="lp-guest-list">
+              {GUEST.map(([h, p]) => (
+                <li key={h}>
+                  <h3>{h}</h3>
+                  <p>{p}</p>
+                </li>
+              ))}
+            </ul>
+            <p className="lp-hint">Yandaki telefon gerçek: kaydırın, bir içkiye dokunun, alttan başka bir dünyanın barına geçin.</p>
+          </div>
+          <LandingPhone worlds={worlds} />
+        </div>
+      </section>
+
+      <section className="lp-sec" id="nasil">
+        <p className="lp-eyebrow">Barlar için · nasıl çalışır</p>
         <h2>Üç adımda masada.</h2>
         <ol className="lp-steps">
           {STEPS.map(([h, p], i) => (
@@ -88,9 +101,14 @@ export default function Home() {
             </li>
           ))}
         </ol>
+        <div className="lp-cta lp-cta-center">
+          <Link className="btn" href="/panel">
+            Barınızı ekleyin
+          </Link>
+        </div>
       </section>
 
-      <section className="lp-sec">
+      <section className="lp-sec" id="barlar">
         <div className="lp-points">
           {POINTS.map(([h, p, icon]) => (
             <article key={h}>
@@ -106,24 +124,19 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="lp-sec lp-worlds">
-        <p className="lp-eyebrow">Dünyalar</p>
-        <h2>Dokuz dünya, dokuz bar.</h2>
-        <p>Her dünyanın kendi barı, kendi imza kokteylleri ve kendi menü dili var. Barınızı açarken birini seçin, menüsü hazır gelsin.</p>
-        <ul>
-          {WORLDS.map((w) => (
-            <li key={w.id}>
-              <Link href={`/v/demo?world=${w.id}`} className={`lp-portal wc-${w.id}`} data-world={w.id}>
-                <span className="lp-portal-wall" aria-hidden />
-                <span className="lp-world-emblem" aria-hidden />
-                <span className="lp-portal-name" lang={w.name.tr === w.name.en ? "en" : undefined}>
-                  {w.name.tr}
-                </span>
-                <span className="lp-portal-line">{w.tagline.tr}</span>
-              </Link>
+      <section className="lp-sec lp-law">
+        <p className="lp-eyebrow">Neden şimdi</p>
+        <h2>Menüler artık yasal bir belge.</h2>
+        <ol className="lp-timeline">
+          {LAW.map(([d, h, p]) => (
+            <li key={d}>
+              <span className="lp-date">{d}</span>
+              <h3>{h}</h3>
+              <p>{p}</p>
             </li>
           ))}
-        </ul>
+        </ol>
+        <p className="lp-small">Tarihler bakanlık duyurularına göredir; uygulama ayrıntıları için Resmî Gazete esastır.</p>
       </section>
 
       <section className="lp-sec lp-pilot" id="pilot">
@@ -145,9 +158,11 @@ export default function Home() {
       <footer className="lp-foot">
         <LogoMark size={28} />
         <p>Garnish Venue · İstanbul</p>
-        <Link href="/panel" className="lp-foot-login">
-          Bar girişi →
-        </Link>
+        <nav className="lp-foot-links" aria-label="Alt menü">
+          <Link href="/dunyalar">Dünyalar</Link>
+          <Link href="/#nasil">Nasıl çalışır</Link>
+          <Link href="/panel">Bar girişi</Link>
+        </nav>
       </footer>
     </main>
   );
