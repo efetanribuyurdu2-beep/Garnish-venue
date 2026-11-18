@@ -1,4 +1,5 @@
 import type { Photo } from "@/domain/types";
+import type { L } from "@/lib/types";
 
 /**
  * Sized URL for a photo. Unsplash raw URLs take imgix parameters (crop to the
@@ -14,3 +15,14 @@ export function photoSrc(p: Photo, w: number, h: number, dpr = 2) {
 }
 
 export const unsplashRef = (url: string) => `${url}${url.includes("?") ? "&" : "?"}utm_source=garnish_venue&utm_medium=referral`;
+
+/** a look-alike from Unsplash, labelled as illustrative and credited */
+export function illustrativePhoto(s: { url: string; color?: string; author: string; authorUrl: string; photoUrl: string }, name: L): Photo {
+  return {
+    url: s.url,
+    alt: { tr: `${name.tr} için temsili fotoğraf`, en: `Illustrative photo for ${name.en}` },
+    color: s.color,
+    illustrative: true,
+    credit: { author: s.author, authorUrl: s.authorUrl, sourceUrl: s.photoUrl, source: "unsplash" },
+  };
+}

@@ -14,6 +14,7 @@ import { WORLDS, worldById } from "@/data/worlds";
 import type { MenuItem, MenuSection, Photo, Venue, VenueMenu } from "@/domain/types";
 import { analyse } from "@/lib/balance";
 import type { Cocktail, L, WorldId } from "@/lib/types";
+import { illustrativePhoto } from "@/lib/photos";
 import { HEAD } from "@/lib/worldMenu";
 import { isZeroCocktail } from "@/lib/zero";
 
@@ -138,14 +139,7 @@ export function stockPhoto(id: string): Photo | undefined {
   // a look-alike for a drink no one has photographed: shown, and labelled, as illustrative
   const s = SIGNATURE_PHOTOS[id];
   const name = cocktailById(id)?.name;
-  if (!s || !name) return undefined;
-  return {
-    url: s.url,
-    alt: l(`${name.tr} için temsili fotoğraf`, `Illustrative photo for ${name.en}`),
-    color: s.color,
-    illustrative: true,
-    credit: { author: s.author, authorUrl: s.authorUrl, sourceUrl: s.photoUrl, source: "unsplash" },
-  };
+  return s && name ? illustrativePhoto(s, name) : undefined;
 }
 
 /** The world's own menu: sections and drinks, ready to price and pour. */

@@ -10,7 +10,9 @@
  * Brand names are avoided on purpose: the bar writes its own producer in "origin".
  */
 import type { ItemDetails, ItemKind, MenuItem } from "@/domain/types";
+import { illustrativePhoto } from "@/lib/photos";
 import type { L, WorldId } from "@/lib/types";
+import { KITCHEN_PHOTOS } from "./kitchenPhotos";
 
 /** what is drawn on the plate (FoodPlate) */
 export type Dish = "dips" | "olives" | "cake" | "fries" | "cheese" | "oysters" | "fried" | "bread" | "rolls" | "ramekin" | "baklava" | "greens" | "grill" | "fish";
@@ -213,7 +215,7 @@ export function libraryPrice(x: Pick<LibItem, "price" | "alt">, world: WorldId) 
 }
 
 /** a library line as menu fields, priced for the world (kuruş), with optional overrides */
-export function libItemFields(x: LibItem, world: WorldId, over: { name?: L; desc?: L } = {}): Pick<MenuItem, "name" | "description" | "price" | "kind" | "details" | "extraAllergens"> {
+export function libItemFields(x: LibItem, world: WorldId, over: { name?: L; desc?: L } = {}): Pick<MenuItem, "name" | "description" | "price" | "kind" | "details" | "extraAllergens" | "photo"> {
   const p = libraryPrice(x, world);
   const details: ItemDetails = { style: x.style, serving: x.serving };
   if (x.dish) details.plate = x.dish;
@@ -222,5 +224,7 @@ export function libItemFields(x: LibItem, world: WorldId, over: { name?: L; desc
   if (x.volume !== undefined) details.volume = x.volume;
   if (x.kcal !== undefined) details.kcal = x.kcal;
   if (x.alt && p.alt) details.alt = { label: x.alt.label, price: p.alt * 100 };
-  return { name: over.name ?? x.name, description: over.desc ?? x.desc, price: p.price * 100, kind: x.kind, details, extraAllergens: [...x.allergens] };
+  const name = over.name ?? x.name;
+  const photo = KITCHEN_PHOTOS[x.id];
+  return { name, description: over.desc ?? x.desc, price: p.price * 100, kind: x.kind, details, extraAllergens: [...x.allergens], ...(photo ? { photo: illustrativePhoto(photo, name) } : {}) };
 }

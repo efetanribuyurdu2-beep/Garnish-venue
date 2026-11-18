@@ -212,6 +212,7 @@ export default function ItemEditor() {
       details: detailsFrom(f.details),
       extraAllergens: f.extraAllergens ?? [],
       price: d.price.trim() ? d.price : kurusToTl(f.price),
+      photo: d.photo && !d.photo.illustrative ? d.photo : f.photo,
       hasZero: false,
       libraryId: undefined,
     });
@@ -615,6 +616,11 @@ export default function ItemEditor() {
           <section className="pn-card">
             <p className="pn-eyebrow">Fotoğraf</p>
             <p className="pn-hint">Kendi çektiğiniz bir fotoğraf; dikey ve sade bir arka plan en iyisi. Yoksa menüde içki, kendi renginde çizilmiş bardağıyla görünür.</p>
+            {d.photo?.illustrative && (
+              <p className="pn-hint">
+                Şu an kütüphanenin temsili fotoğrafı ({d.photo.credit?.author} · Unsplash). Misafir menüsünde &quot;Temsili görsel&quot; yazar; kendi fotoğrafınızı yükleyebilir ya da kaldırabilirsiniz.
+              </p>
+            )}
             <div className="pn-row">
               <label className="btn ghost pn-file">
                 {busy === "photo" ? "Yükleniyor…" : d.photo ? "Fotoğrafı değiştir" : "Fotoğraf yükle"}
