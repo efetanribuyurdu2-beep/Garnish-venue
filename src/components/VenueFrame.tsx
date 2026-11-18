@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { Venue } from "@/domain/types";
 import type { Lang, WorldId } from "@/lib/types";
-import { t } from "@/lib/i18n";
+import { brandLang, t } from "@/lib/i18n";
 import { LogoMark } from "./Logo";
 import { WorldBackdrop } from "./WorldBackdrop";
 
@@ -15,6 +15,7 @@ export function VenueFrame({
   path,
   keep,
   children,
+  demo,
 }: {
   venue: Venue;
   world: WorldId;
@@ -22,13 +23,34 @@ export function VenueFrame({
   path: string; // current path, for the language links
   keep: Record<string, string>; // query params to keep (world preview)
   children: React.ReactNode;
+  /** demo bars: the bars of the worlds before and after, to walk between them */
+  demo?: { prev: { slug: string; name: string }; next: { slug: string; name: string } };
 }) {
   const q = (l: Lang) => "?" + new URLSearchParams({ ...keep, lang: l }).toString();
   return (
     <div className="venue" data-world={world} data-palette={venue.palette ?? "noir"} lang={lang}>
       <WorldBackdrop world={world} />
+      {demo && (
+        <nav className="venue-demo" aria-label={lang === "tr" ? "Diğer dünyalar" : "Other worlds"}>
+          <Link href={`/v/${demo.prev.slug}`} lang={brandLang(demo.prev.name)}>
+            ‹ {demo.prev.name}
+          </Link>
+          <Link href="/dunyalar" className="venue-demo-all">
+            {lang === "tr" ? "Dokuz dünya" : "Nine worlds"}
+          </Link>
+          <Link href={`/v/${demo.next.slug}`} lang={brandLang(demo.next.name)}>
+            {demo.next.name} ›
+          </Link>
+        </nav>
+      )}
       <header className="venue-bar">
-        <span className="venue-city">{venue.city}</span>
+        {demo ? (
+          <Link href="/" className="venue-home" aria-label="Garnish Venue">
+            <LogoMark size={22} />
+          </Link>
+        ) : (
+          <span className="venue-city">{venue.city}</span>
+        )}
         {venue.languages.length > 1 && (
           <nav className="venue-langs" aria-label="Language">
             {venue.languages.map((l) => (
@@ -44,6 +66,7 @@ export function VenueFrame({
         {venue.serviceNote && <p>{venue.serviceNote[lang]}</p>}
         <p>{t("estimate", lang)}</p>
         <p>{t("printed", lang)}</p>
+        {demo && <p>{lang === "tr" ? "Fotoğraflar temsilidir." : "Photographs are illustrative."}</p>}
         <a className="venue-powered" href="/" aria-label="Garnish">
           <LogoMark size={22} /> {t("poweredBy", lang)}
         </a>

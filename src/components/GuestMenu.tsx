@@ -52,6 +52,12 @@ export function GuestMenu({
   const [big, setBig] = useState(false);
   const [active, setActive] = useState(sections[0]?.id);
   const sheet = useRef<HTMLDialogElement>(null);
+  // the guest dock (bottom bar) opens the preferences from anywhere on the page
+  useEffect(() => {
+    const open = () => sheet.current?.showModal();
+    window.addEventListener("gv:prefs", open);
+    return () => window.removeEventListener("gv:prefs", open);
+  }, []);
   const nav = useRef<HTMLDivElement>(null);
 
   useEffect(() => {

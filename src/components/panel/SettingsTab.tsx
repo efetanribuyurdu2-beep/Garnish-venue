@@ -126,10 +126,12 @@ export function SettingsTab({ ws, reload }: { ws: Workspace; reload: () => Promi
         </span>
       </label>
 
-      {msg && <p className={`pn-msg ${msg.kind}`}>{msg.text}</p>}
-      <button className="btn" disabled={busy}>
-        {busy ? "Kaydediliyor…" : "Kaydet"}
-      </button>
+      <div className="pn-actions pn-actions-tabbed">
+        <button className="btn" disabled={busy}>
+          {busy ? "Kaydediliyor…" : "Kaydet"}
+        </button>
+        {msg && <p className={`pn-msg ${msg.kind}`}>{msg.text}</p>}
+      </div>
     </form>
   );
 }

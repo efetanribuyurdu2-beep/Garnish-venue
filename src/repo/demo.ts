@@ -1,12 +1,13 @@
 /**
  * The nine world bars of Garnish, as demo venues: each with its own name,
  * collection of signatures, the classics that suit it, its alcohol-free list,
- * prices in its own register and (where the Garnish Cocktail Book has one) a
- * credited photograph. They are the sales demo and the starting menu a new bar
- * can take (worldStarter). `/v/demo?world=<id>` opens the world's bar.
+ * prices in its own register and a credited photograph (the Garnish Cocktail
+ * Book's, or an illustrative look-alike from signaturePhotos.ts). They are the
+ * sales demo and the starting menu a new bar can take (worldStarter). `/v/demo?world=<id>` opens the world's bar.
  */
 import { COCKTAILS, cocktailById } from "@/data/cocktails";
 import { ingredientById } from "@/data/ingredients";
+import { SIGNATURE_PHOTOS } from "@/data/signaturePhotos";
 import { STOCK_PHOTOS } from "@/data/stockPhotos";
 import { WORLDS, worldById } from "@/data/worlds";
 import type { MenuItem, MenuSection, Photo, Venue, VenueMenu } from "@/domain/types";
@@ -146,7 +147,18 @@ export function describe(parts: { id: string; ml: number }[]): L {
 
 export function stockPhoto(id: string): Photo | undefined {
   const p = STOCK_PHOTOS[id];
-  return p && { url: p.url, alt: p.alt, color: p.color, credit: { author: p.author, authorUrl: p.authorUrl, sourceUrl: p.photoUrl, source: "unsplash" } };
+  if (p) return { url: p.url, alt: p.alt, color: p.color, credit: { author: p.author, authorUrl: p.authorUrl, sourceUrl: p.photoUrl, source: "unsplash" } };
+  // a look-alike for a drink no one has photographed: shown, and labelled, as illustrative
+  const s = SIGNATURE_PHOTOS[id];
+  const name = cocktailById(id)?.name;
+  if (!s || !name) return undefined;
+  return {
+    url: s.url,
+    alt: l(`${name.tr} için temsili fotoğraf`, `Illustrative photo for ${name.en}`),
+    color: s.color,
+    illustrative: true,
+    credit: { author: s.author, authorUrl: s.authorUrl, sourceUrl: s.photoUrl, source: "unsplash" },
+  };
 }
 
 /** The world's own menu: sections and drinks, ready to price and pour. */
@@ -243,3 +255,12 @@ const ALIASES: Record<string, string> = { demo: DEMO_SLUG.maison, sirkeci: DEMO_
 export const demoBySlug = (slug: string) => BY_SLUG.get(ALIASES[slug] ?? slug);
 export const demoForWorld = (world: WorldId) => BY_SLUG.get(DEMO_SLUG[world])!;
 export const isDemoSlug = (slug: string) => BY_SLUG.has(slug) || slug in ALIASES;
+
+/** the demo bars before and after this one, for moving between worlds */
+export function demoNeighbours(slug: string) {
+  const list = DEMO_MENUS.map((m) => ({ slug: m.venue.slug, name: m.venue.name, world: m.venue.world }));
+  const real = ALIASES[slug] ?? slug;
+  const i = list.findIndex((x) => x.slug === real);
+  if (i < 0) return undefined;
+  return { prev: list[(i + list.length - 1) % list.length], next: list[(i + 1) % list.length] };
+}

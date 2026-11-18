@@ -45,6 +45,7 @@ export interface Photo {
   url: string; // public URL (Supabase storage, or Unsplash urls.raw)
   alt?: L;
   color?: string; // average colour, painted while it loads
+  illustrative?: boolean; // a look-alike, not this bar's drink: labelled "Temsili görsel"
   credit?: { author: string; authorUrl: string; sourceUrl: string; source: "unsplash" };
 }
 

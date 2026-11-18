@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { pick } from "@/lib/i18n";
 import { AXES, MOODS, match, type Mood } from "@/lib/moods";
 import type { Lang } from "@/lib/types";
@@ -40,6 +40,11 @@ const T = {
 export function Recommender({ sections, lang, base, query }: { sections: SectionView[]; lang: Lang; base: string; query: string }) {
   const t = T[lang];
   const sheet = useRef<HTMLDialogElement>(null);
+  useEffect(() => {
+    const open = () => sheet.current?.showModal();
+    window.addEventListener("gv:recommend", open);
+    return () => window.removeEventListener("gv:recommend", open);
+  }, []);
   const [mood, setMood] = useState<Mood | null>(null);
   const [zero, setZero] = useState(false);
   const all = sections.flatMap((s) => s.items).filter((i): i is typeof i & { profile: number[] } => Boolean(i.profile));

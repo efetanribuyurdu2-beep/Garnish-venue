@@ -209,10 +209,21 @@ a.pn-item-main:hover { background: color-mix(in srgb, var(--accent) 7%, transpar
 .pn-tables { width: 130px; margin: 0; }
 .pn-url { padding: 9px 12px; border: 1px dashed var(--line); font-size: 0.86rem; word-break: break-all; color: var(--accent); }
 
-/* phones: every tab in view (two rows) instead of a row that hides the last tabs off-screen */
+/* phones: the tabs live at the bottom, like an app; every tab one tap away */
+.pn-tab-icon, .pn-tab-short { display: none; }
 @media (max-width: 640px) {
-  .pn-tabs { flex-wrap: wrap; overflow: visible; gap: 0; }
-  .pn-tabs button { flex: 1 1 auto; padding: 11px 10px; font-size: 0.72rem; letter-spacing: 0.1em; }
+  .pn-tabs {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 30;
+    display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr);
+    margin: 0; padding: 6px 4px calc(6px + env(safe-area-inset-bottom));
+    background: color-mix(in srgb, var(--bg) 94%, transparent); backdrop-filter: blur(10px);
+    border-top: 1px solid var(--line); border-bottom: 0; overflow: visible;
+  }
+  .pn-tabs button { display: grid; justify-items: center; gap: 3px; padding: 6px 2px; border: 0; border-radius: 10px; font-size: 0.62rem; letter-spacing: 0.04em; text-transform: none; }
+  .pn-tabs button.on { background: color-mix(in srgb, var(--accent) 12%, transparent); }
+  .pn-tab-icon, .pn-tab-short { display: block; }
+  .pn-tab-long { display: none; }
+  .pn-page { padding-bottom: 76px; }
 }
 
 /* start with the world's menu */
@@ -234,3 +245,8 @@ a.pn-item-main:hover { background: color-mix(in srgb, var(--accent) 7%, transpar
 .pn-kind.on { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, var(--bg)); color: var(--accent); }
 .pn-pair-tight { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
 @media (max-width: 640px) { .pn-kinds { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+
+/* the editor's Save is always in reach */
+.pn-actions { position: sticky; bottom: 0; z-index: 20; padding: 12px 0 calc(12px + env(safe-area-inset-bottom)); background: linear-gradient(transparent, var(--bg) 30%); }
+/* inside the tabbed venue page the phone tab bar is fixed at the bottom: sit just above it */
+@media (max-width: 640px) { .pn-actions-tabbed { bottom: calc(64px + env(safe-area-inset-bottom)); } }
