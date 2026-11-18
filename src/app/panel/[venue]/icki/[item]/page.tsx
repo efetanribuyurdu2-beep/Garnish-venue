@@ -46,6 +46,7 @@ interface DetailsDraft {
   altLabel: L;
   altPrice: string;
   plate: string;
+  color?: string;
 }
 const num = (s: string) => (s.trim() === "" ? undefined : Number(s.replace(",", ".")));
 const detailsFrom = (d?: ItemDetails): DetailsDraft => ({
@@ -58,6 +59,7 @@ const detailsFrom = (d?: ItemDetails): DetailsDraft => ({
   altLabel: d?.alt?.label ?? { tr: "", en: "" },
   altPrice: d?.alt ? kurusToTl(d.alt.price) : "",
   plate: d?.plate ?? "",
+  color: d?.color,
 });
 const pair = (l: L) => (l.tr.trim() || l.en.trim() ? { tr: l.tr.trim(), en: (l.en || l.tr).trim() } : undefined);
 function detailsTo(x: DetailsDraft, kind: ItemKind): ItemDetails {
@@ -71,6 +73,7 @@ function detailsTo(x: DetailsDraft, kind: ItemKind): ItemDetails {
   if (pair(x.origin)) out.origin = pair(x.origin);
   if (pair(x.altLabel) && alt > 0) out.alt = { label: pair(x.altLabel)!, price: alt };
   if (kind === "food" && x.plate) out.plate = x.plate;
+  if (kind !== "food" && x.color) out.color = x.color;
   return out;
 }
 
@@ -169,7 +172,7 @@ export default function ItemEditor() {
             ...x,
             kind: k,
             hasZero: k === "cocktail" ? x.hasZero : false,
-            details: { ...x.details, style: k === "cocktail" ? "" : Object.keys(STYLES[k as Exclude<ItemKind, "cocktail">])[0], plate: k === "food" ? x.details.plate : "" },
+            details: { ...x.details, style: k === "cocktail" ? "" : Object.keys(STYLES[k as Exclude<ItemKind, "cocktail">])[0], plate: k === "food" ? x.details.plate : "", color: undefined },
             extraAllergens: x.extraAllergens.length || !KIND_ALLERGENS[k] ? x.extraAllergens : KIND_ALLERGENS[k]!,
           }
         : x,
@@ -445,7 +448,7 @@ export default function ItemEditor() {
               <div className="pn-grid2">
                 <label className="pn-field">
                   <span>Tür</span>
-                  <select className="input" value={d.details.style} onChange={(e) => setDet({ style: e.target.value })}>
+                  <select className="input" value={d.details.style} onChange={(e) => setDet({ style: e.target.value, color: undefined })}>
                     {Object.entries(STYLES[d.kind as Exclude<ItemKind, "cocktail">]).map(([k, v]) => (
                       <option key={k} value={k}>
                         {v.label.tr}

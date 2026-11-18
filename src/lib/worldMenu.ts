@@ -12,6 +12,7 @@ export interface MarkInput {
   abv: number; // fraction
   year?: string; // from the Garnish catalogue
   root?: Root; // cocktail family
+  food?: boolean; // a dish: strength marks (proof, mana, degrees) mean nothing on a plate
 }
 
 const ROMAN = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII", "XIII", "XIV", "XV", "XVI", "XVII", "XVIII", "XIX", "XX", "XXI", "XXII", "XXIII", "XXIV", "XXV", "XXVI", "XXVII", "XXVIII", "XXIX", "XXX"];
@@ -31,11 +32,11 @@ export const MARK: Record<WorldId, (m: MarkInput) => string> = {
     return `${String(h % 24).padStart(2, "0")}h ${String((h >>> 5) % 60).padStart(2, "0")}m · ${(h >>> 11) % 2 ? "+" : "−"}${(h >>> 12) % 89}°`;
   },
   // a speakeasy marks strength in proof (twice the ABV)
-  jazz: (m) => (m.abv > 0.005 ? `${Math.round(m.abv * 200)} proof` : "dry"),
+  jazz: (m) => (m.food ? `#${m.index + 1}` : m.abv > 0.005 ? `${Math.round(m.abv * 200)} proof` : "dry"),
   sakura: (m) => kanji(m.index + 1),
   alchemist: (m) => (m.root ? PLANET[m.root] : PLANETS[hash(m.id) % PLANETS.length]),
-  tiki: (m) => "●".repeat(m.abv > 0.24 ? 3 : m.abv > 0.13 ? 2 : m.abv > 0.01 ? 1 : 0).padEnd(3, "○"),
-  boreal: (m) => `❄ ${Math.round(m.abv * 100)}°`,
+  tiki: (m) => m.food ? "" : "●".repeat(m.abv > 0.24 ? 3 : m.abv > 0.13 ? 2 : m.abv > 0.01 ? 1 : 0).padEnd(3, "○"),
+  boreal: (m) => (m.food ? "❄" : `❄ ${Math.round(m.abv * 100)}°`),
   riviera: (m) => m.year ?? `N° ${m.index + 1}`,
 };
 
@@ -83,4 +84,5 @@ export const JA: Record<string, string> = {
   "umeshu-spritz": "梅酒スプリッツ", saketini: "サケティーニ", "matcha-tonic": "抹茶トニック", "haru-soda": "春ソーダ",
 };
 /** section headings for the oshinagaki, by position */
-export const JA_SECTIONS = ["花見の品", "定番", "酒なし", "季節の品", "おすすめ"];
+/** Sakura's section names in Japanese, by position: signatures, classics, alcohol-free, sake, beer, cold plates, izakaya, sweets, tea & soda */
+export const JA_SECTIONS = ["花見の品", "定番", "酒なし", "銘酒", "麦酒", "前菜", "居酒屋", "甘味", "茶と炭酸"];

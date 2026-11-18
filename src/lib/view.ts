@@ -40,6 +40,7 @@ export interface ItemView {
 export interface SectionView {
   id: string;
   title: string;
+  titleLang?: "tr" | "en"; // "Zensai", "Antipasti": the same in both languages, so no Turkish dotted İ when uppercased
   note?: string;
   items: ItemView[];
 }
@@ -61,7 +62,7 @@ export function itemView(it: MenuItem, currency: string, lang: Lang, world: Worl
     kcalKnown: f.kcalKnown,
     serving: d?.serving ? pick(d.serving, lang) : undefined,
     alt: d?.alt ? `${pick(d.alt.label, lang)} ${money(d.alt.price, currency, lang)}` : undefined,
-    mark: MARK[world]({ index, id: it.id, abv: f.abv, year: lib?.year, root: lib?.root }),
+    mark: MARK[world]({ index, id: it.id, abv: f.abv, year: lib?.year, root: lib?.root, food: kind === "food" }),
     profile: f.simple ? undefined : (["sweet", "sour", "bitter", "strong", "fresh", "aromatic"] as const).map((k) => Math.round(f.profile[k] * 10) / 10),
     ja: world === "sakura" && it.libraryId ? JA[it.libraryId] : undefined,
     id: it.id,
@@ -86,6 +87,7 @@ export function menuView(m: VenueMenu, lang: Lang, world: WorldId = m.venue.worl
     .map((s) => ({
       id: s.id,
       title: pick(s.title, lang),
+      titleLang: nameLang(s.title),
       note: s.note ? pick(s.note, lang) : undefined,
       items: m.items
         .filter((i) => i.sectionId === s.id && i.available)

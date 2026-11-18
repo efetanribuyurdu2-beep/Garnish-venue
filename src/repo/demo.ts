@@ -53,56 +53,90 @@ const ZERO_CLASSICS: Record<WorldId, string[]> = {
 type Extra = string | [id: string, over: { name?: L; desc?: L }] | LibItem;
 const own = (x: Omit<LibItem, "serving"> & { serving?: L }): LibItem => ({ serving: l("Porsiyon", "Portion"), ...x });
 
-/** beside the cocktails, what each world's bar also pours and serves: library ids, renamed lines and a few of its own */
-const EXTRAS: Record<WorldId, { key: string; title: L; items: Extra[] }[]> = {
+/** beside the cocktails, what each world's bar also pours and serves: library ids, renamed lines and a few of its own.
+ *  Every world has the same frame: cellar, beer, cold plates, hot plates, desserts, soft drinks. */
+const H = (tr: string, en: string) => l(tr, en);
+const NOTE = { cold: H("Soğuk tabaklar", "Cold plates"), hot: H("Sıcak tabaklar", "Hot plates"), sweet: H("Tatlılar", "Desserts"), soft: H("Alkolsüz içecekler", "Soft drinks") };
+const EXTRAS: Record<WorldId, { key: string; title: L; note?: L; items: Extra[] }[]> = {
   maison: [
-    { key: "cellar", title: l("Şampanya & Mahzen", "Champagne & Cellar"), items: ["champagne-brut", "chablis", "pinot-noir", "konyak"] },
-    { key: "kitchen", title: l("Küçük Tabaklar", "Small Plates"), items: ["istiridye", "truf-patates", "peynir-tabagi", "creme-brulee", "espresso"] },
+    { key: "cellar", title: H("Şampanya & Mahzen", "Champagne & Cellar"), items: ["champagne-brut", "chablis", "pinot-noir", "konyak"] },
+    { key: "beer", title: H("Biralar", "Beers"), items: ["belcika-tripel", "pilsner", "alkolsuz-bira"] },
+    { key: "cold", title: H("Soğuk Tabaklar", "Cold Plates"), items: ["istiridye", "havyar", "dana-tartar", "carpaccio", "peynir-tabagi"] },
+    { key: "hot", title: H("Sıcak Tabaklar", "Hot Plates"), items: ["gougeres", "escargot", "croque-monsieur", "truf-patates"] },
+    { key: "sweet", title: H("Tatlılar", "Desserts"), items: ["creme-brulee", "cikolatali-mus", "macaron"] },
+    { key: "soft", title: H("Kahve, Çay & Soft", "Coffee, Tea & Soft Drinks"), items: ["espresso", "murver-gazozu", "limonata", "maden-suyu"] },
   ],
   anatolia: [
-    { key: "cellar", title: l("Rakı & Şarap", "Rakı & Wine"), items: ["raki", "narince", "okuzgozu", "bogazkere"] },
-    { key: "meze", title: l("Soğuk Mezeler", "Cold Meze"), items: ["haydari", "acili-ezme", "fava", "muhammara", "girit-ezmesi", "deniz-borulcesi", "peynir-kavun", "lakerda"] },
-    { key: "hot", title: l("Ara Sıcaklar & Tatlı", "Hot Meze & Sweets"), items: ["sigara-boregi", "kalamar-tava", "arnavut-cigeri", "karides-guvec", "baklava", "turk-kahvesi"] },
+    { key: "cellar", title: H("Rakı & Şarap", "Rakı & Wine"), items: ["raki", "narince", "okuzgozu", "bogazkere", "kalecik-karasi"] },
+    { key: "beer", title: H("Biralar", "Beers"), items: ["fici-lager", "bugday", "alkolsuz-bira"] },
+    { key: "cold", title: H("Soğuk Mezeler", "Cold Meze"), items: ["haydari", "acili-ezme", "fava", "muhammara", "girit-ezmesi", "deniz-borulcesi", "peynir-kavun", "lakerda"] },
+    { key: "hot", title: H("Ara Sıcaklar", "Hot Meze"), items: ["sigara-boregi", "pacanga", "kalamar-tava", "arnavut-cigeri", "karides-guvec", "ahtapot-izgara"] },
+    { key: "sweet", title: H("Tatlılar", "Desserts"), items: ["baklava", "kunefe", "sutlac"] },
+    { key: "soft", title: H("Ayran, Kahve & Çay", "Ayran, Coffee & Tea"), items: ["ayran", "salgam", "turk-kahvesi", "cay", "maden-suyu"] },
   ],
   cosmos: [
-    { key: "cellar", title: l("Yakıt İstasyonu", "Fuel Station"), items: [["ipa", { name: l("Nebula IPA", "Nebula IPA") }], "japon-viskisi", "tekila"] },
-    {
-      key: "kitchen",
-      title: l("Yörünge Tabakları", "Orbit Plates"),
-      items: ["edamame", "karaage", "gyoza", own({ id: "kuyruklu-cips", kind: "food", style: "snack", dish: "fries", name: l("Kuyruklu Yıldız Cipsi", "Comet Crisps"), desc: l("Mor patates, karabiber", "Purple potato, black pepper"), price: 240, kcal: 430, allergens: [] }), "matcha-cheesecake"],
-    },
+    { key: "cellar", title: H("Yakıt İstasyonu", "Fuel Station"), items: ["japon-viskisi", "tekila", "meskal", "london-dry"] },
+    { key: "beer", title: H("Biralar", "Beers"), items: [["ipa", { name: H("Nebula IPA", "Nebula IPA") }], ["bugday", { name: H("Samanyolu Buğday", "Milky Way Wheat") }], "alkolsuz-bira"] },
+    { key: "cold", title: H("Yörünge Tabakları", "Orbit Plates"), note: NOTE.cold, items: ["ton-tartar", "ceviche", "edamame", ["mor-cips", { name: H("Kuyruklu Yıldız Cipsi", "Comet Crisps") }], "padron"] },
+    { key: "hot", title: H("Ateşleme", "Ignition"), note: NOTE.hot, items: ["karaage", "gyoza", "bao", "tempura"] },
+    { key: "sweet", title: H("Ay Tozu", "Moondust"), note: NOTE.sweet, items: [["fondan", { name: H("Kara Delik Fondan", "Black Hole Fondant") }], "nitro-dondurma", "matcha-cheesecake"] },
+    { key: "soft", title: H("Sıfır Yerçekimi", "Zero Gravity"), note: NOTE.soft, items: [["mor-limonata", { name: H("Nebula Limonata", "Nebula Lemonade") }], "cold-brew", "kombucha", "tonik"] },
   ],
   jazz: [
-    { key: "cellar", title: l("Viski Rafı", "The Whisky Shelf"), items: ["bourbon", "rye", "single-malt", "islay"] },
-    { key: "kitchen", title: l("Bar Atıştırmalıkları", "Bar Bites"), items: ["tuzlu-fistik", "sliders", "patates", "fondan", "espresso"] },
+    { key: "cellar", title: H("Viski Rafı", "The Whisky Shelf"), items: ["bourbon", "rye", "single-malt", "islay"] },
+    {
+      key: "beer",
+      title: H("Biralar", "Beers"),
+      items: ["amber-ale", "pilsner", ["alkolsuz-bira", { name: H("Near Beer", "Near Beer"), desc: H("Yasak yıllarının alkolsüz birası, %0,5'in altında", "The Prohibition-era brew, under 0.5%") }]],
+    },
+    { key: "cold", title: H("Bar Atıştırmalıkları", "Bar Bites"), items: ["tuzlu-fistik", "deviled-eggs", "karides-kokteyli", "hurma-pastirma"] },
+    { key: "hot", title: H("Gece Yarısı Mutfağı", "Midnight Kitchen"), note: NOTE.hot, items: ["sliders", "tavuk-kanat", "mac-cheese", "patates"] },
+    { key: "sweet", title: H("Tatlılar", "Desserts"), items: ["pekan-tart", "ny-cheesecake", "fondan"] },
+    { key: "soft", title: H("Soda Çeşmesi", "Soda Fountain"), note: H("Kahve ve alkolsüz içecekler", "Coffee and soft drinks"), items: ["espresso", "kola", "zencefilli-gazoz", "limonata"] },
   ],
   sakura: [
-    { key: "cellar", title: l("Sake & Viski", "Sake & Whisky"), items: ["sake", "japon-viskisi"] },
-    { key: "kitchen", title: l("Izakaya", "Izakaya"), items: ["edamame", "karaage", "gyoza", "matcha-cheesecake", "sencha"] },
+    { key: "cellar", title: H("Sake & Viski", "Sake & Whisky"), items: ["sake", "umeshu", "japon-viskisi"] },
+    { key: "beer", title: H("Biralar", "Beers"), items: ["pirinc-lager", "koyu-lager", "alkolsuz-bira"] },
+    { key: "cold", title: H("Zensai", "Zensai"), note: NOTE.cold, items: ["edamame", "sashimi", "ton-tataki", "hiyayakko", "sunomono"] },
+    { key: "hot", title: H("Izakaya", "Izakaya"), note: NOTE.hot, items: ["karaage", "yakitori", "gyoza", "agedashi", "takoyaki", "tempura"] },
+    { key: "sweet", title: H("Tatlılar", "Sweets"), items: ["mochi", "dorayaki", "matcha-cheesecake"] },
+    { key: "soft", title: H("Çay & Soda", "Tea & Soda"), items: ["sencha", "matcha-latte", "yuzu-soda", "japon-gazozu"] },
   ],
   alchemist: [
     {
       key: "cellar",
-      title: l("Kabine", "The Cabinet"),
-      items: ["absinthe", own({ id: "chartreuse-v", kind: "spirit", style: "liqueur", name: l("Yeşil Chartreuse", "Green Chartreuse"), desc: l("130 bitki, keşiş tarifi", "130 herbs, the monks' recipe"), origin: l("Fransa", "France"), serving: l("4 cl", "4 cl"), price: 620, abv: 55, allergens: [] }), "amaro", "konyak"],
+      title: H("Kabine", "The Cabinet"),
+      items: ["absinthe", own({ id: "chartreuse-v", kind: "spirit", style: "liqueur", name: H("Yeşil Chartreuse", "Green Chartreuse"), desc: H("130 bitki, keşiş tarifi", "130 herbs, the monks' recipe"), origin: H("Fransa", "France"), serving: H("4 cl", "4 cl"), price: 620, abv: 55, allergens: [] }), "amaro", "konyak"],
     },
-    { key: "kitchen", title: l("Simyacının Masası", "The Alchemist's Table"), items: [["peynir-tabagi", { name: l("Simyacının Peyniri", "The Alchemist's Cheese") }], "sarkuteri", "creme-brulee", "bitki-cayi"] },
+    { key: "beer", title: H("Manastır Biraları", "Abbey Beers"), items: ["trappist-dubbel", "sour-ale", "alkolsuz-bira"] },
+    { key: "cold", title: H("Kiler", "The Larder"), note: NOTE.cold, items: [["peynir-tabagi", { name: H("Simyacının Peyniri", "The Alchemist's Cheese") }], "pate", "fume-alabalik", "tursu", "sarkuteri"] },
+    { key: "hot", title: H("Fırın", "The Furnace"), note: NOTE.hot, items: ["firin-camembert", "mantar-tart", "kroket", "kemik-ilik"] },
+    { key: "sweet", title: H("Tatlılar", "Desserts"), items: ["sticky-toffee", "sarapta-armut", "creme-brulee"] },
+    { key: "soft", title: H("Şifalı İçecekler", "Tonics & Teas"), note: NOTE.soft, items: ["bitki-cayi", "kombucha", "zencefilli-gazoz", "tonik"] },
   ],
   tiki: [
-    { key: "cellar", title: l("Rom Mahzeni", "The Rum Cellar"), items: ["yillanmis-rom", "hindistan-cevizi-suyu"] },
-    {
-      key: "kitchen",
-      title: l("Ada Tabakları", "Island Plates"),
-      items: [own({ id: "muz-cips", kind: "food", style: "snack", dish: "fries", name: l("Muz Cipsi", "Plantain Chips"), desc: l("Lime, tuz", "Lime, salt"), price: 200, kcal: 380, allergens: [] }), "tavuk-sis", "nachos", "sorbe"],
-    },
+    { key: "cellar", title: H("Rom Mahzeni", "The Rum Cellar"), items: ["yillanmis-rom", "baharatli-rom"] },
+    { key: "beer", title: H("Biralar", "Beers"), items: ["tropik-lager", "pale-ale", "alkolsuz-bira"] },
+    { key: "cold", title: H("Ada Tabakları", "Island Plates"), note: NOTE.cold, items: ["poke", "ceviche", "muz-cips", "tropik-meyve"] },
+    { key: "hot", title: H("Meşale Mutfağı", "Torch Kitchen"), note: NOTE.hot, items: ["hindistan-karides", "tavuk-sis", "nachos", "tatli-patates"] },
+    { key: "sweet", title: H("Tatlılar", "Desserts"), items: ["ananasli-kek", "haupia", "sorbe"] },
+    { key: "soft", title: H("Meyve & Soda", "Fruit & Soda"), items: ["hindistan-cevizi-suyu", "ananas-suyu", "carkifelek-gazozu", "zencefilli-gazoz"] },
   ],
   boreal: [
-    { key: "cellar", title: l("Votka & Bira", "Vodka & Beer"), items: ["votka", "stout", "pilsner"] },
-    { key: "kitchen", title: l("Zakuski", "Zakuski"), items: ["ringa", "somon", "kuruyemis", "tarcinli-corek"] },
+    { key: "cellar", title: H("Votka & Akvavit", "Vodka & Aquavit"), items: ["votka", "akvavit"] },
+    { key: "beer", title: H("Biralar", "Beers"), items: ["pilsner", "stout", "alkolsuz-bira"] },
+    { key: "cold", title: H("Zakuski", "Zakuski"), note: NOTE.cold, items: ["ringa", "somon", "blini", "olivier", "tursu"] },
+    { key: "hot", title: H("Sıcaklar", "Hot Plates"), items: ["pelmeni", "isvec-koftesi", "pirojki"] },
+    { key: "sweet", title: H("Tatlılar", "Desserts"), items: ["tarcinli-corek", "bulut-meyvesi", "syrniki"] },
+    { key: "soft", title: H("Semaver & Kvas", "Samovar & Kvass"), note: H("Çay, sıcak çikolata ve Kuzey'in içecekleri", "Tea, hot chocolate and the drinks of the North"), items: [["cay", { name: H("Semaver Çayı", "Samovar Tea") }], "kvas", "mors", "sicak-cikolata"] },
   ],
   riviera: [
-    { key: "cellar", title: l("Mahzen", "The Cellar"), items: ["prosecco", "provence-rose", "chianti", "limoncello"] },
-    { key: "kitchen", title: l("Bahçe Masası", "Garden Table"), items: ["burrata", "bruschetta", "focaccia", "zeytin", "tiramisu"] },
+    { key: "cellar", title: H("Mahzen", "The Cellar"), items: ["prosecco", "provence-rose", "chianti", "limoncello"] },
+    { key: "beer", title: H("Biralar", "Beers"), items: ["italyan-lager", "bugday", "alkolsuz-bira"] },
+    { key: "cold", title: H("Antipasti", "Antipasti"), note: NOTE.cold, items: ["burrata", "vitello-tonnato", "bresaola", "bruschetta", "zeytin"] },
+    { key: "hot", title: H("Fırından & Tavadan", "From the Oven & Pan"), note: NOTE.hot, items: ["arancini", "fritto-misto", "midye-mariniere", "focaccia"] },
+    { key: "sweet", title: H("Dolci", "Dolci"), note: NOTE.sweet, items: ["tiramisu", "panna-cotta", "affogato"] },
+    { key: "soft", title: H("Limonata & Kahve", "Lemonade & Coffee"), items: ["limonata", "kan-portakali-soda", "chinotto", "espresso"] },
   ],
 };
 
@@ -111,6 +145,7 @@ export function worldExtras(world: WorldId) {
   return EXTRAS[world].map((sec) => ({
     key: sec.key,
     title: sec.title,
+    note: sec.note,
     items: sec.items.map((e) => {
       const [x, over] = typeof e === "string" ? [libraryById(e), {}] : Array.isArray(e) ? [libraryById(e[0]), e[1]] : [e, {}];
       if (!x) throw new Error(`unknown library line ${String(e)}`);
