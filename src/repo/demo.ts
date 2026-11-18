@@ -243,3 +243,12 @@ const ALIASES: Record<string, string> = { demo: DEMO_SLUG.maison, sirkeci: DEMO_
 export const demoBySlug = (slug: string) => BY_SLUG.get(ALIASES[slug] ?? slug);
 export const demoForWorld = (world: WorldId) => BY_SLUG.get(DEMO_SLUG[world])!;
 export const isDemoSlug = (slug: string) => BY_SLUG.has(slug) || slug in ALIASES;
+
+/** the demo bars before and after this one, for moving between worlds */
+export function demoNeighbours(slug: string) {
+  const list = DEMO_MENUS.map((m) => ({ slug: m.venue.slug, name: m.venue.name, world: m.venue.world }));
+  const real = ALIASES[slug] ?? slug;
+  const i = list.findIndex((x) => x.slug === real);
+  if (i < 0) return undefined;
+  return { prev: list[(i + list.length - 1) % list.length], next: list[(i + 1) % list.length] };
+}

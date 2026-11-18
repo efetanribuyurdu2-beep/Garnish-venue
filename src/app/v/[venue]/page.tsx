@@ -3,7 +3,9 @@ import { AllergenIcon } from "@/components/AllergenIcon";
 import { ItemVisual } from "@/components/ItemVisual";
 import { DrinkPhoto } from "@/components/DrinkPhoto";
 import { GuestMenu } from "@/components/GuestMenu";
+import { GuestDock } from "@/components/GuestDock";
 import { Recommender } from "@/components/Recommender";
+import { demoNeighbours } from "@/repo/demo";
 import { VenueFrame } from "@/components/VenueFrame";
 import { worldById } from "@/data/worlds";
 import { brandLang, pick, t } from "@/lib/i18n";
@@ -25,6 +27,8 @@ export default async function VenuePage({ params, searchParams }: { params: Para
   const v = menu.venue;
   const w = worldById(world);
   const sections = menuView(menu, lang, world);
+  const other = v.languages.find((l) => l !== lang);
+  const cocktails = sections.reduce((n, s) => n + s.items.filter((i) => i.profile).length, 0);
   const head = HEAD[world];
   // the bar's photograph when there is one, otherwise the glass, drawn here on the server
   const byId = new Map(menu.items.map((it) => [it.id, it]));
@@ -46,7 +50,7 @@ export default async function VenuePage({ params, searchParams }: { params: Para
   );
   const legend = [...new Map(sections.flatMap((s) => s.items.flatMap((i) => i.allergens.map((a) => [a.id, a] as const)))).values()];
   return (
-    <VenueFrame venue={v} world={world} lang={lang} path={`/v/${v.slug}`} keep={keep}>
+    <VenueFrame venue={v} world={world} lang={lang} path={`/v/${v.slug}`} keep={keep} demo={demoNeighbours(slug)}>
       <div className={`wmenu wmenu-${world}`}>
         <article className="wm-card gm-card">
           <span className="wm-corner tl" aria-hidden />
@@ -112,6 +116,12 @@ export default async function VenuePage({ params, searchParams }: { params: Para
           )}
         </article>
       </div>
+      <GuestDock
+        lang={lang}
+        suggest={cocktails >= 3}
+        langHref={other ? `/v/${v.slug}?${new URLSearchParams({ ...keep, lang: other })}` : undefined}
+        langLabel={other?.toUpperCase()}
+      />
     </VenueFrame>
   );
 }

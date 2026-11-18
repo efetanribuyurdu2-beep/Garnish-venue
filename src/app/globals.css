@@ -927,3 +927,30 @@
 .dw-grid { align-items: start; }
 .lp-doors, #misafir, #nasil, #barlar { scroll-margin-top: 70px; }
 @media (max-width: 520px) { .sd-compact { width: 236px; } }
+
+/* ═════════════════════════════════════════════ GUEST DOCK and DEMO WALK */
+.gd {
+  position: fixed; z-index: 30; left: 50%; bottom: 16px; transform: translateX(-50%);
+  display: flex; align-items: stretch; gap: 2px; padding: 5px;
+  background: color-mix(in srgb, var(--surface) 96%, #000); color: var(--ink);
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent); border-radius: 999px;
+  box-shadow: 0 18px 40px -16px rgba(0, 0, 0, 0.8);
+  font-family: var(--font-body);
+}
+.gd button, .gd a { display: inline-flex; align-items: center; gap: 8px; padding: 9px 16px; background: none; border: 0; border-radius: 999px; color: inherit; font: inherit; font-size: 0.8rem; letter-spacing: 0.06em; cursor: pointer; white-space: nowrap; }
+.gd button:hover, .gd a:hover { background: color-mix(in srgb, var(--accent) 14%, transparent); color: var(--accent); }
+.gd svg { color: var(--accent); }
+.gd-lang b { display: inline-grid; place-items: center; min-width: 30px; height: 22px; border: 1px solid var(--line); border-radius: 6px; font-weight: 500; font-size: 0.72rem; color: var(--accent); }
+.venue { padding-bottom: 84px; }
+@media (max-width: 640px) {
+  .gd { left: 8px; right: 8px; bottom: calc(8px + env(safe-area-inset-bottom)); transform: none; border-radius: 18px; display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); }
+  .gd button, .gd a { flex-direction: column; justify-content: center; gap: 3px; padding: 7px 2px; border-radius: 12px; font-size: 0.64rem; letter-spacing: 0.02em; }
+}
+@media print { .gd { display: none; } }
+
+.venue-demo { position: relative; z-index: 2; display: flex; align-items: center; justify-content: space-between; gap: 10px; max-width: 860px; margin: 0 auto; padding: 10px 16px 0; font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; }
+.venue-demo a { color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 38%; }
+.venue-demo a:hover { color: var(--accent); }
+.venue-demo-all { color: var(--accent) !important; border-bottom: 1px solid color-mix(in srgb, var(--accent) 50%, transparent); }
+.venue-home { display: inline-flex; color: var(--accent); }
+@media (min-width: 900px) { .gd { display: none; } .venue { padding-bottom: 0; } }
