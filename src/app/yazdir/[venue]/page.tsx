@@ -5,10 +5,11 @@ import { AllergenIcon } from "@/components/AllergenIcon";
 import { LogoMark } from "@/components/Logo";
 import { PrintBar } from "@/components/PrintBar";
 import { ingredientById } from "@/data/ingredients";
-import { factsOf, zeroRecipe } from "@/lib/facts";
-import { brandLang, money, percent, pick } from "@/lib/i18n";
+import { factsOf, itemFacts, zeroRecipe } from "@/lib/facts";
+import { brandLang, money, nameLang, percent, pick } from "@/lib/i18n";
 import { allergenById } from "@/lib/allergens";
 import { qrSvg } from "@/lib/qr";
+import { HEAD } from "@/lib/worldMenu";
 import { siteOrigin } from "@/lib/siteUrl";
 import type { Lang } from "@/lib/types";
 import { getVenueMenu } from "@/repo";
@@ -54,10 +55,13 @@ export default async function PrintedMenu({ params, searchParams }: { params: Pa
         .filter((i) => i.sectionId === s.id && i.available)
         .sort((a, b) => a.position - b.position)
         .map((it) => {
-          const f = factsOf(it.recipe, it.extraAllergens);
-          const z = it.zeroPrice !== undefined && !f.zero ? factsOf(zeroRecipe(it.recipe), it.extraAllergens) : null;
-          const inside = it.recipe.parts.filter((p) => p.ml > 0).map((p) => pick(ingredientById(p.id)?.name, lang) || p.id);
-          return { it, f, z, inside };
+          const f = itemFacts(it);
+          const z = !f.simple && it.recipe && it.zeroPrice !== undefined && !f.zero ? factsOf(zeroRecipe(it.recipe), it.extraAllergens) : null;
+          // cocktails: every ingredient; wine, beer, food…: what the bar wrote (grape, producer, ingredients)
+          const inside = it.recipe && !f.simple
+            ? it.recipe.parts.filter((p) => p.ml > 0).map((p) => pick(ingredientById(p.id)?.name, lang) || p.id).join(", ")
+            : [pick(it.description, lang), it.details?.origin ? pick(it.details.origin, lang) : ""].filter(Boolean).join(" · ");
+          return { it, f, z, inside, food: it.kind === "food" };
         }),
     }))
     .filter((x) => x.items.length);
@@ -98,7 +102,9 @@ export default async function PrintedMenu({ params, searchParams }: { params: Pa
         </span>
         <header className="pr-head">
           <span className="pr-emblem" aria-hidden />
-          {pick(v.tagline, lang) && <p className="pr-kicker">{pick(v.tagline, lang)}</p>}
+          <p className="pr-kicker" lang={brandLang(pick(v.tagline, lang) || pick(HEAD[v.world].kicker, lang))}>
+            {pick(v.tagline, lang) || pick(HEAD[v.world].kicker, lang)}
+          </p>
           <h1 lang={brandLang(v.name)}>{v.name}</h1>
           <p className="pr-sub">{t.menu}</p>
           <span className="pr-band" aria-hidden />
@@ -109,22 +115,25 @@ export default async function PrintedMenu({ params, searchParams }: { params: Pa
             <section key={s.id} className="pr-section">
               <h2>{pick(s.title, lang)}</h2>
               {s.note && <p className="pr-note">{pick(s.note, lang)}</p>}
-              {items.map(({ it, f, z, inside }) => (
+              {items.map(({ it, f, z, inside, food }) => (
                 <div key={it.id} className="pr-item">
                   <div className="pr-row">
-                    <span className="pr-name" lang={it.name.tr === it.name.en ? "en" : undefined}>
+                    <span className="pr-name" lang={nameLang(it.name)}>
                       {pick(it.name, lang)}
                     </span>
                     <span className="pr-leader" aria-hidden />
                     <span className="pr-price">{money(it.price, v.currency, lang)}</span>
                   </div>
-                  <p className="pr-inside">
-                    <span>{t.inside}:</span> {inside.join(", ")}
-                  </p>
+                  {inside && (
+                    <p className="pr-inside">
+                      {!f.simple || food ? <span>{t.inside}: </span> : null}
+                      {inside}
+                    </p>
+                  )}
                   <p className="pr-meta">
-                    <span>{f.zero ? "0%" : percent(f.abv, lang)}</span>
-                    <span>{f.kcal < 5 ? "< 5" : `≈ ${f.kcal}`} kcal</span>
-                    <span>{f.volume} ml</span>
+                    {!food && <span>{f.zero ? "0%" : percent(f.abv, lang)}</span>}
+                    {f.kcalKnown && f.kcal > 0 && <span>{f.kcal < 5 ? "< 5" : `≈ ${f.kcal}`} kcal</span>}
+                    {it.details?.serving ? <span>{pick(it.details.serving, lang)}</span> : f.volume > 0 && <span>{f.volume} {food ? "g" : "ml"}</span>}
                     {f.allergens.length > 0 && (
                       <span className="pr-al">
                         {f.allergens.map((a) => (
@@ -133,6 +142,13 @@ export default async function PrintedMenu({ params, searchParams }: { params: Pa
                       </span>
                     )}
                   </p>
+                  {it.details?.alt && (
+                    <div className="pr-row pr-zero">
+                      <span>{pick(it.details.alt.label, lang)}</span>
+                      <span className="pr-leader" aria-hidden />
+                      <span className="pr-price">{money(it.details.alt.price, v.currency, lang)}</span>
+                    </div>
+                  )}
                   {z && it.zeroPrice !== undefined && (
                     <div className="pr-row pr-zero">
                       <span>
@@ -173,7 +189,7 @@ export default async function PrintedMenu({ params, searchParams }: { params: Pa
             <span>{t.online}</span>
           </div>
         </footer>
-        {v.footer && <p className="pr-house">{pick(v.footer, lang)}</p>}
+        <p className="pr-house">{pick(v.footer, lang) || pick(HEAD[v.world].foot, lang)}</p>
         <p className="pr-made">
           <LogoMark size={14} /> Garnish
         </p>

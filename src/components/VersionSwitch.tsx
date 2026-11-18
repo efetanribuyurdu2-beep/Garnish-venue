@@ -19,9 +19,11 @@ export interface VersionView {
 export function VersionSwitch({
   versions,
   text,
+  alt,
 }: {
   versions: VersionView[];
   text: { inside: string; allergens: string; noAllergens: string };
+  alt?: { label: string; price: string };
 }) {
   const [k, setK] = useState(0);
   const v = versions[k];
@@ -40,6 +42,12 @@ export function VersionSwitch({
         {versions.length === 1 && <span className="gi-version-name">{v.label}</span>}
         <span className="gi-price">{v.price}</span>
       </div>
+      {alt && (
+        <p className="gi-alt">
+          <span>{alt.label}</span>
+          <span className="gi-price">{alt.price}</span>
+        </p>
+      )}
       <dl className="gi-strip">
         {v.facts.map((f) => (
           <div key={f.label}>
@@ -48,8 +56,12 @@ export function VersionSwitch({
           </div>
         ))}
       </dl>
-      <p className="gi-label">{text.inside}</p>
-      <p className="gi-inside">{v.inside}</p>
+      {v.inside && (
+        <>
+          <p className="gi-label">{text.inside}</p>
+          <p className="gi-inside">{v.inside}</p>
+        </>
+      )}
       <p className="gi-label">{text.allergens}</p>
       {v.allergens.length ? (
         <ul className="gi-allergens">

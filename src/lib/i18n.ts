@@ -2,9 +2,6 @@ import type { L, Lang } from "./types";
 
 export const pick = (l: L | undefined, lang: Lang) => (l ? l[lang] || l.tr : "");
 
-/** "en" when a name reads the same in both languages, so Turkish uppercasing does not turn i into İ */
-export const nameLang = (l: L): "en" | undefined => (l.tr === l.en ? "en" : undefined);
-
 /**
  * lang for a bar's own name, so capitals come out right in caps-only worlds:
  * a name with Turkish letters is Turkish ("Kına Gecesi" → "KINA GECESİ"),
@@ -12,10 +9,19 @@ export const nameLang = (l: L): "en" | undefined => (l.tr === l.en ? "en" : unde
  */
 export const brandLang = (name: string): "tr" | "en" => (/[çğıİöşüÇĞÖŞÜ]/.test(name) ? "tr" : "en");
 
+/**
+ * lang for a name, so capitals come out right in caps-only worlds. A name that
+ * reads the same in both languages is a proper name: Turkish if it has Turkish
+ * letters ("Kalecik Karası" → KALECİK), foreign otherwise ("Negroni" → NEGRONI).
+ */
+export const nameLang = (l: L): "tr" | "en" | undefined => (l.tr === l.en ? brandLang(l.tr) : undefined);
+
+
 export function money(kurus: number, currency: string, lang: Lang) {
   return new Intl.NumberFormat(lang === "tr" ? "tr-TR" : "en-GB", {
     style: "currency",
     currency,
+    currencyDisplay: "narrowSymbol",
     maximumFractionDigits: kurus % 100 ? 2 : 0,
   }).format(kurus / 100);
 }

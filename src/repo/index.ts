@@ -1,14 +1,14 @@
 /**
- * Where menus come from. With Supabase configured (NEXT_PUBLIC_SUPABASE_URL
- * and NEXT_PUBLIC_SUPABASE_ANON_KEY) venues are read from the database;
- * otherwise, and always for the demo slugs, from src/repo/demo.ts.
+ * Where menus come from. The nine world demo bars live in code (src/repo/demo.ts);
+ * every other venue is read from Supabase when it is configured
+ * (NEXT_PUBLIC_SUPABASE_URL and the public key).
  */
 import type { Venue, VenueMenu } from "@/domain/types";
-import { DEMO_MENUS } from "./demo";
+import { DEMO_MENUS, demoBySlug } from "./demo";
 import { supabaseConfigured, supabaseMenu } from "./supabase";
 
 export async function getVenueMenu(slug: string): Promise<VenueMenu | null> {
-  const demo = DEMO_MENUS.find((m) => m.venue.slug === slug);
+  const demo = demoBySlug(slug);
   if (demo) return demo;
   if (supabaseConfigured()) return supabaseMenu(slug);
   return null;

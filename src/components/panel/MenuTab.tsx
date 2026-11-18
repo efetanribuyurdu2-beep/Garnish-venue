@@ -3,7 +3,9 @@
 import Link from "next/link";
 import { useState } from "react";
 import type { MenuItem, MenuSection } from "@/domain/types";
-import { addSection, deleteSection, saveSection, setAvailable, setPositions, type Workspace } from "@/lib/panel/db";
+import { worldById } from "@/data/worlds";
+import { addSection, deleteSection, saveSection, seedWorldMenu, setAvailable, setPositions, type Workspace } from "@/lib/panel/db";
+import { nameLang } from "@/lib/i18n";
 import { tl } from "@/lib/panel/labels";
 import type { L } from "@/lib/types";
 import { ItemThumb } from "./ItemThumb";
@@ -46,9 +48,23 @@ export function MenuTab({ ws, reload, canEdit }: { ws: Workspace; reload: () => 
 
   return (
     <div className="pn-menu">
+      {ws.items.length === 0 && canEdit && (
+        <div className="pn-card pn-start pn-seed">
+          <p className="pn-eyebrow">{worldById(ws.venue.world).name.tr} dünyası</p>
+          <h2>{worldById(ws.venue.world).bar.tr} menüsüyle başlayın</h2>
+          <p>
+            {worldById(ws.venue.world).collection.tr} koleksiyonu, dünyaya uygun klasikler ve alkolsüzler; reçeteleri, hikâyeleri ve önerilen fiyatlarıyla. Sonra dilediğinizi
+            değiştirin ya da silin.
+          </p>
+          <button className="btn" disabled={!!busy} onClick={() => run("seed", () => seedWorldMenu(ws.venue.id, ws.venue.world, sections.length))}>
+            {busy === "seed" ? "Menü hazırlanıyor…" : "Dünyanın menüsünü ekle"}
+          </button>
+        </div>
+      )}
+
       {sections.length === 0 && (
         <div className="pn-card pn-start">
-          <h2>Menünüz boş</h2>
+          <h2>Ya da kendiniz kurun</h2>
           <p>Önce bölümleri ekleyin, sonra her bölüme içkilerinizi. Hızlı başlangıç:</p>
           <div className="pn-row">
             {STARTERS.map((s) => (
@@ -131,7 +147,7 @@ export function MenuTab({ ws, reload, canEdit }: { ws: Workspace; reload: () => 
             </ol>
             {canEdit && (
               <Link className="pn-add" href={`/panel/${ws.venue.id}/icki/yeni?bolum=${s.id}`}>
-                + Bu bölüme içki ekle
+                + Bu bölüme ekle
               </Link>
             )}
           </section>
@@ -170,7 +186,7 @@ function ItemRow({ it, ws, canEdit, busy, first, last, onMove, onToggle }: { it:
         <ItemThumb item={it} world={ws.venue.world} />
       </span>
       <span className="pn-item-text">
-        <span className="pn-item-name" lang={it.name.tr === it.name.en ? "en" : undefined}>
+        <span className="pn-item-name" lang={nameLang(it.name)}>
           {it.featured && <span className="pn-star" title="Barmenin seçimi">✦ </span>}
           {it.name.tr}
         </span>

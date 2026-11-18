@@ -3,6 +3,7 @@ import type { Venue } from "@/domain/types";
 import type { Lang, WorldId } from "@/lib/types";
 import { t } from "@/lib/i18n";
 import { LogoMark } from "./Logo";
+import { WorldBackdrop } from "./WorldBackdrop";
 
 const LANG_NAME: Record<Lang, string> = { tr: "TR", en: "EN" };
 
@@ -25,7 +26,7 @@ export function VenueFrame({
   const q = (l: Lang) => "?" + new URLSearchParams({ ...keep, lang: l }).toString();
   return (
     <div className="venue" data-world={world} data-palette={venue.palette ?? "noir"} lang={lang}>
-      <div className="venue-wall" aria-hidden />
+      <WorldBackdrop world={world} />
       <header className="venue-bar">
         <span className="venue-city">{venue.city}</span>
         {venue.languages.length > 1 && (

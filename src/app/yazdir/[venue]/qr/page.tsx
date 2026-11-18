@@ -5,6 +5,7 @@ import { LogoMark } from "@/components/Logo";
 import { PrintBar } from "@/components/PrintBar";
 import { brandLang, pick } from "@/lib/i18n";
 import { qrSvg } from "@/lib/qr";
+import { HEAD } from "@/lib/worldMenu";
 import { siteOrigin } from "@/lib/siteUrl";
 import { getVenueMenu } from "@/repo";
 
@@ -36,7 +37,7 @@ export default async function TableCards({ params, searchParams }: { params: Par
   );
   const sheets: (typeof cards)[] = [];
   for (let i = 0; i < cards.length; i += 4) sheets.push(cards.slice(i, i + 4));
-  const tagline = pick(v.tagline, "tr");
+  const tagline = pick(v.tagline, "tr") || pick(HEAD[v.world].kicker, "tr");
 
   return (
     <div className="pr pr-cards" data-world={v.world} data-palette={v.palette ?? "noir"}>
@@ -62,7 +63,9 @@ export default async function TableCards({ params, searchParams }: { params: Par
               <span className="wm-corner bl" aria-hidden />
               <span className="wm-corner br" aria-hidden />
               <span className="pr-emblem" aria-hidden />
-              {tagline && <p className="pr-kicker">{tagline}</p>}
+              <p className="pr-kicker" lang={brandLang(tagline)}>
+                {tagline}
+              </p>
               <p className="pr-card-name" lang={brandLang(v.name)}>
                 {v.name}
               </p>

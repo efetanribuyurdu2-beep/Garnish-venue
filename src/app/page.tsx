@@ -56,7 +56,7 @@ export default function Home() {
             <Link className="btn" href="/panel">Barınızın menüsünü oluşturun</Link>
             <Link className="btn ghost" href="/v/demo">Demo menüyü aç</Link>
           </div>
-          <p className="lp-hint">Telefondaki menü gerçek demo menüdür: kaydırın, bir içkiye dokunun, dünyayı değiştirin.</p>
+          <p className="lp-hint">Telefondaki menüler gerçek: kaydırın, bir içkiye dokunun, alttan başka bir dünyanın barına geçin.</p>
         </div>
         <LandingPhone worlds={worlds} />
       </section>
@@ -108,7 +108,8 @@ export default function Home() {
 
       <section className="lp-sec lp-worlds">
         <p className="lp-eyebrow">Dünyalar</p>
-        <h2>Aynı menü, dokuz dünya.</h2>
+        <h2>Dokuz dünya, dokuz bar.</h2>
+        <p>Her dünyanın kendi barı, kendi imza kokteylleri ve kendi menü dili var. Barınızı açarken birini seçin, menüsü hazır gelsin.</p>
         <ul>
           {WORLDS.map((w) => (
             <li key={w.id}>

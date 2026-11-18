@@ -48,6 +48,20 @@ export interface Photo {
   credit?: { author: string; authorUrl: string; sourceUrl: string; source: "unsplash" };
 }
 
+/** What a menu line is. Cocktails are computed from their recipe; the rest are described by the bar. */
+export type ItemKind = "cocktail" | "wine" | "beer" | "spirit" | "food" | "other";
+
+/** For everything that is not a cocktail: what the bar tells us instead of a recipe. */
+export interface ItemDetails {
+  style?: string; // wine: red | white | rose | sparkling | orange; beer: lager | ale | dark | wheat; spirit: whisky | rum | clear | agave | anise | brandy; other: coffee | tea | soft | water
+  abv?: number; // percent, e.g. 13.5
+  volume?: number; // ml (drinks) or g (food) per serving
+  serving?: L; // "Kadeh · 150 ml", "Porsiyon"
+  kcal?: number; // per serving, if the bar knows it
+  origin?: L; // producer, region, grape…
+  alt?: { label: L; price: number }; // a second size: bottle, double…
+}
+
 export interface MenuItem {
   id: string;
   venueId: string;
@@ -57,7 +71,9 @@ export interface MenuItem {
   description: L; // one line on the menu
   story?: L; // longer text on the item page
   price: Money;
-  recipe: Recipe;
+  kind?: ItemKind; // default cocktail
+  recipe?: Recipe; // cocktails only
+  details?: ItemDetails; // everything else
   available: boolean; // false = "bitti" (sold out), hidden from guests
   featured?: boolean;
   /** price of the alcohol-free version, if the bar offers one; the recipe is derived with toZero() */

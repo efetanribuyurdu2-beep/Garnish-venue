@@ -35,13 +35,18 @@ export function GuestMenu({
   text,
   base,
   query,
+  world,
+  jaSections,
 }: {
   sections: SectionView[];
   thumbs: Record<string, React.ReactNode>;
   text: GuestMenuText;
   base: string;
   query: string;
+  world: string;
+  jaSections?: string[];
 }) {
+  const sakura = world === "sakura";
   const [zeroOnly, setZeroOnly] = useState(false);
   const [avoid, setAvoid] = useState<string[]>([]);
   const [big, setBig] = useState(false);
@@ -151,28 +156,46 @@ export function GuestMenu({
 
       {shown.map((s) => (
         <section className="gm-section" key={s.id} id={`s-${s.id}`}>
-          <h2 className="gm-section-title">{s.title}</h2>
+          <h2 className={`gm-section-title${sakura ? "" : " wm-section-title"}`}>
+            {sakura && jaSections?.[sections.findIndex((x) => x.id === s.id)] && (
+              <span className="gm-ja-title" lang="ja">
+                {jaSections[sections.findIndex((x) => x.id === s.id)]}
+              </span>
+            )}
+            <span>{s.title}</span>
+          </h2>
           {s.note && <p className="gm-section-note">{s.note}</p>}
           <ol className="gm-list">
             {s.items.map((i) => (
               <li key={i.id} className={`gm-item${i.featured ? " featured" : ""}`}>
-                <Link href={`${base}/${encodeURIComponent(i.slug)}${query}`} className="gm-link" scroll={false}>
+                <Link href={`${base}/${encodeURIComponent(i.slug)}${query}`} className={`gm-link${i.ja ? " has-ja" : ""}`} scroll={false}>
+                  {i.ja && (
+                    <span className="gm-ja" lang="ja" aria-hidden>
+                      {i.ja.split(/(\d+)/).map((part, k) => (/^\d+$/.test(part) ? <span key={k} className="tcy">{part}</span> : part))}
+                    </span>
+                  )}
                   <span className="gm-thumb" aria-hidden>
                     {thumbs[i.id]}
                   </span>
                   <span className="gm-body">
-                    {i.featured && <span className="gm-chosen">✦ {text.chosen}</span>}
+                    <span className="gm-eyebrow">
+                      <span className="gm-mark wm-mark">{i.mark}</span>
+                      {i.featured && <span className="gm-chosen">✦ {text.chosen}</span>}
+                    </span>
                     <span className="gm-row">
                       <span className="gm-name" lang={i.nameLang}>
                         {i.name}
                       </span>
-                      <span className="gm-leader" aria-hidden />
+                      <span className="gm-leader wm-leader" aria-hidden />
                       <span className="gm-price">{zeroOnly && !i.zero && i.zeroPrice ? i.zeroPrice : i.price}</span>
                     </span>
                     <span className="gm-desc">{i.description}</span>
                     <span className="gm-meta">
-                      {i.zero || (zeroOnly && i.zeroPrice) ? <span className="gm-badge">0%</span> : <span>{i.abv}</span>}
-                      <span>{i.kcal < 5 ? "< 5" : `≈ ${i.kcal}`} kcal</span>
+                      {i.food ? null : i.zero || (zeroOnly && i.zeroPrice) ? <span className="gm-badge">0%</span> : <span>{i.abv}</span>}
+                      {i.serving && <span>{i.serving}</span>}
+                      {i.kcalKnown && i.kcal > 0 && <span>{i.kcal < 5 ? "< 5" : `≈ ${i.kcal}`} kcal</span>}
+                      {i.kcalKnown && i.kcal === 0 && !i.food && <span>&lt; 5 kcal</span>}
+                      {i.alt && <span className="gm-alt">{i.alt}</span>}
                       {i.allergens.length > 0 && (
                         <span className="gm-allergens" aria-label={`${text.allergens}: ${i.allergens.map((a) => a.name).join(", ")}`}>
                           {i.allergens.map((a) => (
