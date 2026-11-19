@@ -29,6 +29,8 @@ export default async function VenuePage({ params, searchParams }: { params: Para
   const sections = menuView(menu, lang, world);
   const other = v.languages.find((l) => l !== lang);
   const cocktails = sections.reduce((n, s) => n + s.items.filter((i) => i.profile).length, 0);
+  // the bar offers the Atelier when its "your own cocktail" line is on the menu
+  const atelierHref = sections.some((s) => s.items.some((i) => i.atelier)) ? `/v/${v.slug}/atelier${query}` : undefined;
   const head = HEAD[world];
   // the bar's photograph when there is one, otherwise the glass, drawn here on the server
   const byId = new Map(menu.items.map((it) => [it.id, it]));
@@ -76,6 +78,7 @@ export default async function VenuePage({ params, searchParams }: { params: Para
             world={world}
             jaSections={world === "sakura" ? JA_SECTIONS : undefined}
             query={query}
+            atelierHref={atelierHref}
             text={{
               prefs: t("prefs", lang),
               zeroOnly: t("zeroOnly", lang),
@@ -90,6 +93,7 @@ export default async function VenuePage({ params, searchParams }: { params: Para
               chosen: t("chosen", lang),
               close: t("close", lang),
               without: t("without", lang),
+              design: lang === "tr" ? "Tasarlamaya başla" : "Start designing",
             }}
           />
           {legend.length > 0 && (
@@ -120,6 +124,7 @@ export default async function VenuePage({ params, searchParams }: { params: Para
       <GuestDock
         lang={lang}
         suggest={cocktails >= 3}
+        atelierHref={atelierHref}
         langHref={other ? `/v/${v.slug}?${new URLSearchParams({ ...keep, lang: other })}` : undefined}
         langLabel={other?.toUpperCase()}
       />

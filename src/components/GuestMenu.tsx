@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { itemHref, shownVersion } from "@/lib/guestChoice";
-import { useGuestPrefs } from "@/lib/guestPrefs";
+import { rememberTable, useGuestPrefs } from "@/lib/guestPrefs";
 import type { SectionView } from "@/lib/view";
 import { AllergenIcon } from "./AllergenIcon";
 
@@ -21,6 +21,7 @@ export interface GuestMenuText {
   chosen: string;
   close: string;
   without: string;
+  design: string; // "Tasarlamaya başla" on the Atelier line
 }
 
 const BIG_KEY = "garnish-venue:big";
@@ -39,6 +40,7 @@ export function GuestMenu({
   query,
   world,
   jaSections,
+  atelierHref,
 }: {
   sections: SectionView[];
   thumbs: Record<string, React.ReactNode>;
@@ -47,6 +49,8 @@ export function GuestMenu({
   query: string;
   world: string;
   jaSections?: string[];
+  /** where the "your own cocktail" line leads (the Atelier, its own page) */
+  atelierHref?: string;
 }) {
   const sakura = world === "sakura";
   // shared with "Suggest a drink" and kept for the tab: what the guest asked for applies everywhere
@@ -65,6 +69,8 @@ export function GuestMenu({
     return () => window.removeEventListener("gv:prefs", open);
   }, []);
   const nav = useRef<HTMLDivElement>(null);
+  // a table card's QR carries ?masa=N: kept for the tab, for the Atelier's card
+  useEffect(() => rememberTable(base), [base]);
 
   useEffect(() => {
     try {
@@ -90,6 +96,8 @@ export function GuestMenu({
     .map((s) => ({
       ...s,
       items: s.items.flatMap((i) => {
+        // the Atelier follows the preferences itself (its shelf), so its line always stays
+        if (i.atelier) return prefs.zero && !i.atelierZero ? [] : [{ ...i, v: { key: "original" as const, zero: prefs.zero, price: i.price, description: i.description, kcal: 0, allergens: [] } }];
         const v = shownVersion(i, prefs);
         return v ? [{ ...i, v }] : [];
       }),
@@ -183,7 +191,32 @@ export function GuestMenu({
           {s.note && <p className="gm-section-note">{s.note}</p>}
           <ol className="gm-list">
             {s.items.map((i) => (
-              <li key={i.id} className={`gm-item${i.featured ? " featured" : ""}`} data-kind={i.kind} data-version={i.v.key}>
+              <li key={i.id} className={`gm-item${i.featured ? " featured" : ""}${i.atelier ? " gm-atelier" : ""}`} data-kind={i.kind} data-version={i.v.key}>
+                {i.atelier ? (
+                  <a href={atelierHref} className="gm-link">
+                    <span className="gm-thumb" aria-hidden>
+                      {thumbs[i.id]}
+                    </span>
+                    <span className="gm-body">
+                      <span className="gm-eyebrow">
+                        <span className="gm-mark wm-mark">✦</span>
+                        <span className="gm-chosen" lang="en">Atelier</span>
+                      </span>
+                      <span className="gm-row">
+                        <span className="gm-name" lang={i.nameLang}>
+                          {i.name}
+                        </span>
+                        <span className="gm-leader wm-leader" aria-hidden />
+                        <span className="gm-price">{i.price}</span>
+                      </span>
+                      <span className="gm-desc">{i.description}</span>
+                      <span className="gm-meta gm-atelier-go">
+                        {i.v.zero && <span className="gm-badge">0%</span>}
+                        <span>{text.design} ›</span>
+                      </span>
+                    </span>
+                  </a>
+                ) : (
                 <Link href={itemHref(base, i.slug, query, i.v.key)} className={`gm-link${i.ja ? " has-ja" : ""}`} scroll={false}>
                   {i.ja && (
                     <span className="gm-ja" lang="ja" aria-hidden>
@@ -227,6 +260,7 @@ export function GuestMenu({
                     </span>
                   </span>
                 </Link>
+                )}
               </li>
             ))}
           </ol>

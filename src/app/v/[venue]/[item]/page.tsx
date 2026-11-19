@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { ItemDetail } from "@/components/ItemDetail";
 import { VenueFrame } from "@/components/VenueFrame";
 import { pick, t } from "@/lib/i18n";
+import { isAtelierLine } from "@/lib/atelier";
 import { versionParam } from "@/lib/guestChoice";
 import { loadVenue, type Search } from "@/lib/venuePage";
 import { getVenueMenu } from "@/repo";
@@ -24,6 +25,8 @@ export default async function ItemPage({ params, searchParams }: { params: Param
   const it = menu.items.find((i) => i.slug === itemSlug && i.available);
   if (!it) notFound();
   const v = menu.venue;
+  // "your own cocktail" is not a drink page: it is the Atelier
+  if (isAtelierLine(it)) redirect(`/v/${v.slug}/atelier${query}`);
   const section = menu.sections.find((s) => s.id === it.sectionId);
   return (
     <VenueFrame venue={v} world={world} lang={lang} path={`/v/${v.slug}/${it.slug}`} keep={{ ...keep, ...(versionParam((await searchParams).v) ? { v: "zero" } : {}) }}>

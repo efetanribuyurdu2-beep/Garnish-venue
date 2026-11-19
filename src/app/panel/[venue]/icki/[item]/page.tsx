@@ -456,6 +456,12 @@ export default function ItemEditor() {
                     ))}
                   </select>
                 </label>
+                {d.kind === "other" && d.details.style === "atelier" && (
+                  <p className="pn-hint" style={{ gridColumn: "1 / -1" }}>
+                    Bu satır misafiri <b>Atelier</b>'e götürür: barınızın kokteyl tariflerindeki şişelerle (artı limon, misket limonu, şeker şurubu, soda ve Angostura) kendi kokteylini tasarlar,
+                    alkolsüz versiyon sunuyorsanız alkolsüz karşılıklarıyla. Barmene gösterdiği kartta tarif, masa numarası ve bu satırın fiyatı yazar. Fiyat basılı menüde de görünür; kapatmak için satırı “bitti” yapın.
+                  </p>
+                )}
                 {d.kind === "food" && (
                   <label className="pn-field">
                     <span>Tabakta</span>

@@ -51,6 +51,8 @@ export const STYLES: Record<Exclude<ItemKind, "cocktail">, Record<string, { labe
     soft: { label: { tr: "Meşrubat / limonata", en: "Soft drink / lemonade" }, glass: "highball", color: "#ecc86a", ice: "cube", abv: 0, volume: 250 },
     water: { label: { tr: "Su / maden suyu", en: "Water / sparkling water" }, glass: "highball", color: "#e6f2f8", abv: 0, volume: 250 },
     juice: { label: { tr: "Taze meyve suyu", en: "Fresh juice" }, glass: "highball", color: "#f29a2e", opaque: true, abv: 0, volume: 250 },
+    // the line that opens the guest Atelier: an empty glass, the guest fills it (src/lib/atelier.ts)
+    atelier: { label: { tr: "Kendi kokteylin (Atelier)", en: "Your own cocktail (Atelier)" }, glass: "coupe", color: "transparent", abv: 0, volume: 0 },
   },
   food: {
     meze: { label: { tr: "Meze / tabak", en: "Small plate" }, glass: "coupe", color: "#000", abv: 0, volume: 0 },

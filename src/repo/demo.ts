@@ -13,6 +13,7 @@ import { REGISTER, libItemFields, libraryById, type LibItem } from "@/data/kitch
 import { WORLDS, worldById } from "@/data/worlds";
 import type { MenuItem, MenuSection, Photo, Venue, VenueMenu } from "@/domain/types";
 import { analyse } from "@/lib/balance";
+import { atelierLine } from "@/lib/atelier";
 import type { Cocktail, L, WorldId } from "@/lib/types";
 import { illustrativePhoto } from "@/lib/photos";
 import { HEAD } from "@/lib/worldMenu";
@@ -251,7 +252,10 @@ function demoVenue(world: WorldId): VenueMenu {
       };
     }),
   );
-  return { venue, sections, items: [...items, ...moreItems] };
+  // "your own cocktail": the guest Atelier's line, last among the signatures
+  const sig = sections[0];
+  const atelier: MenuItem = { ...atelierLine(world), id: `${id}-atelier`, venueId: id, sectionId: sig.id, available: true, position: 99 };
+  return { venue, sections, items: [...items, atelier, ...moreItems] };
 }
 
 export const DEMO_MENUS: VenueMenu[] = WORLDS.map((w) => demoVenue(w.id));
