@@ -19,7 +19,23 @@ const I = {
  * a suggestion, one's own cocktail (when the bar offers the Atelier), the
  * preferences, and the other language.
  */
-export function GuestDock({ lang, langHref, langLabel, suggest, atelierHref }: { lang: "tr" | "en"; langHref?: string; langLabel?: string; suggest: boolean; atelierHref?: string }) {
+export function GuestDock({
+  lang,
+  langHref,
+  langLabel,
+  suggest,
+  atelierHref,
+  menuHref,
+}: {
+  lang: "tr" | "en";
+  langHref?: string;
+  langLabel?: string;
+  suggest: boolean;
+  /** the Atelier, when the bar's menu offers it (a plain link: it is its own page, never a sheet over the menu) */
+  atelierHref?: string;
+  /** off the menu page (the Atelier): "Menu" goes back to it, and the preferences live there */
+  menuHref?: string;
+}) {
   const t = T[lang];
   const icon = (k: keyof typeof I) => (
     <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden>
@@ -30,10 +46,17 @@ export function GuestDock({ lang, langHref, langLabel, suggest, atelierHref }: {
   );
   return (
     <nav className="gd" aria-label={t.menu}>
-      <button onClick={() => document.querySelector(".gm")?.scrollIntoView({ behavior: "smooth", block: "start" })}>
-        {icon("menu")}
-        <span>{t.menu}</span>
-      </button>
+      {menuHref ? (
+        <Link href={menuHref}>
+          {icon("menu")}
+          <span>{t.menu}</span>
+        </Link>
+      ) : (
+        <button onClick={() => document.querySelector(".gm")?.scrollIntoView({ behavior: "smooth", block: "start" })}>
+          {icon("menu")}
+          <span>{t.menu}</span>
+        </button>
+      )}
       {suggest && (
         <button onClick={() => window.dispatchEvent(new Event("gv:recommend"))}>
           {icon("suggest")}
@@ -41,15 +64,17 @@ export function GuestDock({ lang, langHref, langLabel, suggest, atelierHref }: {
         </button>
       )}
       {atelierHref && (
-        <Link href={atelierHref}>
+        <a href={atelierHref}>
           {icon("atelier")}
           <span>{t.atelier}</span>
-        </Link>
+        </a>
       )}
-      <button onClick={() => window.dispatchEvent(new Event("gv:prefs"))}>
-        {icon("prefs")}
-        <span>{t.prefs}</span>
-      </button>
+      {!menuHref && (
+        <button onClick={() => window.dispatchEvent(new Event("gv:prefs"))}>
+          {icon("prefs")}
+          <span>{t.prefs}</span>
+        </button>
+      )}
       {langHref && (
         <Link href={langHref} replace className="gd-lang">
           <b>{langLabel}</b>

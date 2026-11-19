@@ -965,3 +965,170 @@
 /* a drink page drawn for both versions: only the chosen one shows (VersionSwitch sets data-version) */
 .gi[data-version="original"] .gi-v-zero,
 .gi[data-version="zero"] .gi-v-original { display: none; }
+
+/* ═════════════════════════════════════════════ GUEST ATELIER ("Kendi kokteylini tasarla")
+   On the world's menu paper: read the paper tokens (--wm-paper/ink/soft/rule); the bartender's card is a sheet (page tokens). */
+.at-card { --pad: clamp(18px, 5vw, 56px); padding-inline: var(--pad); }
+.at-head { margin-bottom: 22px; }
+.at-head .wm-title { font-size: clamp(1.7rem, 6.4vw, 2.8rem); }
+.at-price { display: flex; justify-content: center; align-items: baseline; gap: 10px; margin: 12px 0 0; font-size: 0.74rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--wm-soft); }
+.at-price-v { font-family: var(--font-display); font-size: 1.1rem; letter-spacing: 0; text-transform: none; color: var(--wm-rule); font-variant-numeric: tabular-nums; }
+
+.at-saved { margin: 0 0 14px; min-width: 0; }
+.at-saved .at-label { margin-bottom: 8px; }
+.at-saved-row { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; }
+.at-saved-row::-webkit-scrollbar { display: none; }
+.at-saved-chip { flex: none; display: inline-flex; align-items: center; border: 1px solid color-mix(in srgb, var(--wm-rule) 45%, transparent); border-radius: 999px; }
+.at-saved-chip button { background: none; border: 0; color: var(--wm-ink); font: inherit; font-size: 0.8rem; padding: 6px 4px 6px 12px; cursor: pointer; white-space: nowrap; }
+.at-saved-chip .at-saved-x { padding: 6px 11px 6px 4px; color: var(--wm-soft); }
+
+.at-prefs { display: grid; gap: 6px; margin: 0 0 16px; }
+.at-prefs .gm-active { margin: 0; align-items: center; }
+.at-using { font-size: 0.74rem; color: var(--wm-soft); }
+.at-hidden { margin: 0; font-size: 0.76rem; font-style: italic; color: var(--wm-soft); }
+.at-nothing { max-width: 460px; margin: 30px auto; text-align: center; font-style: italic; color: var(--wm-soft); }
+
+/* switches on the paper */
+.at .gm-switch { padding: 10px 0; border-color: color-mix(in srgb, var(--wm-rule) 28%, transparent); color: var(--wm-ink); }
+.at .gm-switch strong { color: var(--wm-rule); }
+.at .gm-switch-track { border-color: color-mix(in srgb, var(--wm-rule) 50%, transparent); background: color-mix(in srgb, var(--wm-ink) 8%, transparent); }
+.at .gm-switch-track::after { background: var(--wm-soft); }
+.at .gm-switch input:checked + .gm-switch-track { background: var(--wm-rule); border-color: var(--wm-rule); }
+.at .gm-switch input:checked + .gm-switch-track::after { background: var(--wm-paper); }
+
+.at-grid { display: grid; gap: 20px; }
+
+/* the stage: the glass and what it holds, always in view while the guest mixes */
+.at-stage {
+  position: sticky;
+  top: 0;
+  z-index: 4;
+  display: grid;
+  grid-template-columns: 84px minmax(0, 1fr);
+  align-items: center;
+  gap: 14px;
+  margin: 0 calc(16px - var(--pad));
+  padding: 10px calc(var(--pad) - 16px);
+  background: var(--wm-paper);
+  border-block: 1px solid color-mix(in srgb, var(--wm-rule) 32%, transparent);
+}
+.at-glass { display: grid; place-items: center; }
+.at-glass svg { width: 84px; height: auto; }
+.at-read { min-width: 0; display: grid; gap: 5px; }
+.at-name { margin: 0; font-family: var(--font-display); font-weight: var(--display-weight); font-size: 1.15rem; letter-spacing: var(--display-spacing); line-height: 1.15; color: var(--wm-ink); overflow-wrap: anywhere; }
+.at-facts { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 12px; margin: 0; font-size: 0.78rem; color: var(--wm-soft); font-variant-numeric: tabular-nums; }
+.at-allergens { display: inline-flex; gap: 4px; color: var(--wm-rule); }
+.at-meter { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 8px; font-size: 0.62rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--wm-soft); }
+.at-meter-track {
+  position: relative;
+  height: 5px;
+  border-radius: 3px;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--wm-rule) 60%, transparent), color-mix(in srgb, var(--wm-rule) 14%, transparent) 38% 62%, color-mix(in srgb, var(--wm-rule) 60%, transparent));
+}
+.at-meter-mid { position: absolute; left: 50%; top: -4px; bottom: -4px; width: 1px; background: var(--wm-ink); opacity: 0.45; }
+.at-meter-needle { position: absolute; top: 50%; width: 12px; height: 12px; margin: -6px 0 0 -6px; border-radius: 50%; background: var(--wm-rule); box-shadow: 0 0 0 3px var(--wm-paper); transition: left 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); }
+.at-verdict { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; margin: 0; font-family: var(--font-prose, var(--font-display)); font-style: italic; font-size: 0.88rem; color: var(--wm-ink); }
+.at-verdict.ok::before { content: "✓"; margin-right: -4px; font-style: normal; color: var(--wm-rule); }
+.at-fix { padding: 3px 10px; background: color-mix(in srgb, var(--wm-rule) 14%, transparent); color: var(--wm-ink); border: 1px solid color-mix(in srgb, var(--wm-rule) 60%, transparent); border-radius: 999px; font: inherit; font-style: normal; font-size: 0.74rem; cursor: pointer; }
+.at-fix:hover { border-color: var(--wm-rule); }
+.at-taste .rc-bar { background: color-mix(in srgb, var(--wm-ink) 14%, transparent); }
+.at-taste .rc-bar i { background: var(--wm-rule); }
+.at-taste small { color: var(--wm-soft); }
+@media (max-width: 720px) { .at-taste { display: none; } }
+
+/* the steps */
+.at-steps { min-width: 0; display: grid; gap: 24px; }
+.at-step { min-width: 0; }
+.at-label { display: flex; align-items: center; gap: 10px; margin: 0 0 12px; font-family: var(--font-body); font-weight: 500; font-size: 0.72rem; letter-spacing: 0.26em; text-transform: uppercase; color: var(--wm-rule); }
+.at-label::after { content: ""; flex: 1; height: 1px; background: currentColor; opacity: 0.35; }
+.at-label label { display: inline-flex; align-items: center; gap: 10px; cursor: pointer; }
+.at-n { display: inline-grid; place-items: center; width: 22px; height: 22px; border: 1px solid currentColor; border-radius: 50%; font-size: 0.68rem; letter-spacing: 0; }
+
+.at-frames { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+@media (max-width: 540px) { .at-frames { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.at-frame { display: grid; align-content: start; gap: 3px; padding: 10px 12px; text-align: left; background: transparent; color: var(--wm-ink); border: 1px solid color-mix(in srgb, var(--wm-rule) 32%, transparent); border-radius: calc(var(--radius) + 2px); cursor: pointer; transition: border-color 0.2s, background 0.2s; -webkit-tap-highlight-color: transparent; }
+.at-frame:hover { border-color: color-mix(in srgb, var(--wm-rule) 70%, transparent); }
+.at-frame strong { font-family: var(--font-display); font-weight: var(--display-weight); font-size: 1rem; letter-spacing: var(--display-spacing); }
+.at-frame small { font-size: 0.72rem; line-height: 1.3; color: var(--wm-soft); }
+.at-frame.on { border-color: var(--wm-rule); background: color-mix(in srgb, var(--wm-rule) 13%, transparent); box-shadow: inset 0 0 0 1px var(--wm-rule); }
+
+.at-slot { min-width: 0; margin-bottom: 14px; }
+.at-slot-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 32px; margin-bottom: 6px; }
+.at-slot-name { font-family: var(--font-display); font-size: 0.98rem; letter-spacing: var(--display-spacing); color: var(--wm-ink); }
+.at-slot-name small { font-family: var(--font-body); font-size: 0.7rem; letter-spacing: 0; text-transform: none; color: var(--wm-soft); }
+.at-stepper { flex: none; display: inline-flex; align-items: center; border: 1px solid color-mix(in srgb, var(--wm-rule) 45%, transparent); border-radius: 999px; }
+.at-stepper button { width: 36px; height: 32px; background: none; border: 0; color: var(--wm-ink); font-size: 1.1rem; line-height: 1; cursor: pointer; }
+.at-stepper button:disabled { opacity: 0.3; cursor: default; }
+.at-stepper output { min-width: 64px; text-align: center; font-size: 0.86rem; color: var(--wm-rule); font-variant-numeric: tabular-nums; }
+
+.at-bottles { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; margin: 0 -2px; padding: 2px 24px 4px 2px; -webkit-mask: linear-gradient(90deg, #000 88%, transparent); mask: linear-gradient(90deg, #000 88%, transparent); }
+.at-bottles::-webkit-scrollbar { display: none; }
+.at-bottle { flex: none; display: inline-flex; align-items: center; gap: 6px; padding: 6px 13px 6px 8px; background: transparent; color: var(--wm-ink); border: 1px solid color-mix(in srgb, var(--wm-rule) 30%, transparent); border-radius: 999px; font: inherit; font-size: 0.8rem; white-space: nowrap; cursor: pointer; transition: border-color 0.2s, background 0.2s; -webkit-tap-highlight-color: transparent; }
+.at-bottle:not(:has(svg)) { padding-left: 13px; }
+.at-bottle.at-none { color: var(--wm-soft); font-style: italic; }
+.at-bottle:hover { border-color: color-mix(in srgb, var(--wm-rule) 70%, transparent); }
+.at-bottle.on { color: var(--wm-ink); background: color-mix(in srgb, var(--wm-rule) 16%, transparent); border-color: var(--wm-rule); box-shadow: inset 0 0 0 1px var(--wm-rule); }
+.at-bm { flex: none; color: color-mix(in srgb, var(--wm-ink) 60%, transparent); }
+@media (min-width: 900px) {
+  .at-bottles { flex-wrap: wrap; overflow: visible; padding-right: 2px; -webkit-mask: none; mask: none; }
+}
+.at-foam { margin-top: 4px; }
+
+.at-name-row { display: flex; gap: 8px; }
+.at-name-row .input { flex: 1; min-width: 0; }
+.at-name-row .btn { flex: none; padding-inline: 16px; }
+.at-actions { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: 10px; }
+.at-actions .btn { justify-content: center; }
+.at-note { margin: -8px 0 0; text-align: center; font-size: 0.74rem; font-style: italic; color: var(--wm-soft); }
+
+@media (min-width: 900px) {
+  .at-grid { grid-template-columns: 290px minmax(0, 1fr); gap: 44px; align-items: start; }
+  .at-stage { top: 18px; grid-template-columns: minmax(0, 1fr); justify-items: center; gap: 12px; margin: 0; padding: 22px 20px; text-align: center; border: 1px solid color-mix(in srgb, var(--wm-rule) 32%, transparent); border-radius: calc(var(--radius) + 4px); background: color-mix(in srgb, var(--wm-paper) 92%, var(--wm-rule)); }
+  .at-glass svg { width: 150px; }
+  .at-read { justify-items: center; width: 100%; }
+  .at-name { font-size: 1.35rem; }
+  .at-facts, .at-verdict { justify-content: center; }
+  .at-meter { width: 100%; }
+}
+
+/* the Atelier line on the menu */
+.gm-atelier .gm-link { border: 1px dashed color-mix(in srgb, var(--wm-rule) 55%, transparent); }
+.gm-atelier-go { color: var(--wm-rule); letter-spacing: 0.08em; }
+
+/* the card the guest shows the bartender: large, plain, in the bar's language */
+.at-show { width: min(520px, 100%); max-width: 100%; max-height: 100dvh; margin: auto; padding: 0; border: 0; background: transparent; color: var(--ink); overflow: visible; }
+.at-show::backdrop { background: rgba(0, 0, 0, 0.74); }
+.at-show-inner {
+  max-height: 100dvh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 26px 22px calc(20px + env(safe-area-inset-bottom));
+  background: var(--surface);
+  border: 1px solid var(--accent);
+  border-radius: max(var(--radius), 8px);
+  box-shadow: 0 0 0 5px var(--surface), 0 0 0 6px color-mix(in srgb, var(--accent) 40%, transparent), 0 30px 60px -20px #000;
+  font-family: var(--font-body);
+  text-align: center;
+}
+.at-show[open] .at-show-inner { animation: atCard 0.45s cubic-bezier(0.2, 0.8, 0.2, 1); }
+@keyframes atCard { from { transform: translateY(24px) scale(0.97); opacity: 0; } }
+.at-show-guest { margin: -6px 0 14px; font-size: 0.7rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); }
+.at-show-kicker { margin: 0; font-size: 0.7rem; letter-spacing: 0.28em; text-transform: uppercase; color: var(--accent); }
+.at-show-name { margin: 8px 0 4px; font-family: var(--font-display); font-weight: var(--display-weight); font-size: clamp(1.7rem, 8vw, 2.4rem); letter-spacing: var(--display-spacing); line-height: 1.08; color: var(--ink); overflow-wrap: anywhere; }
+.at-show-frame { margin: 0 0 14px; font-size: 0.78rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); }
+.at-show-body { display: grid; grid-template-columns: 96px minmax(0, 1fr); align-items: center; gap: 16px; padding: 14px 0; text-align: left; border-block: 1px solid var(--line); }
+.at-show-body svg { width: 96px; height: auto; }
+.at-spec { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; font-size: 1.12rem; line-height: 1.25; }
+.at-spec b { display: inline-block; min-width: 76px; font-weight: 500; color: var(--accent); font-variant-numeric: tabular-nums; }
+.at-show-how { margin: 12px 0 4px; font-size: 0.95rem; }
+.at-show-facts { margin: 0 0 8px; font-size: 0.85rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.at-show-allergens { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 12px; margin: 0 0 14px; font-size: 0.85rem; }
+.at-show-a { display: inline-flex; align-items: center; gap: 4px; color: var(--accent); }
+.at-show-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-top: 12px; border-top: 1px solid var(--line); }
+.at-table { display: inline-flex; align-items: center; gap: 8px; font-size: 0.74rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); }
+.at-table .input { width: 86px; padding: 6px; text-align: center; font-size: 1.2rem; letter-spacing: 0; }
+.at-show-price { display: grid; margin: 0; text-align: right; font-size: 0.74rem; color: var(--muted); }
+.at-show-price b { font-family: var(--font-display); font-weight: var(--display-weight); font-size: 1.35rem; color: var(--accent); }
+.at-show-time { margin: 12px 0 14px; font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+.at-show-close { width: 100%; justify-content: center; }
+@media (prefers-reduced-motion: reduce) { .at-show[open] .at-show-inner { animation: none; } .at-meter-needle { transition: none; } }

@@ -10,6 +10,7 @@ import { itemFrom, itemTo, sectionFrom, venueFrom, venueTo } from "@/lib/supabas
 import type { L, WorldId } from "@/lib/types";
 import { describe, suggestedPrice, worldExtras, worldStarter } from "@/repo/demo";
 import { isZeroCocktail } from "@/lib/zero";
+import { atelierLine } from "@/lib/atelier";
 
 export type Role = "owner" | "manager" | "staff";
 export type PanelVenue = Venue & { published: boolean };
@@ -157,6 +158,8 @@ export async function seedWorldMenu(venueId: string, world: WorldId, startPositi
         position: i,
       });
     });
+    // the guest Atelier's line, last among the signatures (the bar can price it, or switch it off like any line)
+    if (sec.key === "sig" && !taken.has(atelierLine(world).slug)) rows.push(itemTo({ ...atelierLine(world), venueId, sectionId: section.id, available: true, extraAllergens: [], position: rows.length }));
     must(await db().from("menu_items").insert(rows));
     count += rows.length;
   }

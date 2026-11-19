@@ -49,3 +49,28 @@ export function useGuestPrefs(menu: string) {
   const set = useCallback((patch: Partial<GuestPrefs>) => write(menu, { ...read(menu), ...patch }), [menu]);
   return [prefs, set] as const;
 }
+
+const tableKey = (menu: string) => `garnish-venue:table:${menu}`;
+
+/** the table number from a table card's QR (`?masa=7`), remembered for the tab so the Atelier's card can show it */
+export function rememberTable(menu: string) {
+  try {
+    const n = new URLSearchParams(location.search).get("masa");
+    if (n && /^[\w-]{1,8}$/.test(n)) sessionStorage.setItem(tableKey(menu), n);
+  } catch {}
+}
+
+export function readTable(menu: string): string {
+  try {
+    return sessionStorage.getItem(tableKey(menu)) ?? "";
+  } catch {
+    return "";
+  }
+}
+
+export function writeTable(menu: string, n: string) {
+  try {
+    if (n) sessionStorage.setItem(tableKey(menu), n);
+    else sessionStorage.removeItem(tableKey(menu));
+  } catch {}
+}

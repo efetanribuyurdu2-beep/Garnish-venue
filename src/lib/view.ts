@@ -7,6 +7,7 @@ import { GARNISHES, cocktailById } from "@/data/cocktails";
 import { ingredientById } from "@/data/ingredients";
 import type { MenuItem, VenueMenu } from "@/domain/types";
 import { allergenById } from "./allergens";
+import { isAtelierLine, shelfOf } from "./atelier";
 import { factsOf, itemFacts, zeroRecipe, type Facts } from "./facts";
 import { kindOf, styleOf } from "./itemLook";
 import type { ItemKind } from "@/domain/types";
@@ -37,6 +38,10 @@ export interface ItemView {
   ja?: string; // Japanese name, for Sakura's oshinagaki
   /** the alcohol-free version, when the bar offers one: its own recipe, so its own allergens, taste and energy */
   zeroVersion?: VersionFacts;
+  /** the line that opens the guest Atelier ("your own cocktail"): its price is on the list, its drink is the guest's */
+  atelier?: boolean;
+  /** …and its shelf can pour alcohol-free (the bar has 0% versions), so it stays on an alcohol-free menu */
+  atelierZero?: boolean;
 }
 
 /** what the guest is shown of one version of a line */
@@ -69,6 +74,13 @@ const partNames = (parts: { id: string; ml: number }[], lang: Lang) =>
   parts.filter((p) => p.ml >= 5).slice(0, 4).map((p) => pick(ingredientById(p.id)?.name, lang) || p.id).join(" · ");
 
 export function itemView(it: MenuItem, currency: string, lang: Lang, world: WorldId = "maison", index = 0): ItemView {
+  if (isAtelierLine(it)) {
+    // no strength, energy or allergens of its own: those come with the drink the guest designs
+    return {
+      kind: "other", food: false, kcalKnown: false, mark: "✦", id: it.id, slug: it.slug, name: pick(it.name, lang), nameLang: nameLang(it.name),
+      description: pick(it.description, lang), price: money(it.price, currency, lang), featured: false, zero: false, abv: "", kcal: 0, allergens: [], atelier: true,
+    };
+  }
   const f = itemFacts(it);
   const hasZero = !f.simple && it.recipe && it.zeroPrice !== undefined && !f.zero;
   const zr = hasZero ? zeroRecipe(it.recipe!) : undefined;
@@ -106,6 +118,7 @@ export function itemView(it: MenuItem, currency: string, lang: Lang, world: Worl
 
 export function menuView(m: VenueMenu, lang: Lang, world: WorldId = m.venue.world): SectionView[] {
   let index = 0;
+  const atelierZero = m.items.some((i) => isAtelierLine(i)) && shelfOf(m).offersZero;
   return [...m.sections]
     .sort((a, b) => a.position - b.position)
     .map((s) => ({
@@ -116,7 +129,8 @@ export function menuView(m: VenueMenu, lang: Lang, world: WorldId = m.venue.worl
       items: m.items
         .filter((i) => i.sectionId === s.id && i.available)
         .sort((a, b) => a.position - b.position)
-        .map((i) => itemView(i, m.venue.currency, lang, world, index++)),
+        .map((i) => itemView(i, m.venue.currency, lang, world, index++))
+        .map((v) => (v.atelier ? { ...v, atelierZero } : v)),
     }))
     .filter((s) => s.items.length > 0);
 }

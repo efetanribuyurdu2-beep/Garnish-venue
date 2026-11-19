@@ -6,12 +6,14 @@ const { chromium } = require('playwright');
 const BASE = 'http://localhost:3200';
 let fails = 0;
 const ok = (c, msg) => { console.log(`${c ? 'PASS' : 'FAIL'}  ${msg}`); if (!c) fails++; };
-const CASES = [
+const ALL_CASES = [
   { lang: 'tr', bar: 'surum-testi', avoid: 'Sert kabuklu meyveler', expect: ['Sake Highball', 'Whiskey Sour'], open: 'Sake Highball', more: ['Sülfitler', 'Yumurta'], zeroTab: 'Alkolsüz', strength: 'Alkol' },
   { lang: 'en', bar: 'surum-testi', avoid: 'Sulphites', expect: ['Chartreuse Swizzle', 'Whiskey Sour'], open: 'Chartreuse Swizzle', more: ['Tree nuts', 'Egg'], zeroTab: 'Alcohol-free', strength: 'Strength' },
   { lang: 'tr', bar: 'le-grand-bar', avoid: 'Sülfitler', zeroTab: 'Alkolsüz', strength: 'Alkol' },
   { lang: 'en', bar: 'le-grand-bar', avoid: 'Sulphites', zeroTab: 'Alcohol-free', strength: 'Strength' },
 ];
+// BARS=le-grand-bar runs only the demo cases (no local Supabase)
+const CASES = ALL_CASES.filter((c) => !process.env.BARS || process.env.BARS.split(',').includes(c.bar));
 const prefsDialog = 'dialog.gm-sheet:not(.rc-sheet)';
 async function setPrefs(p, zero, avoids) {
   await p.click('.gm-prefs-btn');

@@ -8,6 +8,7 @@ import { ingredientById } from "@/data/ingredients";
 import { factsOf, itemFacts, zeroRecipe } from "@/lib/facts";
 import { brandLang, money, nameLang, percent, pick } from "@/lib/i18n";
 import { allergenById } from "@/lib/allergens";
+import { isAtelierLine } from "@/lib/atelier";
 import { qrSvg } from "@/lib/qr";
 import { HEAD } from "@/lib/worldMenu";
 import { siteOrigin } from "@/lib/siteUrl";
@@ -23,8 +24,8 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
 }
 
 const T = {
-  tr: { menu: "Menü", inside: "İçindekiler", zero: "Alkolsüz", allergens: "Alerjenler", valid: "Fiyatlar {d} tarihinden itibaren geçerlidir.", estimate: "Alkol oranı ve enerji değerleri tarifinden hesaplanmış tahminlerdir. Alerjenler hakkında personelimize danışabilirsiniz.", online: "Menünün tamamı, fotoğraflar ve alkolsüz seçenekler için okutun", none: "Bildirilmesi gereken alerjen yok" },
-  en: { menu: "Menu", inside: "Ingredients", zero: "Alcohol-free", allergens: "Allergens", valid: "Prices valid from {d}.", estimate: "Strength and energy are estimates calculated from the recipe. Please ask our staff about allergens.", online: "Scan for the full menu, photographs and alcohol-free options", none: "No declarable allergens" },
+  tr: { menu: "Menü", inside: "İçindekiler", zero: "Alkolsüz", allergens: "Alerjenler", valid: "Fiyatlar {d} tarihinden itibaren geçerlidir.", estimate: "Alkol oranı ve enerji değerleri tarifinden hesaplanmış tahminlerdir. Alerjenler hakkında personelimize danışabilirsiniz.", online: "Menünün tamamı, fotoğraflar ve alkolsüz seçenekler için okutun", none: "Bildirilmesi gereken alerjen yok", atelier: "Tarif misafirin: alkol, enerji ve alerjenler seçilen şişelere göre değişir; personelimize danışın." },
+  en: { menu: "Menu", inside: "Ingredients", zero: "Alcohol-free", allergens: "Allergens", valid: "Prices valid from {d}.", estimate: "Strength and energy are estimates calculated from the recipe. Please ask our staff about allergens.", online: "Scan for the full menu, photographs and alcohol-free options", none: "No declarable allergens", atelier: "The guest's own recipe: strength, energy and allergens depend on the bottles chosen; please ask our staff." },
 };
 
 /**
@@ -130,6 +131,11 @@ export default async function PrintedMenu({ params, searchParams }: { params: Pa
                       {inside}
                     </p>
                   )}
+                  {isAtelierLine(it) ? (
+                    <p className="pr-meta">
+                      <span>{t.atelier}</span>
+                    </p>
+                  ) : (
                   <p className="pr-meta">
                     {!food && <span>{f.zero ? "0%" : percent(f.abv, lang)}</span>}
                     {f.kcalKnown && f.kcal > 0 && <span>{f.kcal < 5 ? "< 5" : `≈ ${f.kcal}`} kcal</span>}
@@ -142,6 +148,7 @@ export default async function PrintedMenu({ params, searchParams }: { params: Pa
                       </span>
                     )}
                   </p>
+                  )}
                   {it.details?.alt && (
                     <div className="pr-row pr-zero">
                       <span>{pick(it.details.alt.label, lang)}</span>
