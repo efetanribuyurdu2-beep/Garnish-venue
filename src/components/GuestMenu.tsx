@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { itemHref, shownVersion } from "@/lib/guestChoice";
+import { useGuestPrefs } from "@/lib/guestPrefs";
 import type { SectionView } from "@/lib/view";
 import { AllergenIcon } from "./AllergenIcon";
 
@@ -47,8 +49,12 @@ export function GuestMenu({
   jaSections?: string[];
 }) {
   const sakura = world === "sakura";
-  const [zeroOnly, setZeroOnly] = useState(false);
-  const [avoid, setAvoid] = useState<string[]>([]);
+  // shared with "Suggest a drink" and kept for the tab: what the guest asked for applies everywhere
+  const [prefs, setPrefs] = useGuestPrefs(base);
+  const zeroOnly = prefs.zero;
+  const avoid = prefs.avoid;
+  const setZeroOnly = (zero: boolean) => setPrefs({ zero });
+  const setAvoid = (list: string[]) => setPrefs({ avoid: list });
   const [big, setBig] = useState(false);
   const [active, setActive] = useState(sections[0]?.id);
   const sheet = useRef<HTMLDialogElement>(null);
@@ -75,14 +81,18 @@ export function GuestMenu({
   // only the allergens that actually occur on this menu are offered
   const present = useMemo(() => {
     const m = new Map<string, { id: string; name: string }>();
-    sections.forEach((s) => s.items.forEach((i) => i.allergens.forEach((a) => m.set(a.id, a))));
+    sections.forEach((s) => s.items.forEach((i) => [...i.allergens, ...(i.zeroVersion?.allergens ?? [])].forEach((a) => m.set(a.id, a))));
     return [...m.values()];
   }, [sections]);
 
+  // each line as the version the guest is shown (original, or its alcohol-free version), or left out
   const shown = sections
     .map((s) => ({
       ...s,
-      items: s.items.filter((i) => (!zeroOnly || i.zero || i.zeroPrice) && !i.allergens.some((a) => avoid.includes(a.id))),
+      items: s.items.flatMap((i) => {
+        const v = shownVersion(i, prefs);
+        return v ? [{ ...i, v }] : [];
+      }),
     }))
     .filter((s) => s.items.length);
 
@@ -173,8 +183,8 @@ export function GuestMenu({
           {s.note && <p className="gm-section-note">{s.note}</p>}
           <ol className="gm-list">
             {s.items.map((i) => (
-              <li key={i.id} className={`gm-item${i.featured ? " featured" : ""}`}>
-                <Link href={`${base}/${encodeURIComponent(i.slug)}${query}`} className={`gm-link${i.ja ? " has-ja" : ""}`} scroll={false}>
+              <li key={i.id} className={`gm-item${i.featured ? " featured" : ""}`} data-kind={i.kind} data-version={i.v.key}>
+                <Link href={itemHref(base, i.slug, query, i.v.key)} className={`gm-link${i.ja ? " has-ja" : ""}`} scroll={false}>
                   {i.ja && (
                     <span className="gm-ja" lang="ja" aria-hidden>
                       {i.ja.split(/(\d+)/).map((part, k) => (/^\d+$/.test(part) ? <span key={k} className="tcy">{part}</span> : part))}
@@ -193,25 +203,25 @@ export function GuestMenu({
                         {i.name}
                       </span>
                       <span className="gm-leader wm-leader" aria-hidden />
-                      <span className="gm-price">{zeroOnly && !i.zero && i.zeroPrice ? i.zeroPrice : i.price}</span>
+                      <span className="gm-price">{i.v.price}</span>
                     </span>
-                    <span className="gm-desc">{i.description}</span>
+                    <span className="gm-desc">{i.v.description}</span>
                     <span className="gm-meta">
-                      {i.food ? null : i.zero || (zeroOnly && i.zeroPrice) ? <span className="gm-badge">0%</span> : <span>{i.abv}</span>}
+                      {i.food ? null : i.v.zero ? <span className="gm-badge">0%</span> : <span>{i.abv}</span>}
                       {i.serving && <span>{i.serving}</span>}
-                      {i.kcalKnown && i.kcal > 0 && <span>{i.kcal < 5 ? "< 5" : `≈ ${i.kcal}`} kcal</span>}
-                      {i.kcalKnown && i.kcal === 0 && !i.food && <span>&lt; 5 kcal</span>}
+                      {i.kcalKnown && i.v.kcal > 0 && <span>{i.v.kcal < 5 ? "< 5" : `≈ ${i.v.kcal}`} kcal</span>}
+                      {i.kcalKnown && i.v.kcal === 0 && !i.food && <span>&lt; 5 kcal</span>}
                       {i.alt && <span className="gm-alt">{i.alt}</span>}
-                      {i.allergens.length > 0 && (
-                        <span className="gm-allergens" aria-label={`${text.allergens}: ${i.allergens.map((a) => a.name).join(", ")}`}>
-                          {i.allergens.map((a) => (
+                      {i.v.allergens.length > 0 && (
+                        <span className="gm-allergens" aria-label={`${text.allergens}: ${i.v.allergens.map((a) => a.name).join(", ")}`}>
+                          {i.v.allergens.map((a) => (
                             <AllergenIcon key={a.id} id={a.id} size={big ? 20 : 16} title={a.name} />
                           ))}
                         </span>
                       )}
-                      {!i.zero && i.zeroPrice && !zeroOnly && (
+                      {i.v.key === "original" && i.zeroVersion && (
                         <span className="gm-zero-also">
-                          {text.zeroAlso} · {i.zeroPrice}
+                          {text.zeroAlso} · {i.zeroVersion.price}
                         </span>
                       )}
                     </span>

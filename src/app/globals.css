@@ -954,3 +954,14 @@
 .venue-demo-all { color: var(--accent) !important; border-bottom: 1px solid color-mix(in srgb, var(--accent) 50%, transparent); }
 .venue-home { display: inline-flex; color: var(--accent); }
 @media (min-width: 900px) { .gd { display: none; } .venue { padding-bottom: 0; } }
+
+/* ─────────────────────────────── suggest a drink: the menu preferences it follows */
+.rc-prefs { margin: 6px 0 0; font-size: 0.78rem; color: var(--accent); }
+.rc-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; color: var(--muted); }
+.rc-meta:empty { display: none; }
+.rc-none, .rc-fewer { margin: 0 0 12px; }
+.rc-none { color: var(--ink); }
+
+/* a drink page drawn for both versions: only the chosen one shows (VersionSwitch sets data-version) */
+.gi[data-version="original"] .gi-v-zero,
+.gi[data-version="zero"] .gi-v-original { display: none; }

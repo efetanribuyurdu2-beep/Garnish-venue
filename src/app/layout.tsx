@@ -15,9 +15,12 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = { themeColor: "#0b0b0b", width: "device-width", initialScale: 1 };
 
-// every display font carries latin-ext (ğ ş ı İ)
-const FONTS =
-  "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Jost:wght@300;400;500&family=Bodoni+Moda:ital,wght@0,400;0,500;0,600;1,400&family=Aref+Ruqaa:wght@400;700&family=Syncopate:wght@400;700&family=Exo+2:wght@300;400;600&family=Limelight&family=Poiret+One&family=Forum&family=Josefin+Sans:wght@300;400;600&family=Zen+Antique&family=Shippori+Mincho:wght@400;600&family=Zen+Kaku+Gothic+New:wght@300;400;500&family=Grenze+Gotisch:wght@400;500;600&family=Kavoon&family=Karla:wght@300;400;600&family=Ruslan+Display&family=Aboreto&family=Lora:ital,wght@0,400;0,500;1,400&display=swap";
+// the theme stylesheet's address carries a hash of its content, so browsers keep it until it changes
+const THEME = (() => {
+  let h = 2166136261;
+  for (const ch of themeCSS()) h = Math.imul(h ^ ch.charCodeAt(0), 16777619);
+  return `/theme.css?v=${(h >>> 0).toString(36)}`;
+})();
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -25,8 +28,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
-        <link rel="stylesheet" href={FONTS} />
-        <style dangerouslySetInnerHTML={{ __html: themeCSS() }} />
+        <link rel="stylesheet" href={THEME} />
       </head>
       <body>{children}</body>
     </html>

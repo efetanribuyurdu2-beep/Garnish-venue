@@ -48,7 +48,8 @@ export default async function VenuePage({ params, searchParams }: { params: Para
       }),
     ),
   );
-  const legend = [...new Map(sections.flatMap((s) => s.items.flatMap((i) => i.allergens.map((a) => [a.id, a] as const)))).values()];
+  // the key covers both versions of each drink: with "alcohol-free only" the menu shows the 0% recipe's allergens
+  const legend = [...new Map(sections.flatMap((s) => s.items.flatMap((i) => [...i.allergens, ...(i.zeroVersion?.allergens ?? [])].map((a) => [a.id, a] as const)))).values()];
   return (
     <VenueFrame venue={v} world={world} lang={lang} path={`/v/${v.slug}`} keep={keep} demo={demoNeighbours(slug)} illustrative={menu.items.some((i) => i.photo?.illustrative)}>
       <div className={`wmenu wmenu-${world}`}>
